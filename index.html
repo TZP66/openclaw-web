@@ -127,7 +127,6 @@ const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"e
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 const canvas = document.getElementById('canvas');
-let serviceWorkerReloadPending = false;
 
 function focusCanvas() {
 	if (canvas && typeof canvas.focus === 'function') {
@@ -155,46 +154,21 @@ if (canvas) {
 	canvas.addEventListener('mousedown', focusCanvas);
 }
 
-function requestServiceWorkerRefresh() {
+function scheduleServiceWorkerUpdateCheck() {
 	if (!GODOT_CONFIG.serviceWorker || !('serviceWorker' in navigator)) {
 		return;
 	}
 
-	const triggerUpdate = (registration) => {
-		if (!registration) {
-			return;
-		}
-		registration.update().catch(() => {});
-		if (registration.waiting) {
-			serviceWorkerReloadPending = true;
-			registration.waiting.postMessage('update');
-		}
-		registration.addEventListener('updatefound', () => {
-			const installing = registration.installing;
-			if (!installing) {
-				return;
+	window.setTimeout(() => {
+		navigator.serviceWorker.getRegistration().then((registration) => {
+			if (registration) {
+				registration.update().catch(() => {});
 			}
-			installing.addEventListener('statechange', () => {
-				if (installing.state === 'installed' && navigator.serviceWorker.controller && registration.waiting) {
-					serviceWorkerReloadPending = true;
-					registration.waiting.postMessage('update');
-				}
-			});
-		});
-	};
-
-	navigator.serviceWorker.addEventListener('controllerchange', () => {
-		if (!serviceWorkerReloadPending) {
-			return;
-		}
-		serviceWorkerReloadPending = false;
-		window.location.reload();
-	});
-
-	navigator.serviceWorker.getRegistration().then(triggerUpdate).catch(() => {});
+		}).catch(() => {});
+	}, 4000);
 }
 
-requestServiceWorkerRefresh();
+scheduleServiceWorkerUpdateCheck();
 
 (function () {
 	const statusOverlay = document.getElementById('status');
