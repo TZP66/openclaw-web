@@ -4,9 +4,9 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '20260405-exp-bar-1';
+const CACHE_VERSION = '1775388613|4709866';
 /** @type {string} */
-const CACHE_PREFIX = 'openclaw-web-sw-cache-';
+const CACHE_PREFIX = '钢翼秘术旅团-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 /** @type {string} */
 const OFFLINE_URL = 'index.offline.html';
@@ -163,3 +163,4 @@ self.addEventListener('message', (event) => {
 		}
 	});
 });
+
