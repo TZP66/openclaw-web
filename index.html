@@ -141,8 +141,20 @@ function consumeTouchEvent(event) {
 	focusCanvas();
 }
 
-['touchstart', 'touchmove', 'touchend', 'touchcancel', 'pointerdown', 'pointermove', 'pointerup'].forEach((eventName) => {
+['touchstart', 'touchmove', 'touchend', 'touchcancel'].forEach((eventName) => {
 	canvas.addEventListener(eventName, consumeTouchEvent, { passive: false });
+});
+
+['pointerdown', 'pointermove', 'pointerup', 'pointercancel'].forEach((eventName) => {
+	canvas.addEventListener(eventName, (event) => {
+		if (event.pointerType && event.pointerType !== 'mouse') {
+			consumeTouchEvent(event);
+		}
+	}, { passive: false });
+});
+
+canvas.addEventListener('mousedown', () => {
+	focusCanvas();
 });
 
 (function () {
