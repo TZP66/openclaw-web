@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
@@ -9,8 +9,6 @@ html, body, #canvas {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	width: 100%;
-	height: 100%;
 }
 
 body {
@@ -18,19 +16,10 @@ body {
 	background-color: black;
 	overflow: hidden;
 	touch-action: none;
-	overscroll-behavior: none;
-	position: fixed;
-	inset: 0;
-	-webkit-user-select: none;
-	user-select: none;
-	-webkit-touch-callout: none;
 }
 
 #canvas {
 	display: block;
-	width: 100%;
-	height: 100%;
-	touch-action: none;
 }
 
 #canvas:focus {
@@ -123,52 +112,9 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":706436,"index.wasm":37685705},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":712884,"index.wasm":37685705},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
-const canvas = document.getElementById('canvas');
-
-function focusCanvas() {
-	if (canvas && typeof canvas.focus === 'function') {
-		canvas.focus();
-	}
-}
-
-function consumeTouchEvent(event) {
-	event.preventDefault();
-	focusCanvas();
-}
-
-if (canvas) {
-	canvas.tabIndex = 0;
-	['touchstart', 'touchmove', 'touchend', 'touchcancel'].forEach((eventName) => {
-		canvas.addEventListener(eventName, consumeTouchEvent, { passive: false });
-	});
-	['pointerdown', 'pointermove', 'pointerup', 'pointercancel'].forEach((eventName) => {
-		canvas.addEventListener(eventName, (event) => {
-			if (event.pointerType !== 'mouse') {
-				consumeTouchEvent(event);
-			}
-		}, { passive: false });
-	});
-	canvas.addEventListener('mousedown', focusCanvas);
-}
-
-function scheduleServiceWorkerUpdateCheck() {
-	if (!GODOT_CONFIG.serviceWorker || !('serviceWorker' in navigator)) {
-		return;
-	}
-
-	window.setTimeout(() => {
-		navigator.serviceWorker.getRegistration().then((registration) => {
-			if (registration) {
-				registration.update().catch(() => {});
-			}
-		}).catch(() => {});
-	}, 4000);
-}
-
-scheduleServiceWorkerUpdateCheck();
 
 (function () {
 	const statusOverlay = document.getElementById('status');
@@ -265,7 +211,6 @@ scheduleServiceWorkerUpdateCheck();
 				}
 			},
 		}).then(() => {
-			focusCanvas();
 			setStatusMode('hidden');
 		}, displayFailureNotice);
 	}
@@ -273,3 +218,4 @@ scheduleServiceWorkerUpdateCheck();
 		</script>
 	</body>
 </html>
+
