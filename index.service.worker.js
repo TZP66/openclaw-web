@@ -4,10 +4,16 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '20260405-step-slash-1';
+const CACHE_VERSION = '20260405-mobile-character-fix-1';
 /** @type {string} */
 const CACHE_PREFIX = 'openclaw-web-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
+/** @type {string[]} */
+const LEGACY_CACHE_PREFIXES = [
+	CACHE_PREFIX,
+	'钢翼秘术旅团-sw-cache-',
+	'閽㈢考绉樻湳鏃呭洟-sw-cache-',
+];
 /** @type {string} */
 const OFFLINE_URL = 'index.offline.html';
 /** @type {boolean} */
@@ -29,7 +35,9 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
 	event.waitUntil(caches.keys().then(
 		function (keys) {
-			return Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map((key) => caches.delete(key)));
+			return Promise.all(
+				keys.filter((key) => LEGACY_CACHE_PREFIXES.some((prefix) => key.startsWith(prefix)) && key !== CACHE_NAME).map((key) => caches.delete(key))
+			);
 		}
 	).then(function () {
 		return ('navigationPreload' in self.registration) ? self.registration.navigationPreload.enable() : Promise.resolve();
