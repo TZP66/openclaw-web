@@ -126,6 +126,7 @@ const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"e
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 const canvas = document.getElementById('canvas');
+let reloadingForNewWorker = false;
 
 function focusCanvas() {
 	if (canvas && typeof canvas.focus === 'function') {
@@ -153,6 +154,22 @@ if (canvas) {
 	canvas.addEventListener('mousedown', focusCanvas);
 }
 
+if ('serviceWorker' in navigator) {
+	navigator.serviceWorker.addEventListener('controllerchange', () => {
+		if (reloadingForNewWorker) {
+			return;
+		}
+		reloadingForNewWorker = true;
+		window.location.reload();
+	});
+}
+
+function activateWaitingServiceWorker(registration) {
+	if (registration && registration.waiting) {
+		registration.waiting.postMessage('update');
+	}
+}
+
 function scheduleServiceWorkerUpdateCheck() {
 	if (!GODOT_CONFIG.serviceWorker || !('serviceWorker' in navigator)) {
 		return;
@@ -161,10 +178,24 @@ function scheduleServiceWorkerUpdateCheck() {
 	window.setTimeout(() => {
 		navigator.serviceWorker.getRegistration().then((registration) => {
 			if (registration) {
-				registration.update().catch(() => {});
+				activateWaitingServiceWorker(registration);
+				registration.addEventListener('updatefound', () => {
+					const worker = registration.installing;
+					if (!worker) {
+						return;
+					}
+					worker.addEventListener('statechange', () => {
+						if (worker.state === 'installed') {
+							activateWaitingServiceWorker(registration);
+						}
+					});
+				});
+				registration.update().then(() => {
+					activateWaitingServiceWorker(registration);
+				}).catch(() => {});
 			}
 		}).catch(() => {});
-	}, 4000);
+	}, 1500);
 }
 
 scheduleServiceWorkerUpdateCheck();
