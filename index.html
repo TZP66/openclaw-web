@@ -9,8 +9,6 @@ html, body, #canvas {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	width: 100%;
-	height: 100%;
 }
 
 body {
@@ -18,19 +16,10 @@ body {
 	background-color: black;
 	overflow: hidden;
 	touch-action: none;
-	overscroll-behavior: none;
-	position: fixed;
-	inset: 0;
-	-webkit-user-select: none;
-	user-select: none;
-	-webkit-touch-callout: none;
 }
 
 #canvas {
 	display: block;
-	width: 100%;
-	height: 100%;
-	touch-action: none;
 }
 
 #canvas:focus {
@@ -122,27 +111,9 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":13871656,"index.wasm":37685705},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":13872376,"index.wasm":37685705},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
-const canvas = document.getElementById('canvas');
-
-function focusCanvas() {
-	if (document.activeElement !== canvas) {
-		canvas.focus({ preventScroll: true });
-	}
-}
-
-function consumeTouchEvent(event) {
-	if (event.cancelable) {
-		event.preventDefault();
-	}
-	focusCanvas();
-}
-
-['touchstart', 'touchmove', 'touchend', 'touchcancel', 'pointerdown', 'pointermove', 'pointerup'].forEach((eventName) => {
-	canvas.addEventListener(eventName, consumeTouchEvent, { passive: false });
-});
 
 (function () {
 	const statusOverlay = document.getElementById('status');
@@ -239,7 +210,6 @@ function consumeTouchEvent(event) {
 				}
 			},
 		}).then(() => {
-			focusCanvas();
 			setStatusMode('hidden');
 		}, displayFailureNotice);
 	}
@@ -247,3 +217,4 @@ function consumeTouchEvent(event) {
 		</script>
 	</body>
 </html>
+
