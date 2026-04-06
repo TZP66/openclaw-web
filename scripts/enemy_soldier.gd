@@ -6,6 +6,7 @@ const SVG_MODEL_LIBRARY := preload("res://scripts/svg_model_library.gd")
 signal defeated(enemy, experience_value)
 signal special_attack(position, radius, primary_color, secondary_color)
 signal summon_requested(position, summon_type, count, radius)
+signal boss_phase_changed(enemy, phase_index)
 
 var target: Player = null
 var active: bool = true
@@ -31,6 +32,8 @@ var _dash_velocity: Vector2 = Vector2.ZERO
 var _orbit_direction: float = 1.0
 var _summon_type: String = "seer"
 var _special_cycle: int = 0
+var _boss_phase_index: int = 0
+var _boss_phase_thresholds := [0.70, 0.40, 0.15]
 var _shape_node: CollisionShape2D
 var _sprite: Sprite2D
 var _model_offset: Vector2 = Vector2.ZERO
@@ -58,6 +61,7 @@ func configure(type_name: String, wave_rank: int, is_elite: bool, player_target:
 	_orbit_direction = 1.0 if randf() < 0.5 else -1.0
 	_summon_type = String(options.get("summon_type", "seer"))
 	_special_cycle = randi() % 3
+	_boss_phase_index = 0
 	shield = 0
 	max_shield = 0
 
@@ -196,6 +200,7 @@ func take_damage(amount: int, impulse: Vector2 = Vector2.ZERO) -> void:
 		health = max(0, health - amount)
 	_flash_timer = 0.14
 	_apply_impulse_internal(impulse)
+	_check_boss_phase_transition()
 	_update_visual_state()
 	queue_redraw()
 
@@ -241,6 +246,10 @@ func is_boss() -> bool:
 	return boss
 
 
+func get_boss_phase_index() -> int:
+	return _boss_phase_index
+
+
 func _process_special_behavior(to_player: Vector2, direction: Vector2) -> void:
 	if _special_timer > 0.0:
 		return
@@ -265,50 +274,80 @@ func _process_special_behavior(to_player: Vector2, direction: Vector2) -> void:
 
 
 func _use_storm_archon_skill(direction: Vector2) -> void:
+	var phase_bonus := float(_boss_phase_index)
 	var cycle := _special_cycle % 3
 	if cycle == 0:
-		_dash_velocity = direction * speed * 4.6
-		_dash_time = 0.66
+		var blast_radius := 92.0 + phase_bonus * 10.0
+		_dash_velocity = direction * speed * (4.6 + phase_bonus * 0.45)
+		_dash_time = 0.66 + phase_bonus * 0.04
 		_orbit_direction *= -1.0
-		special_attack.emit(global_position, 92.0, Color(0.84, 0.94, 1.0), Color(0.28, 0.70, 1.0))
-		if _player_in_radius(global_position, 92.0):
-			target.take_damage(2)
-		_special_timer = 4.2
+		special_attack.emit(global_position, blast_radius, Color(0.84, 0.94, 1.0), Color(0.28, 0.70, 1.0))
+		var flank_positions: Array[Vector2] = []
+		if _boss_phase_index >= 2:
+			var flank_offset := direction.orthogonal() * (112.0 + phase_bonus * 10.0)
+			flank_positions = [
+				target.global_position + flank_offset,
+				target.global_position - flank_offset,
+			]
+			for blast_position in flank_positions:
+				special_attack.emit(blast_position, 52.0 + phase_bonus * 4.0, Color(0.82, 0.92, 1.0), Color(0.20, 0.54, 0.98))
+		if _player_in_radius(global_position, blast_radius) or _player_in_any_radius(flank_positions, 52.0 + phase_bonus * 4.0):
+			target.take_damage(2 + int(_boss_phase_index >= 2))
+		_special_timer = maxf(2.9, 4.2 - phase_bonus * 0.30)
 	elif cycle == 1:
+		var cross_distance := 96.0 + phase_bonus * 12.0
 		var cross_positions: Array[Vector2] = [
 			target.global_position,
-			target.global_position + Vector2(96.0, 0.0),
-			target.global_position + Vector2(-96.0, 0.0),
-			target.global_position + Vector2(0.0, 96.0),
-			target.global_position + Vector2(0.0, -96.0),
+			target.global_position + Vector2(cross_distance, 0.0),
+			target.global_position + Vector2(-cross_distance, 0.0),
+			target.global_position + Vector2(0.0, cross_distance),
+			target.global_position + Vector2(0.0, -cross_distance),
 		]
+		if _boss_phase_index >= 1:
+			var diagonal := cross_distance * 0.72
+			cross_positions.append_array([
+				target.global_position + Vector2(diagonal, diagonal),
+				target.global_position + Vector2(diagonal, -diagonal),
+				target.global_position + Vector2(-diagonal, diagonal),
+				target.global_position + Vector2(-diagonal, -diagonal),
+			])
 		for blast_position in cross_positions:
-			special_attack.emit(blast_position, 64.0, Color(0.88, 0.96, 1.0), Color(0.34, 0.62, 1.0))
-		if _player_in_any_radius(cross_positions, 64.0):
-			target.take_damage(2)
-		_special_timer = 4.9
+			special_attack.emit(blast_position, 64.0 + phase_bonus * 4.0, Color(0.88, 0.96, 1.0), Color(0.34, 0.62, 1.0))
+		if _player_in_any_radius(cross_positions, 64.0 + phase_bonus * 4.0):
+			target.take_damage(2 + int(_boss_phase_index >= 2))
+		_special_timer = maxf(3.2, 4.9 - phase_bonus * 0.34)
 	else:
 		var ring_positions: Array[Vector2] = []
-		for index in range(6):
-			var angle := TAU * float(index) / 6.0 + _phase * 0.18
-			ring_positions.append(global_position + Vector2.RIGHT.rotated(angle) * 148.0)
+		var ring_count := 6 + _boss_phase_index * 2
+		var ring_radius := 148.0 + phase_bonus * 12.0
+		for index in range(ring_count):
+			var angle := TAU * float(index) / float(ring_count) + _phase * 0.18
+			ring_positions.append(global_position + Vector2.RIGHT.rotated(angle) * ring_radius)
 		for blast_position in ring_positions:
-			special_attack.emit(blast_position, 58.0, Color(0.68, 0.88, 1.0), Color(0.20, 0.54, 0.98))
-		special_attack.emit(global_position, 74.0, Color(0.88, 0.96, 1.0), Color(0.28, 0.70, 1.0))
-		if _player_in_any_radius(ring_positions, 58.0) or _player_in_radius(global_position, 74.0):
-			target.take_damage(1)
-		_special_timer = 5.3
+			special_attack.emit(blast_position, 58.0 + phase_bonus * 4.0, Color(0.68, 0.88, 1.0), Color(0.20, 0.54, 0.98))
+		var center_radius := 74.0 + phase_bonus * 8.0
+		special_attack.emit(global_position, center_radius, Color(0.88, 0.96, 1.0), Color(0.28, 0.70, 1.0))
+		if _player_in_any_radius(ring_positions, 58.0 + phase_bonus * 4.0) or _player_in_radius(global_position, center_radius):
+			target.take_damage(1 + int(_boss_phase_index >= 1))
+		_special_timer = maxf(3.4, 5.3 - phase_bonus * 0.38)
 	_special_cycle += 1
 
 
 func _use_forge_tyrant_skill(direction: Vector2) -> void:
+	var phase_bonus := float(_boss_phase_index)
 	var cycle := _special_cycle % 3
 	if cycle == 0:
-		var shockwave_radius := 146.0
+		var shockwave_radius := 146.0 + phase_bonus * 14.0
 		special_attack.emit(global_position, shockwave_radius, Color(1.0, 0.76, 0.42), Color(0.92, 0.32, 0.18))
-		if _player_in_radius(global_position, shockwave_radius):
-			target.take_damage(2)
-		_special_timer = 4.6
+		var side_bursts: Array[Vector2] = []
+		if _boss_phase_index >= 1:
+			var side_offset := direction.orthogonal() * (108.0 + phase_bonus * 10.0)
+			side_bursts = [global_position + side_offset, global_position - side_offset]
+			for blast_position in side_bursts:
+				special_attack.emit(blast_position, 52.0 + phase_bonus * 4.0, Color(1.0, 0.84, 0.52), Color(0.84, 0.24, 0.12))
+		if _player_in_radius(global_position, shockwave_radius) or _player_in_any_radius(side_bursts, 52.0 + phase_bonus * 4.0):
+			target.take_damage(2 + int(_boss_phase_index >= 2))
+		_special_timer = maxf(3.2, 4.6 - phase_bonus * 0.30)
 	elif cycle == 1:
 		var orthogonal := direction.orthogonal()
 		var artillery_positions: Array[Vector2] = [
@@ -317,54 +356,74 @@ func _use_forge_tyrant_skill(direction: Vector2) -> void:
 			target.global_position - orthogonal * 96.0,
 			target.global_position,
 		]
+		if _boss_phase_index >= 1:
+			artillery_positions.append(target.global_position + direction * (136.0 + phase_bonus * 12.0))
+			artillery_positions.append(target.global_position - direction * 84.0)
+		if _boss_phase_index >= 2:
+			artillery_positions.append(global_position + orthogonal * 152.0)
+			artillery_positions.append(global_position - orthogonal * 152.0)
 		for blast_position in artillery_positions:
-			special_attack.emit(blast_position, 56.0, Color(1.0, 0.82, 0.46), Color(0.92, 0.30, 0.16))
-		if _player_in_any_radius(artillery_positions, 56.0):
-			target.take_damage(2)
-		_special_timer = 5.2
+			special_attack.emit(blast_position, 56.0 + phase_bonus * 4.0, Color(1.0, 0.82, 0.46), Color(0.92, 0.30, 0.16))
+		if _player_in_any_radius(artillery_positions, 56.0 + phase_bonus * 4.0):
+			target.take_damage(2 + int(_boss_phase_index >= 2))
+		_special_timer = maxf(3.5, 5.2 - phase_bonus * 0.34)
 	else:
-		_dash_velocity = direction * speed * 3.2
-		_dash_time = 0.58
+		_dash_velocity = direction * speed * (3.2 + phase_bonus * 0.30)
+		_dash_time = 0.58 + phase_bonus * 0.05
 		var rush_positions: Array[Vector2] = []
-		for index in range(1, 4):
-			rush_positions.append(global_position + direction * (66.0 + float(index) * 54.0))
+		for index in range(1, 4 + _boss_phase_index):
+			rush_positions.append(global_position + direction * (66.0 + float(index) * (54.0 + phase_bonus * 4.0)))
 		for blast_position in rush_positions:
-			special_attack.emit(blast_position, 52.0, Color(1.0, 0.70, 0.32), Color(0.74, 0.18, 0.10))
-		if _player_in_any_radius(rush_positions, 52.0):
-			target.take_damage(1)
-		_special_timer = 5.5
+			special_attack.emit(blast_position, 52.0 + phase_bonus * 4.0, Color(1.0, 0.70, 0.32), Color(0.74, 0.18, 0.10))
+		if _boss_phase_index >= 2:
+			special_attack.emit(global_position, 88.0, Color(1.0, 0.82, 0.48), Color(0.86, 0.24, 0.12))
+		if _player_in_any_radius(rush_positions, 52.0 + phase_bonus * 4.0) or (_boss_phase_index >= 2 and _player_in_radius(global_position, 88.0)):
+			target.take_damage(1 + int(_boss_phase_index >= 1))
+		_special_timer = maxf(3.6, 5.5 - phase_bonus * 0.38)
 	_special_cycle += 1
 
 
 func _use_void_matriarch_skill(_direction: Vector2) -> void:
+	var phase_bonus := float(_boss_phase_index)
 	var cycle := _special_cycle % 3
 	if cycle == 0:
-		special_attack.emit(global_position, 118.0, Color(0.72, 0.66, 1.0), Color(0.24, 0.16, 0.40))
-		summon_requested.emit(global_position, _summon_type, 3, 196.0)
-		if _player_in_radius(global_position, 118.0):
-			target.take_damage(2)
-		_special_timer = 5.4
+		var brood_radius := 118.0 + phase_bonus * 12.0
+		special_attack.emit(global_position, brood_radius, Color(0.72, 0.66, 1.0), Color(0.24, 0.16, 0.40))
+		if _boss_phase_index >= 2:
+			for index in range(4):
+				var angle := TAU * float(index) / 4.0 + _phase * 0.10
+				special_attack.emit(global_position + Vector2.RIGHT.rotated(angle) * 104.0, 42.0 + phase_bonus * 4.0, Color(0.78, 0.70, 1.0), Color(0.30, 0.18, 0.42))
+		summon_requested.emit(global_position, _summon_type, 3 + _boss_phase_index, 196.0 + phase_bonus * 12.0)
+		if _player_in_radius(global_position, brood_radius):
+			target.take_damage(2 + int(_boss_phase_index >= 2))
+		_special_timer = maxf(3.8, 5.4 - phase_bonus * 0.30)
 	elif cycle == 1:
 		var bloom_positions: Array[Vector2] = []
-		for index in range(3):
-			var angle := TAU * float(index) / 3.0 + 0.35
-			bloom_positions.append(target.global_position + Vector2.RIGHT.rotated(angle) * 112.0)
+		var bloom_count := 3 + _boss_phase_index
+		var bloom_distance := 112.0 + phase_bonus * 8.0
+		for index in range(bloom_count):
+			var angle := TAU * float(index) / float(bloom_count) + 0.35
+			bloom_positions.append(target.global_position + Vector2.RIGHT.rotated(angle) * bloom_distance)
 		for blast_position in bloom_positions:
-			special_attack.emit(blast_position, 66.0, Color(0.80, 0.72, 1.0), Color(0.28, 0.16, 0.40))
-		if _player_in_any_radius(bloom_positions, 66.0):
-			target.take_damage(1)
-		_special_timer = 5.7
+			special_attack.emit(blast_position, 66.0 + phase_bonus * 4.0, Color(0.80, 0.72, 1.0), Color(0.28, 0.16, 0.40))
+		if _boss_phase_index >= 1:
+			special_attack.emit(target.global_position, 48.0 + phase_bonus * 4.0, Color(0.84, 0.76, 1.0), Color(0.28, 0.16, 0.40))
+		if _player_in_any_radius(bloom_positions, 66.0 + phase_bonus * 4.0) or (_boss_phase_index >= 1 and _player_in_radius(target.global_position, 48.0 + phase_bonus * 4.0)):
+			target.take_damage(1 + int(_boss_phase_index >= 2))
+		_special_timer = maxf(4.0, 5.7 - phase_bonus * 0.34)
 	else:
 		var brood_ring: Array[Vector2] = []
-		for index in range(5):
-			var angle := TAU * float(index) / 5.0 + _phase * 0.12
-			brood_ring.append(global_position + Vector2.RIGHT.rotated(angle) * 154.0)
+		var brood_count := 5 + _boss_phase_index * 2
+		var brood_radius := 154.0 + phase_bonus * 14.0
+		for index in range(brood_count):
+			var angle := TAU * float(index) / float(brood_count) + _phase * 0.12
+			brood_ring.append(global_position + Vector2.RIGHT.rotated(angle) * brood_radius)
 		for blast_position in brood_ring:
-			special_attack.emit(blast_position, 60.0, Color(0.68, 0.60, 1.0), Color(0.18, 0.12, 0.32))
-		summon_requested.emit(global_position, _summon_type, 1, 170.0)
-		if _player_in_any_radius(brood_ring, 60.0):
-			target.take_damage(1)
-		_special_timer = 6.0
+			special_attack.emit(blast_position, 60.0 + phase_bonus * 4.0, Color(0.68, 0.60, 1.0), Color(0.18, 0.12, 0.32))
+		summon_requested.emit(global_position, _summon_type, 1 + int(_boss_phase_index >= 1), 170.0 + phase_bonus * 12.0)
+		if _player_in_any_radius(brood_ring, 60.0 + phase_bonus * 4.0):
+			target.take_damage(1 + int(_boss_phase_index >= 1))
+		_special_timer = maxf(4.2, 6.0 - phase_bonus * 0.38)
 	_special_cycle += 1
 
 
@@ -385,6 +444,7 @@ func _build_desired_velocity(to_player: Vector2, direction: Vector2) -> Vector2:
 	if _dash_time > 0.0:
 		return _dash_velocity
 
+	var boss_phase_speed_bonus := 1.0 + float(_boss_phase_index) * 0.06
 	match archetype:
 		"lancer":
 			if to_player.length() < 110.0:
@@ -400,12 +460,12 @@ func _build_desired_velocity(to_player: Vector2, direction: Vector2) -> Vector2:
 			var pull_speed := speed * (0.68 if to_player.length() < 120.0 else 1.0)
 			return direction * pull_speed + direction.orthogonal() * sin(_phase * 0.75) * 18.0
 		"storm_archon":
-			return direction * speed * 0.74 + direction.orthogonal() * _orbit_direction * 94.0
+			return direction * speed * 0.74 * boss_phase_speed_bonus + direction.orthogonal() * _orbit_direction * (94.0 + float(_boss_phase_index) * 10.0)
 		"forge_tyrant":
-			return direction * speed * 0.86 + direction.orthogonal() * cos(_phase * 0.85) * 18.0
+			return direction * speed * (0.86 + float(_boss_phase_index) * 0.04) + direction.orthogonal() * cos(_phase * 0.85) * (18.0 + float(_boss_phase_index) * 4.0)
 		"void_matriarch":
-			var orbit_velocity := direction.orthogonal() * _orbit_direction * 92.0
-			var pull := direction * 54.0
+			var orbit_velocity := direction.orthogonal() * _orbit_direction * (92.0 + float(_boss_phase_index) * 8.0)
+			var pull := direction * (54.0 + float(_boss_phase_index) * 8.0)
 			if to_player.length() < 180.0:
 				pull *= -0.35
 			return orbit_velocity + pull
@@ -424,6 +484,7 @@ func _draw() -> void:
 			var angle := _phase * 0.6 + TAU * float(index) / 3.0
 			var orb_position := Vector2.RIGHT.rotated(angle) * (_body_radius + 10.0)
 			draw_circle(orb_position, 4.0, Color(accent_color.r, accent_color.g, accent_color.b, 0.82))
+		_draw_boss_phase_pips(accent_color)
 	elif elite:
 		draw_arc(Vector2.ZERO, _body_radius + 8.0, 0.0, TAU, 42, Color(accent_color.r, accent_color.g, accent_color.b, 0.46), 2.4)
 
@@ -442,6 +503,39 @@ func _draw_health_bar(fill_color: Color) -> void:
 		draw_rect(Rect2(-bar_width * 0.5, shield_y, bar_width, 3.0), Color(0.08, 0.14, 0.22, 0.72))
 		draw_rect(Rect2(-bar_width * 0.5, shield_y, bar_width * shield_ratio, 3.0), Color(0.42, 0.76, 1.0, 0.94))
 	draw_rect(Rect2(-bar_width * 0.5, bar_y, bar_width * health_ratio, 5.0 if boss else 4.0), fill_color)
+
+
+func _draw_boss_phase_pips(fill_color: Color) -> void:
+	var pip_count := _boss_phase_thresholds.size()
+	if pip_count <= 0:
+		return
+	var spacing := 14.0
+	var start_x := -spacing * float(pip_count - 1) * 0.5
+	var y := -_body_radius - 32.0
+	for index in range(pip_count):
+		var active_pip := index < _boss_phase_index
+		var pip_color := fill_color if active_pip else Color(0.14, 0.16, 0.20, 0.88)
+		draw_circle(Vector2(start_x + float(index) * spacing, y), 3.4, pip_color)
+
+
+func _check_boss_phase_transition() -> void:
+	if not boss or health <= 0:
+		return
+
+	var vitality_ratio := _get_effective_vitality_ratio()
+	while _boss_phase_index < _boss_phase_thresholds.size() and vitality_ratio <= float(_boss_phase_thresholds[_boss_phase_index]):
+		_boss_phase_index += 1
+		_special_timer = minf(_special_timer, 0.45)
+		_dash_time = 0.0
+		_dash_velocity = Vector2.ZERO
+		queue_redraw()
+		boss_phase_changed.emit(self, _boss_phase_index)
+
+
+func _get_effective_vitality_ratio() -> float:
+	var total_max := float(max(max_health + max_shield, 1))
+	var total_current := float(max(health + shield, 0))
+	return total_current / total_max
 
 
 func _ensure_collision_shape() -> void:

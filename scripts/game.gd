@@ -98,6 +98,116 @@ const UPGRADE_LIMITS := {
 	"magnet": 4,
 	"mastery": 4,
 }
+const CHARACTER_BUILD_PATHS := {
+	"blade": [
+		{
+			"id": "blade_flame_wave",
+			"name": "焰浪刀潮",
+			"summary": "半圆挥击接火焰刀波推进，靠分裂与残月形成双波压线。",
+			"focus": "优先补钢刃斩、残月斩和焰刃分裂。",
+			"weights": {
+				"slash": 3,
+				"mooncut": 2,
+				"mut_flame_split": 4,
+				"mut_rend": 3,
+				"focus": 1,
+				"mastery": 1,
+			},
+		},
+		{
+			"id": "blade_execution",
+			"name": "近身处决",
+			"summary": "靠旋刀和踏空圆斩稳住贴脸，再用处决场清掉高压混编。",
+			"focus": "优先补旋刀护环、踏空圆斩和处决场。",
+			"weights": {
+				"blade_ring": 3,
+				"step_slash": 3,
+				"mut_execution": 4,
+				"vitality": 1,
+				"stride": 1,
+			},
+		},
+	],
+	"thunder": [
+		{
+			"id": "thunder_chain",
+			"name": "导电爆链",
+			"summary": "连锁闪电和电荷爆裂做清场中继，超导回响负责滚雪球。",
+			"focus": "优先补连锁闪电、电荷爆裂和超导回响。",
+			"weights": {
+				"chain": 3,
+				"detonate": 3,
+				"mut_supercell": 4,
+				"mastery": 1,
+				"magnet": 1,
+			},
+		},
+		{
+			"id": "thunder_domain",
+			"name": "雷域审判",
+			"summary": "用雷球领域定点锁场，再靠雷霆进化压终局。",
+			"focus": "优先补雷球领域、雷霆进化和聚焦镜片。",
+			"weights": {
+				"storm_orb": 3,
+				"ascension": 4,
+				"focus": 2,
+				"vitality": 1,
+			},
+		},
+	],
+	"caster": [
+		{
+			"id": "caster_orbit",
+			"name": "环轨新星",
+			"summary": "环轨护体叠出近身安全区，再用新星爆发清空身边怪群。",
+			"focus": "优先补环轨核心、新星爆发和轨道新星。",
+			"weights": {
+				"orbit": 3,
+				"nova": 3,
+				"mut_nova_orbit": 4,
+				"vitality": 1,
+			},
+		},
+		{
+			"id": "caster_control",
+			"name": "雷暴控场",
+			"summary": "奥术箭负责收线，雷暴牵引和奇点负责压缩战场。",
+			"focus": "优先补奥术箭、雷暴牵引和雷暴奇点。",
+			"weights": {
+				"bolt": 2,
+				"storm": 3,
+				"mut_singularity": 4,
+				"focus": 1,
+				"mastery": 1,
+			},
+		},
+	],
+}
+const BUILD_ROUTE_TARGETS := {
+	"bolt": 4,
+	"orbit": 3,
+	"nova": 3,
+	"storm": 3,
+	"slash": 4,
+	"blade_ring": 3,
+	"mooncut": 3,
+	"step_slash": 3,
+	"chain": 4,
+	"detonate": 3,
+	"storm_orb": 3,
+	"ascension": 1,
+	"stride": 2,
+	"vitality": 2,
+	"focus": 2,
+	"magnet": 2,
+	"mastery": 2,
+	"mut_flame_split": 1,
+	"mut_rend": 1,
+	"mut_execution": 1,
+	"mut_nova_orbit": 1,
+	"mut_singularity": 1,
+	"mut_supercell": 1,
+}
 const THREAT_PHASE_TIMES := [60.0, 180.0, 300.0, 420.0, 540.0]
 const THREAT_PHASE_LABELS := [
 	"00:00-01:00 清杂兵",
@@ -900,17 +1010,23 @@ func _on_threat_phase_changed(phase: int) -> void:
 
 
 func _get_pressure_wave_interval(phase: int) -> float:
+	var interval := 10.5
 	match phase:
 		1:
-			return 24.0
+			interval = 24.0
 		2:
-			return 18.0
+			interval = 18.0
 		3:
-			return 15.0
+			interval = 15.0
 		4:
-			return 12.5
+			interval = 12.5
 		_:
-			return 10.5
+			interval = 10.5
+	if _is_hard_mode():
+		interval *= 0.88
+	elif _is_endless_mode():
+		interval *= maxf(0.90, 1.0 - float(_active_world_mutations.size()) * 0.02)
+	return interval
 
 
 func _spawn_pressure_wave(phase: int, immediate: bool = false) -> void:
@@ -938,6 +1054,15 @@ func _spawn_pressure_wave(phase: int, immediate: bool = false) -> void:
 	var pack_size := 1 + phase
 	if immediate:
 		pack_size += 1
+	if _is_hard_mode():
+		pressure_roles.append("ranged")
+		if phase >= 2:
+			pressure_roles.append("control")
+		pack_size += 1
+	elif _is_endless_mode():
+		pack_size += mini(2, int(_active_world_mutations.size() / 2))
+		if _active_world_mutations.size() >= 2:
+			elite_roles.append("elite")
 	if _mobile_layout:
 		pack_size = maxi(2, pack_size - 1)
 
@@ -1915,6 +2040,7 @@ func _spawn_enemy(type_name: String, is_elite: bool, options: Dictionary = {}) -
 	enemy.defeated.connect(_on_enemy_defeated)
 	enemy.special_attack.connect(_on_enemy_special_attack)
 	enemy.summon_requested.connect(_on_enemy_summon_requested)
+	enemy.boss_phase_changed.connect(_on_boss_phase_changed)
 	_enemy_root.add_child(enemy)
 	_enemies.append(enemy)
 	return enemy
@@ -2547,7 +2673,7 @@ func _append_combo_upgrade_candidate(
 ) -> void:
 	if not enabled:
 		return
-	target.append({
+	var candidate := {
 		"key": key,
 		"title": title,
 		"desc": desc,
@@ -2555,7 +2681,12 @@ func _append_combo_upgrade_candidate(
 		"combo": combo,
 		"bucket": bucket,
 		"accent": accent,
-	})
+	}
+	var route_info := _get_upgrade_route_info(key)
+	if not route_info.is_empty():
+		candidate["route"] = String(route_info.get("route", ""))
+		candidate["route_hint"] = String(route_info.get("route_hint", ""))
+	target.append(candidate)
 
 
 func _build_combo_upgrade_choices() -> Array[Dictionary]:
@@ -2594,6 +2725,211 @@ func _append_combo_generic_upgrade_candidates(target: Array[Dictionary]) -> void
 	_append_combo_upgrade_candidate(target, "mastery", _is_upgrade_available("mastery", _mastery_level), "战斗精要", "提高法术威力与经验收益，让核心联动更早成型。", ["成长", "收益"], "偏中后期的构筑加速器。", "support", Color(1.0, 0.82, 0.52))
 	_append_combo_upgrade_candidate(target, "repair", true, "战地修复", "立即恢复 3 点生命，适合高压波次里强行续一口气。", ["应急", "续航"], "把残血倍率安全换成继续冲分。", "support", Color(0.96, 0.98, 0.88))
 	_append_combo_upgrade_candidate(target, "cache", true, "战备缓存", "立即获得当前等级经验条的 35%，加速下一次联动成型。", ["经济", "节奏"], "想追关键变异时最直接。", "support", Color(1.0, 0.88, 0.58))
+
+
+func _get_build_path_definitions() -> Array[Dictionary]:
+	var definitions: Array[Dictionary] = []
+	var path_variants = CHARACTER_BUILD_PATHS.get(_selected_character_id, [])
+	if path_variants is Array:
+		for path_variant in path_variants:
+			var path: Dictionary = path_variant
+			definitions.append(path)
+	return definitions
+
+
+func _get_upgrade_progress_value(key: String) -> int:
+	match key:
+		"bolt":
+			return _bolt_level
+		"orbit":
+			return _orbit_level
+		"nova":
+			return _nova_level
+		"storm":
+			return _storm_level
+		"slash":
+			return _slash_level
+		"blade_ring":
+			return _blade_ring_level
+		"mooncut":
+			return _mooncut_level
+		"step_slash":
+			return _step_slash_level
+		"chain":
+			return _chain_level
+		"detonate":
+			return _detonate_level
+		"storm_orb":
+			return _storm_orb_level
+		"ascension":
+			return _ascension_level
+		"stride":
+			return _stride_level
+		"vitality":
+			return _vitality_level
+		"focus":
+			return _focus_level
+		"magnet":
+			return _magnet_level
+		"mastery":
+			return _mastery_level
+		"mut_flame_split":
+			return int(_flame_split_mutation)
+		"mut_rend":
+			return int(_rend_mutation)
+		"mut_execution":
+			return int(_execution_mutation)
+		"mut_nova_orbit":
+			return int(_nova_orbit_mutation)
+		"mut_singularity":
+			return int(_storm_singularity_mutation)
+		"mut_supercell":
+			return int(_supercell_mutation)
+		_:
+			return 0
+
+
+func _get_upgrade_target_level(key: String) -> int:
+	return int(BUILD_ROUTE_TARGETS.get(key, 1))
+
+
+func _get_upgrade_short_label(key: String) -> String:
+	match key:
+		"bolt":
+			return "奥术箭"
+		"orbit":
+			return "环轨核心"
+		"nova":
+			return "新星爆发"
+		"storm":
+			return "雷暴牵引"
+		"slash":
+			return "钢刃斩"
+		"blade_ring":
+			return "旋刀护环"
+		"mooncut":
+			return "残月斩"
+		"step_slash":
+			return "踏空圆斩"
+		"chain":
+			return "连锁闪电"
+		"detonate":
+			return "电荷爆裂"
+		"storm_orb":
+			return "雷球领域"
+		"ascension":
+			return "雷霆进化"
+		"stride":
+			return "步幅矩阵"
+		"vitality":
+			return "生命织网"
+		"focus":
+			return "聚焦镜片"
+		"magnet":
+			return "磁引场"
+		"mastery":
+			return "战斗精要"
+		"mut_flame_split":
+			return "焰刃分裂"
+		"mut_rend":
+			return "裂月"
+		"mut_execution":
+			return "处决场"
+		"mut_nova_orbit":
+			return "轨道新星"
+		"mut_singularity":
+			return "雷暴奇点"
+		"mut_supercell":
+			return "超导回响"
+		"repair":
+			return "战地修复"
+		"cache":
+			return "战备缓存"
+		_:
+			return key
+
+
+func _get_build_path_score(path: Dictionary) -> int:
+	var score := 0
+	var weights: Dictionary = path.get("weights", {})
+	for key_variant in weights.keys():
+		var key := String(key_variant)
+		var weight := int(weights.get(key_variant, 0))
+		score += _get_upgrade_progress_value(key) * weight
+	return score
+
+
+func _get_build_focus_snapshot() -> Dictionary:
+	var primary: Dictionary = {}
+	var secondary: Dictionary = {}
+	for path in _get_build_path_definitions():
+		var entry: Dictionary = path.duplicate(true)
+		entry["score"] = _get_build_path_score(path)
+		if primary.is_empty() or int(entry.get("score", 0)) > int(primary.get("score", -1)):
+			secondary = primary
+			primary = entry
+		elif secondary.is_empty() or int(entry.get("score", 0)) > int(secondary.get("score", -1)):
+			secondary = entry
+	return {
+		"primary": primary,
+		"secondary": secondary,
+	}
+
+
+func _get_build_path_recommendations(path: Dictionary, count: int = 2) -> Array[String]:
+	var weights: Dictionary = path.get("weights", {})
+	var pending: Array[Dictionary] = []
+	for key_variant in weights.keys():
+		var key := String(key_variant)
+		var current_level := _get_upgrade_progress_value(key)
+		var target_level := _get_upgrade_target_level(key)
+		var remaining: int = maxi(target_level - current_level, 0)
+		if remaining <= 0:
+			continue
+		pending.append({
+			"label": _get_upgrade_short_label(key),
+			"priority": remaining * int(weights.get(key_variant, 0)),
+		})
+
+	var result: Array[String] = []
+	while result.size() < count and not pending.is_empty():
+		var best_index := 0
+		var best_priority := int(pending[0].get("priority", 0))
+		for index in range(1, pending.size()):
+			var priority := int(pending[index].get("priority", 0))
+			if priority > best_priority:
+				best_priority = priority
+				best_index = index
+		result.append(String(pending[best_index].get("label", "核心组件")))
+		pending.remove_at(best_index)
+	return result
+
+
+func _get_upgrade_route_info(key: String) -> Dictionary:
+	var related_paths: Array[Dictionary] = []
+	for path in _get_build_path_definitions():
+		var weights: Dictionary = path.get("weights", {})
+		if weights.has(key):
+			related_paths.append(path)
+
+	if related_paths.is_empty():
+		return {}
+
+	if related_paths.size() == 1:
+		var route_path: Dictionary = related_paths[0]
+		var recommendations := _get_build_path_recommendations(route_path, 2)
+		return {
+			"route": String(route_path.get("name", "当前路线")),
+			"route_hint": "核心件: %s" % (" / ".join(recommendations) if not recommendations.is_empty() else String(route_path.get("focus", ""))),
+		}
+
+	var route_names: Array[String] = []
+	for path in related_paths:
+		route_names.append(String(path.get("name", "当前路线")))
+	return {
+		"route": "双路线通用",
+		"route_hint": "同时补 %s" % " / ".join(route_names),
+	}
 
 
 func _pick_combo_upgrade_choices(candidates: Array[Dictionary]) -> Array[Dictionary]:
@@ -2834,32 +3170,8 @@ func _update_character_hud_v2() -> void:
 	if _player == null or not is_instance_valid(_player):
 		return
 
-	var spell_lines: Array[String] = []
+	var spell_lines := _get_build_info_lines()
 	var skill_entries := _build_hud_skill_entries_v2()
-	if _is_thunder_character():
-		spell_lines = [
-			"连锁闪电 %d 级  连锁 %d" % [_chain_level, _get_chain_target_count()],
-			"电荷爆裂 %d 级  概率 %.0f%%" % [_detonate_level, _get_detonate_chance() * 100.0],
-			"雷球领域 %d 级  半径 %.0f" % [_storm_orb_level, _get_storm_orb_radius()],
-			"雷霆进化 %d 级  雷暴 %.0f%%" % [_ascension_level, _get_thunder_strike_proc_chance() * 100.0],
-		]
-	elif _is_blade_character():
-		spell_lines = [
-			"钢刃斩 %d 级  刀气推进 %.0f" % [_slash_level, _get_slash_wave_range()],
-			"旋刀护环 %d 级  刀刃 %d" % [_blade_ring_level, _get_blade_ring_count()],
-			"残月斩 %d 级  刀波 %d  穿透 %d" % [_mooncut_level, _get_mooncut_projectile_count(), _get_mooncut_pierce()],
-			"踏空圆斩 %d 级  半径 %.0f" % [_step_slash_level, _get_step_slash_radius()],
-			"变异技能: %s" % _get_blade_mutation_text(),
-		]
-	else:
-		spell_lines = [
-			"奥术箭 %d 级  数量 %d  穿透 %d" % [_bolt_level, _get_bolt_count(), _get_bolt_pierce()],
-			"环轨核心 %d 级  卫星 %d" % [_orbit_level, _get_orbit_count()],
-			"新星爆发 %d 级  投射物 %d" % [_nova_level, _get_nova_projectile_count()],
-			"雷暴牵引 %d 级  目标 %d" % [_storm_level, _get_storm_target_count()],
-		]
-
-	spell_lines.insert(0, _get_build_tag_summary())
 	var threat_text := "%s   %s   倍率 x%.2f   得分 %d   %s" % [
 		_get_objective_text(),
 		_get_threat_phase_name(),
@@ -2884,10 +3196,14 @@ func _build_hud_skill_entries_v2() -> Array[Dictionary]:
 	var entries := _build_hud_skill_entries()
 	for index in range(entries.size()):
 		var entry: Dictionary = entries[index]
-		var extra_tags := _get_skill_tags(String(entry.get("icon_id", "")))
+		var icon_id := String(entry.get("icon_id", ""))
+		var extra_tags := _get_skill_tags(icon_id)
 		var tooltip := String(entry.get("tooltip", ""))
 		if not extra_tags.is_empty():
 			tooltip = "%s\n标签: %s" % [tooltip, " ".join(extra_tags)]
+		var route_info := _get_upgrade_route_info(icon_id)
+		if not route_info.is_empty():
+			tooltip = "%s\n路线: %s" % [tooltip, String(route_info.get("route", ""))]
 		entry["tooltip"] = tooltip
 		entries[index] = entry
 	return entries
@@ -3109,6 +3425,34 @@ func _get_skill_tags(icon_id: String) -> Array[String]:
 			return ["[奥术]", "[远程]"]
 
 
+func _get_build_info_lines() -> Array[String]:
+	var lines: Array[String] = []
+	var snapshot := _get_build_focus_snapshot()
+	var primary: Dictionary = snapshot.get("primary", {})
+	var secondary: Dictionary = snapshot.get("secondary", {})
+	var primary_score := int(primary.get("score", 0))
+	if primary.is_empty() or primary_score <= 0:
+		var paths := _get_build_path_definitions()
+		if paths.size() >= 2:
+			lines.append("构筑路线: %s / %s" % [String(paths[0].get("name", "路线A")), String(paths[1].get("name", "路线B"))])
+			lines.append("开局建议: %s" % String(paths[0].get("focus", "先拿核心主动和第一段联动。")))
+		else:
+			lines.append("构筑路线: 未定型")
+	else:
+		var focus_line := "构筑焦点: %s %d" % [String(primary.get("name", "当前路线")), primary_score]
+		var secondary_score := int(secondary.get("score", 0))
+		if not secondary.is_empty() and secondary_score > 0:
+			focus_line += "   次焦点: %s %d" % [String(secondary.get("name", "补路线")), secondary_score]
+		lines.append(focus_line)
+		var recommendations := _get_build_path_recommendations(primary, 2)
+		if recommendations.is_empty():
+			lines.append("联动提示: %s 已成型，继续补核心等级。" % String(primary.get("name", "当前路线")))
+		else:
+			lines.append("联动提示: 补 %s" % " / ".join(recommendations))
+	lines.append(_get_build_tag_summary())
+	return lines
+
+
 func _get_build_tag_summary() -> String:
 	var tags: Array[String] = []
 	if _is_thunder_character():
@@ -3192,15 +3536,20 @@ func _update_hud() -> void:
 
 
 func _get_objective_text() -> String:
+	var boss_phase_suffix := ""
+	if _boss_enemy != null and is_instance_valid(_boss_enemy):
+		var phase_index := _boss_enemy.get_boss_phase_index()
+		if phase_index > 0:
+			boss_phase_suffix = " P%d" % (phase_index + 1)
 	if _is_endless_mode():
 		if _boss_spawned and _boss_enemy != null and is_instance_valid(_boss_enemy):
-			return "%s   无尽首领：%s" % [_get_current_map_name(), _get_current_boss_name()]
+			return "%s   无尽首领：%s%s" % [_get_current_map_name(), _get_current_boss_name(), boss_phase_suffix]
 		var remaining_endless := maxf(0.0, _get_boss_spawn_time() - _run_time)
 		return "%s   无尽模式   下次首领 %s" % [_get_current_map_name(), _format_time(remaining_endless)]
 	if _boss_defeated:
 		return "%s   %s   已肃清" % [_get_current_map_name(), _get_current_run_mode_name()]
 	if _boss_spawned and _boss_enemy != null and is_instance_valid(_boss_enemy):
-		return "%s   %s   首领：%s" % [_get_current_map_name(), _get_current_run_mode_name(), _get_current_boss_name()]
+		return "%s   %s   首领：%s%s" % [_get_current_map_name(), _get_current_run_mode_name(), _get_current_boss_name(), boss_phase_suffix]
 	var remaining := maxf(0.0, _get_boss_spawn_time() - _run_time)
 	return "%s   %s   首领倒计时 %s" % [_get_current_map_name(), _get_current_run_mode_name(), _format_time(remaining)]
 
@@ -3966,6 +4315,105 @@ func _on_enemy_summon_requested(position: Vector2, summon_type: String, count: i
 		if _is_position_blocked(spawn_position, 18.0):
 			spawn_position = _find_spawn_position(320.0, 680.0, 18.0)
 		_spawn_enemy(summon_type, false, {"spawn_position": spawn_position, "wave_rank": _get_wave_rank()})
+
+
+func _on_boss_phase_changed(enemy: EnemySoldier, phase_index: int) -> void:
+	if enemy == null or not is_instance_valid(enemy) or enemy != _boss_enemy:
+		return
+
+	_spawn_effect(
+		enemy.global_position,
+		118.0 + float(phase_index) * 18.0,
+		Color(1.0, 0.92, 0.66),
+		Color(0.96, 0.42, 0.22),
+		0.44
+	)
+	_spawn_boss_phase_reinforcements(phase_index)
+
+	var extra_text := "战场规则开始介入。"
+	if _is_hard_mode():
+		_trigger_hard_mode_boss_phase_pressure(phase_index)
+		extra_text = "困难模式增援和地图压迫同步抬升。"
+	elif _is_endless_mode():
+		_trigger_endless_mode_boss_phase_pressure(phase_index)
+		extra_text = "无尽倍率、精英链和下一轮首领节奏继续上扬。"
+	else:
+		_trigger_map_boss_phase_burst(phase_index, false)
+
+	_show_message("%s 进入%s。%s" % [_get_current_boss_name(), _get_boss_phase_title(phase_index), extra_text], Color(1.0, 0.90, 0.64), 3.4)
+	_update_hud()
+
+
+func _get_boss_phase_title(phase_index: int) -> String:
+	match phase_index:
+		1:
+			return "二阶段压迫"
+		2:
+			return "三阶段暴走"
+		_:
+			return "终局狂潮"
+
+
+func _spawn_boss_phase_reinforcements(phase_index: int) -> void:
+	var roles: Array[String] = []
+	match _selected_map_id:
+		"sky_ruins":
+			roles = ["ranged", "diver", "ranged", "control"]
+		"ember_forge":
+			roles = ["ranged", "elite", "fodder", "ranged"]
+		"void_marsh":
+			roles = ["control", "ranged", "elite", "control"]
+		_:
+			roles = ["ranged", "diver", "control"]
+
+	var spawn_count := 1 + phase_index
+	if _is_hard_mode():
+		spawn_count += 1
+	elif _is_endless_mode():
+		spawn_count += int(phase_index >= 2)
+
+	for index in range(spawn_count):
+		if _enemies.size() >= _get_active_enemy_cap():
+			break
+		var role := roles[index % roles.size()]
+		var make_elite := role == "elite" or (_is_endless_mode() and phase_index >= 2 and index == spawn_count - 1)
+		_spawn_role_enemy(role, make_elite)
+
+
+func _trigger_map_boss_phase_burst(phase_index: int, heavy_pressure: bool) -> void:
+	match _selected_map_id:
+		"sky_ruins":
+			if (_ruins_altar_zone == null or not is_instance_valid(_ruins_altar_zone)) and _hazard_root != null and is_instance_valid(_hazard_root):
+				_spawn_ruins_altar()
+			if heavy_pressure or phase_index >= 2:
+				_spawn_pressure_wave(max(_threat_phase, 2 + phase_index), true)
+		"ember_forge":
+			var burst_count := 1 + int(heavy_pressure)
+			for _burst in range(burst_count):
+				_trigger_forge_flame_pattern()
+		"void_marsh":
+			var pool_count := 1 + int(heavy_pressure or phase_index >= 2)
+			for index in range(pool_count):
+				_spawn_void_pool("pool" if index % 2 == 0 else "mud")
+
+
+func _trigger_hard_mode_boss_phase_pressure(phase_index: int) -> void:
+	_trigger_map_boss_phase_burst(phase_index, true)
+	var pressure_roles := ["ranged", "control", "ranged", "diver"]
+	var extra_count := 1 + phase_index
+	for index in range(extra_count):
+		if _enemies.size() >= _get_active_enemy_cap():
+			break
+		_spawn_role_enemy(pressure_roles[index % pressure_roles.size()], phase_index >= 2 and index == 0)
+
+
+func _trigger_endless_mode_boss_phase_pressure(phase_index: int) -> void:
+	_score_bonus_multiplier += 0.08 + float(phase_index) * 0.04
+	_endless_elite_bonus += 0.01 + float(phase_index) * 0.01
+	_endless_boss_interval_scale *= 0.97
+	_award_score(120 + phase_index * 60)
+	if phase_index >= 2:
+		_trigger_map_boss_phase_burst(phase_index, false)
 
 
 func _on_meteor_impact(position: Vector2, radius: float, current_health_ratio: float, knockback: float) -> void:

@@ -16,6 +16,7 @@ var _mobile_layout: bool = false
 var _portrait_layout: bool = false
 var _stats_label: Label
 var _skill_panel: ColorRect
+var _spell_lines_label: Label
 var _skill_slots: Array = []
 var _message_label: Label
 var _upgrade_panel: ColorRect
@@ -189,6 +190,7 @@ func _rebuild_ui() -> void:
 func _reset_ui_references() -> void:
 	_stats_label = null
 	_skill_panel = null
+	_spell_lines_label = null
 	_skill_slots.clear()
 	_message_label = null
 	_upgrade_panel = null
@@ -232,6 +234,7 @@ func _apply_run_stats() -> void:
 		return
 	_stats_label.text = "等级 %d   生命 %d/%d   击败 %d   时间 %s\n%s" % [_current_level, _current_health, _current_max_health, _current_kills, _current_time_text, _current_threat_text]
 	_apply_skill_entries()
+	_apply_spell_lines()
 	_hp_fill.size.x = _hp_fill_width * clampf(float(_current_health) / float(max(_current_max_health, 1)), 0.0, 1.0)
 	_xp_fill.size = Vector2(_xp_fill_width * clampf(_current_xp_ratio, 0.0, 1.0), _xp_fill_height)
 	if _hp_value_label != null:
@@ -250,6 +253,17 @@ func _apply_skill_entries() -> void:
 			slot.set_skill_data(_current_skill_entries[index])
 		else:
 			slot.set_skill_data({})
+
+
+func _apply_spell_lines() -> void:
+	if _spell_lines_label == null:
+		return
+	var rendered_lines: Array[String] = []
+	var max_lines := 2 if _mobile_layout and not _portrait_layout else 3
+	for index in range(min(_current_spell_lines.size(), max_lines)):
+		rendered_lines.append(_current_spell_lines[index])
+	_spell_lines_label.text = "\n".join(rendered_lines)
+	_spell_lines_label.visible = not rendered_lines.is_empty()
 
 
 func _apply_upgrade_state() -> void:
@@ -294,9 +308,15 @@ func _format_upgrade_choice_text(index: int, choice: Dictionary) -> String:
 			for tag_variant in tags:
 				tag_parts.append("[%s]" % String(tag_variant))
 			lines.append(" ".join(tag_parts))
+	var route := String(choice.get("route", ""))
+	if not route.is_empty():
+		lines.append("璺嚎: %s" % route)
 	var combo := String(choice.get("combo", ""))
 	if not combo.is_empty():
 		lines.append("联动: %s" % combo)
+	var route_hint := String(choice.get("route_hint", ""))
+	if not route_hint.is_empty():
+		lines.append("鏂瑰悜: %s" % route_hint)
 	lines.append(String(choice.get("desc", "")))
 	return "\n".join(lines)
 
@@ -424,14 +444,14 @@ func _build_ui() -> void:
 	_xp_value_label.size = Vector2(116.0, 20.0)
 	add_child(_xp_value_label)
 
-	var spell_panel_position := Vector2(side_margin, viewport_size.y - 134.0)
-	var spell_panel_size := Vector2(468.0, 118.0)
+	var spell_panel_position := Vector2(side_margin, viewport_size.y - 164.0)
+	var spell_panel_size := Vector2(468.0, 156.0)
 	if _mobile_layout:
 		if mobile_landscape:
-			spell_panel_size = Vector2(minf(340.0, viewport_size.x * 0.36), 92.0)
+			spell_panel_size = Vector2(minf(352.0, viewport_size.x * 0.38), 118.0)
 			spell_panel_position = Vector2(viewport_size.x - side_margin - spell_panel_size.x, viewport_size.y - side_margin - spell_panel_size.y)
 		else:
-			spell_panel_size = Vector2(viewport_size.x - side_margin * 2.0, 94.0)
+			spell_panel_size = Vector2(viewport_size.x - side_margin * 2.0, 128.0)
 			spell_panel_position = Vector2(side_margin, top_panel.position.y + top_panel.size.y + 12.0)
 
 	_skill_panel = ColorRect.new()
@@ -442,15 +462,24 @@ func _build_ui() -> void:
 
 	var slot_gap: float = 8.0 if _mobile_layout else 10.0
 	var slot_padding: float = 10.0
+	var info_height := 34.0 if mobile_landscape else (42.0 if _mobile_layout else 52.0)
+	var slot_area_height := maxf(54.0, spell_panel_size.y - info_height - 14.0)
 	var slot_size: float = floor((spell_panel_size.x - slot_padding * 2.0 - slot_gap * 3.0) / 4.0)
-	slot_size = minf(slot_size, spell_panel_size.y - 14.0)
-	var slot_y: float = (spell_panel_size.y - slot_size) * 0.5
+	slot_size = minf(slot_size, slot_area_height - 8.0)
+	var slot_y: float = 8.0
 	for index in range(4):
 		var slot = SKILL_SLOT_SCRIPT.new()
 		slot.position = Vector2(slot_padding + float(index) * (slot_size + slot_gap), slot_y)
 		slot.size = Vector2(slot_size, slot_size)
 		_skill_panel.add_child(slot)
 		_skill_slots.append(slot)
+	_spell_lines_label = _make_label(11 if mobile_landscape else (12 if _mobile_layout else 14), Color(0.88, 0.94, 0.98))
+	_spell_lines_label.position = Vector2(12.0, spell_panel_size.y - info_height - 2.0)
+	_spell_lines_label.size = Vector2(spell_panel_size.x - 24.0, info_height)
+	_spell_lines_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_spell_lines_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_spell_lines_label.visible = false
+	_skill_panel.add_child(_spell_lines_label)
 
 	var message_width := 840.0
 	var message_y := 20.0
