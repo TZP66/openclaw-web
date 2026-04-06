@@ -208,6 +208,116 @@ const BUILD_ROUTE_TARGETS := {
 	"mut_singularity": 1,
 	"mut_supercell": 1,
 }
+const ENDGAME_EVOLUTION_DEFINITIONS := {
+	"blade_flame_wave": [
+		{
+			"key": "evo_blade_crimson_tide",
+			"title": "终局分叉: 赤潮推进",
+			"desc": "火焰刀气推进长度和宽度暴涨，分裂层数 +1，贯穿衰减底线抬到 55%。",
+			"tags": ["终局", "火焰", "推进"],
+			"combo": "把焰浪刀潮彻底做成正面推进波。",
+			"accent": Color(1.0, 0.72, 0.42),
+		},
+		{
+			"key": "evo_blade_pyre_forks",
+			"title": "终局分叉: 焚线散华",
+			"desc": "每次钢刃斩额外甩出两道斜向副刀潮，前场形成完整扇面火网。",
+			"tags": ["终局", "火焰", "分叉"],
+			"combo": "把单向推进改成扇面扫图。",
+			"accent": Color(1.0, 0.84, 0.56),
+		},
+	],
+	"blade_execution": [
+		{
+			"key": "evo_blade_execution_storm",
+			"title": "终局分叉: 处决风暴",
+			"desc": "踏空圆斩必定追加处决场，范围和伤害继续抬升，冷却进一步压低。",
+			"tags": ["终局", "处决", "爆发"],
+			"combo": "把近身处决路线变成连续处刑机器。",
+			"accent": Color(1.0, 0.90, 0.62),
+		},
+		{
+			"key": "evo_blade_ring_dominion",
+			"title": "终局分叉: 旋刃领域",
+			"desc": "旋刀数量、半径和伤害大幅提高，贴身区域会变成持续切割禁区。",
+			"tags": ["终局", "旋刀", "领域"],
+			"combo": "让站场路线真正拥有贴身领域。",
+			"accent": Color(0.92, 0.96, 1.0),
+		},
+	],
+	"thunder_chain": [
+		{
+			"key": "evo_thunder_arc_net",
+			"title": "终局分叉: 电网追猎",
+			"desc": "连锁闪电命中后会从末端再续出一轮迷你追击电链。",
+			"tags": ["终局", "连锁", "追击"],
+			"combo": "把导电爆链做成滚动扩散的整片电网。",
+			"accent": Color(0.74, 0.92, 1.0),
+		},
+		{
+			"key": "evo_thunder_blast_relay",
+			"title": "终局分叉: 爆裂继电",
+			"desc": "电荷爆裂半径更大，并固定触发缩小版雷暴追击。",
+			"tags": ["终局", "爆裂", "雷暴"],
+			"combo": "让爆点本身变成新的雷暴中继。",
+			"accent": Color(0.92, 0.98, 1.0),
+		},
+	],
+	"thunder_domain": [
+		{
+			"key": "evo_thunder_orb_overclock",
+			"title": "终局分叉: 雷域过载",
+			"desc": "雷球持续更久、脉冲更密、每次脉冲的连锁上限继续提高。",
+			"tags": ["终局", "雷域", "过载"],
+			"combo": "把雷球领域推成主场控图核心。",
+			"accent": Color(0.82, 0.94, 1.0),
+		},
+		{
+			"key": "evo_thunder_storm_core",
+			"title": "终局分叉: 风暴核",
+			"desc": "每次雷球脉冲都会追加一次缩小版雷暴打击，落点会自己清场。",
+			"tags": ["终局", "雷域", "雷暴"],
+			"combo": "让雷球领域自己生成雷暴核心。",
+			"accent": Color(0.96, 0.96, 0.74),
+		},
+	],
+	"caster_orbit": [
+		{
+			"key": "evo_caster_orbit_overload",
+			"title": "终局分叉: 环轨过载",
+			"desc": "环轨卫星数量、转速和伤害大幅提高，近身区域进入持续切割状态。",
+			"tags": ["终局", "环轨", "护体"],
+			"combo": "把环轨新星做成真正的近身绞盘。",
+			"accent": Color(0.70, 0.98, 0.90),
+		},
+		{
+			"key": "evo_caster_supernova_lattice",
+			"title": "终局分叉: 超新星阵列",
+			"desc": "新星投射物暴增，冷却压低，爆发密度和范围同步拉满。",
+			"tags": ["终局", "新星", "爆发"],
+			"combo": "让新星爆发成为一轮一轮的终局清屏。",
+			"accent": Color(1.0, 0.84, 0.46),
+		},
+	],
+	"caster_control": [
+		{
+			"key": "evo_caster_tempest_network",
+			"title": "终局分叉: 风暴网络",
+			"desc": "每次雷暴命中后都会再连出两段追击电链，专门收掉外围漏怪。",
+			"tags": ["终局", "雷暴", "连锁"],
+			"combo": "让控场路线在团控外补上远端追杀。",
+			"accent": Color(0.80, 0.92, 1.0),
+		},
+		{
+			"key": "evo_caster_singularity_prison",
+			"title": "终局分叉: 奇点牢笼",
+			"desc": "雷暴落点会追加延迟二段爆轰和更强牵引，把怪团直接锁死在原地。",
+			"tags": ["终局", "奇点", "控场"],
+			"combo": "把雷暴控场进化成完整的囚笼打法。",
+			"accent": Color(0.88, 0.90, 1.0),
+		},
+	],
+}
 const THREAT_PHASE_TIMES := [60.0, 180.0, 300.0, 420.0, 540.0]
 const THREAT_PHASE_LABELS := [
 	"00:00-01:00 清杂兵",
@@ -473,6 +583,7 @@ var _mooncut_timer: float = 1.2
 var _step_slash_timer: float = 2.4
 var _chain_timer: float = 0.0
 var _storm_orb_timer: float = 1.8
+var _selected_endgame_branches: Dictionary = {}
 var _touch_move_vector: Vector2 = Vector2.ZERO
 var _touch_pointer_id: int = -1
 var _touch_pointer_origin: Vector2 = Vector2.ZERO
@@ -873,6 +984,7 @@ func _reset_progression_state() -> void:
 	_step_slash_timer = 2.4
 	_chain_timer = 0.0
 	_storm_orb_timer = 1.8
+	_selected_endgame_branches.clear()
 
 	_boss_spawned = false
 	_boss_defeated = false
@@ -1083,6 +1195,44 @@ func _spawn_role_enemy(role: String, force_elite: bool = false) -> void:
 	var type_name := roster[_rng.randi_range(0, roster.size() - 1)]
 	var is_elite := force_elite and type_name not in ["storm_archon", "forge_tyrant", "void_matriarch"]
 	_spawn_enemy(type_name, is_elite, {"wave_rank": _get_wave_rank() + int(force_elite)})
+
+
+func _roll_elite_affixes(type_name: String, wave_rank: int) -> Array[String]:
+	var weighted_pool: Array[String] = []
+	match type_name:
+		"lancer":
+			weighted_pool = ["hunter", "hunter", "dash", "dash", "deathburst", "splitter"]
+		"brute":
+			weighted_pool = ["shielded", "shielded", "dash", "deathburst", "splitter", "hunter"]
+		"embermage":
+			weighted_pool = ["shielded", "snare", "snare", "deathburst", "hunter", "splitter"]
+		"seer":
+			weighted_pool = ["snare", "snare", "hunter", "shielded", "splitter", "deathburst"]
+		"mireling":
+			weighted_pool = ["shielded", "splitter", "splitter", "snare", "hunter", "deathburst"]
+		_:
+			weighted_pool = ["shielded", "splitter", "hunter", "snare", "deathburst", "dash"]
+
+	var affix_count := 1
+	if _run_time >= 240.0 or _threat_phase >= 3:
+		affix_count = 2
+	if _run_time >= 480.0 or (_is_hard_mode() and _run_time >= 360.0) or (_is_endless_mode() and _active_world_mutations.size() >= 2):
+		affix_count = 3
+	if wave_rank >= 14 and affix_count < 3:
+		affix_count += 1
+	if _mobile_layout:
+		affix_count = mini(affix_count, 2)
+
+	var result: Array[String] = []
+	while result.size() < affix_count and not weighted_pool.is_empty():
+		var pick_index := _rng.randi_range(0, weighted_pool.size() - 1)
+		var affix_id := weighted_pool[pick_index]
+		if not result.has(affix_id):
+			result.append(affix_id)
+		for pool_index in range(weighted_pool.size() - 1, -1, -1):
+			if weighted_pool[pool_index] == affix_id:
+				weighted_pool.remove_at(pool_index)
+	return result
 
 
 func _get_enemy_roster_for_role(role: String) -> Array[String]:
@@ -1540,17 +1690,66 @@ func _cast_storm() -> void:
 	if targets.is_empty():
 		return
 
-	for target in targets:
+	var storm_damage := _get_storm_damage()
+	var has_tempest_network := _has_endgame_evolution("evo_caster_tempest_network")
+	var has_singularity_prison := _has_endgame_evolution("evo_caster_singularity_prison")
+	var splash_damage: int = max(1, int(round(float(storm_damage) * 0.42)))
+	var singularity_radius := 132.0
+	var singularity_force := 220.0
+	var singularity_burst_radius := 64.0
+	var singularity_burst_hits := 4
+	if has_singularity_prison:
+		singularity_radius += 48.0
+		singularity_force += 120.0
+		singularity_burst_radius = 86.0
+		singularity_burst_hits = 6
+
+	for target_variant in targets:
+		var target: EnemySoldier = target_variant
 		if target == null or not is_instance_valid(target):
 			continue
 		_spawn_effect(target.global_position, 56.0, Color(0.84, 0.94, 1.0), Color(0.26, 0.60, 1.0), 0.30)
-		target.take_damage(_get_storm_damage())
-		if _storm_singularity_mutation:
-			_pull_enemies_toward_point(target.global_position, 132.0, 220.0)
-			_damage_enemies_in_radius(target.global_position, 64.0, max(1, int(round(float(_get_storm_damage()) * 0.42))), 180.0, 4)
+		target.take_damage(storm_damage)
+		if _storm_singularity_mutation or has_singularity_prison:
+			_pull_enemies_toward_point(target.global_position, singularity_radius, singularity_force)
+			_damage_enemies_in_radius(target.global_position, singularity_burst_radius, splash_damage, 180.0, singularity_burst_hits)
+			if has_singularity_prison:
+				_schedule_singularity_aftershock(
+					target.global_position,
+					max(1, int(round(float(storm_damage) * 0.62))),
+					92.0
+				)
+		if has_tempest_network:
+			var excluded: Array[EnemySoldier] = []
+			excluded.append(target)
+			_emit_chain_followup(
+				target.global_position,
+				excluded,
+				2,
+				_get_chain_bounce_range() * 0.82,
+				max(1, int(round(float(storm_damage) * 0.54))),
+				_get_chain_knockback() * 0.72,
+				5.8
+			)
 		_trigger_void_pool_explosions(target.global_position, 72.0)
 
 	_audio.play_player_shot("power")
+
+
+func _schedule_singularity_aftershock(position: Vector2, damage: int, radius: float) -> void:
+	if damage <= 0 or radius <= 0.0 or get_tree() == null:
+		return
+	var timer := get_tree().create_timer(0.36, false)
+	timer.timeout.connect(_trigger_singularity_aftershock.bind(position, damage, radius))
+
+
+func _trigger_singularity_aftershock(position: Vector2, damage: int, radius: float) -> void:
+	if damage <= 0 or radius <= 0.0:
+		return
+	_spawn_effect(position, radius * 0.94, Color(0.90, 0.96, 1.0), Color(0.56, 0.62, 1.0), 0.24)
+	_pull_enemies_toward_point(position, radius + 36.0, 260.0)
+	_damage_enemies_in_radius(position, radius, damage, 260.0, 8)
+	_trigger_void_pool_explosions(position, radius * 0.82)
 
 
 func _update_thunder_attacks(delta: float) -> void:
@@ -1629,7 +1828,50 @@ func _emit_chain_lightning(origin: Vector2, max_targets: int, initial_range: flo
 		if strike_target != null and is_instance_valid(strike_target):
 			_trigger_thunder_strike(strike_target.global_position)
 
+	if allow_thunder_strike and _has_endgame_evolution("evo_thunder_arc_net") and not hit_enemies.is_empty():
+		_emit_chain_followup(
+			hit_enemies[hit_enemies.size() - 1].global_position,
+			hit_enemies,
+			mini(3, max_targets),
+			bounce_range * 0.84,
+			max(1, int(round(float(damage) * 0.58))),
+			knockback * 0.74,
+			5.0
+		)
+
 	return hit_enemies
+
+
+func _emit_chain_followup(origin: Vector2, excluded: Array[EnemySoldier], max_targets: int, bounce_range: float, damage: int, knockback: float, thickness: float = 5.6) -> Array[EnemySoldier]:
+	var followup_hits: Array[EnemySoldier] = []
+	if max_targets <= 0 or damage <= 0:
+		return followup_hits
+
+	var blocked: Array[EnemySoldier] = []
+	for enemy_variant in excluded:
+		var blocked_enemy: EnemySoldier = enemy_variant
+		if blocked_enemy == null or not is_instance_valid(blocked_enemy):
+			continue
+		blocked.append(blocked_enemy)
+
+	var current_origin := origin
+	for bounce_index in range(max_targets):
+		var target := _get_chain_target_from_origin(current_origin, blocked, bounce_range)
+		if target == null:
+			break
+		var target_position := target.global_position
+		_spawn_lightning_link_effect(current_origin, target_position, thickness)
+		_spawn_effect(target_position, 12.0 if bounce_index == 0 else 10.0, Color(0.88, 0.98, 1.0), Color(0.40, 0.68, 1.0), 0.10)
+		var impulse_direction := (target_position - current_origin).normalized()
+		if impulse_direction == Vector2.ZERO:
+			impulse_direction = Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU))
+		target.take_damage(damage, impulse_direction * knockback)
+		_trigger_void_pool_explosions(target_position, 24.0)
+		followup_hits.append(target)
+		blocked.append(target)
+		current_origin = target_position
+
+	return followup_hits
 
 
 func _get_chain_target_from_origin(origin: Vector2, excluded: Array[EnemySoldier], max_distance: float) -> EnemySoldier:
@@ -1705,7 +1947,7 @@ func _get_storm_orb_target_position() -> Vector2:
 
 func _on_lightning_orb_pulse(origin: Vector2) -> void:
 	_spawn_effect(origin, _get_storm_orb_radius() * 0.30, Color(0.84, 0.97, 1.0), Color(0.30, 0.60, 1.0), 0.14)
-	_emit_chain_lightning(
+	var pulse_hits := _emit_chain_lightning(
 		origin,
 		_get_storm_orb_target_count(),
 		_get_storm_orb_radius(),
@@ -1714,6 +1956,13 @@ func _on_lightning_orb_pulse(origin: Vector2) -> void:
 		_get_chain_knockback() * 0.82,
 		true
 	)
+	if _has_endgame_evolution("evo_thunder_storm_core"):
+		var strike_position := origin
+		if not pulse_hits.is_empty():
+			var last_hit := pulse_hits[pulse_hits.size() - 1]
+			if last_hit != null and is_instance_valid(last_hit):
+				strike_position = last_hit.global_position
+		_trigger_minor_thunder_strike(strike_position, 0.56, 0.72)
 
 
 func _trigger_thunder_strike(position: Vector2) -> void:
@@ -1721,6 +1970,15 @@ func _trigger_thunder_strike(position: Vector2) -> void:
 	_spawn_lightning_link_effect(position + Vector2(0.0, -strike_radius * 2.4), position, 10.0)
 	_spawn_effect(position, strike_radius, Color(0.92, 0.99, 1.0), Color(0.40, 0.68, 1.0), 0.18)
 	_damage_enemies_in_radius(position, strike_radius, _get_thunder_strike_damage(), 280.0)
+
+
+func _trigger_minor_thunder_strike(position: Vector2, damage_scale: float = 0.72, radius_scale: float = 0.78) -> void:
+	var strike_radius := _get_thunder_strike_radius() * radius_scale
+	var strike_damage: int = max(1, int(round(float(_get_thunder_strike_damage()) * damage_scale)))
+	_spawn_lightning_link_effect(position + Vector2(0.0, -strike_radius * 2.0), position, 7.2)
+	_spawn_effect(position, strike_radius, Color(0.90, 0.98, 1.0), Color(0.38, 0.68, 1.0), 0.14)
+	_damage_enemies_in_radius(position, strike_radius, strike_damage, 240.0)
+	_trigger_void_pool_explosions(position, strike_radius * 0.48)
 
 
 func _try_trigger_detonate(position: Vector2) -> void:
@@ -1746,6 +2004,18 @@ func _try_trigger_detonate(position: Vector2) -> void:
 			max(1, int(round(float(_get_chain_damage()) * 0.54))),
 			_get_chain_knockback() * 0.76,
 			false
+		)
+	if _has_endgame_evolution("evo_thunder_blast_relay"):
+		_trigger_minor_thunder_strike(position, 0.82, 0.84)
+		var relay_excluded := _get_nearest_enemies(position, _enemies.size(), _get_detonate_radius() + 16.0)
+		_emit_chain_followup(
+			position,
+			relay_excluded,
+			2 + int(_storm_orb_level > 0),
+			_get_detonate_radius() + 82.0,
+			max(1, int(round(float(_get_chain_damage()) * 0.48))),
+			_get_chain_knockback() * 0.70,
+			4.8
 		)
 
 
@@ -1816,6 +2086,9 @@ func _perform_steel_slash() -> bool:
 	)
 	_spawn_slash_effect(_player.global_position, direction, _get_slash_range(), _get_slash_arc_span())
 	var slash_wave := _spawn_slash_flame_wave(_player.global_position + direction * 18.0, direction)
+	if _has_endgame_evolution("evo_blade_pyre_forks"):
+		_spawn_slash_flame_wave(_player.global_position + direction * 14.0, direction.rotated(0.22), 0.76)
+		_spawn_slash_flame_wave(_player.global_position + direction * 14.0, direction.rotated(-0.22), 0.76)
 	_trigger_void_pool_explosions(_player.global_position + direction * _get_slash_range() * 0.48, _get_slash_range() * 0.70)
 
 	if hit_count <= 0 and slash_wave == null:
@@ -1825,7 +2098,7 @@ func _perform_steel_slash() -> bool:
 	return true
 
 
-func _spawn_slash_flame_wave(origin: Vector2, direction: Vector2) -> SpellProjectile:
+func _spawn_slash_flame_wave(origin: Vector2, direction: Vector2, damage_scale: float = 1.0) -> SpellProjectile:
 	if _projectile_root == null or not is_instance_valid(_projectile_root):
 		return null
 	if direction == Vector2.ZERO:
@@ -1834,7 +2107,7 @@ func _spawn_slash_flame_wave(origin: Vector2, direction: Vector2) -> SpellProjec
 	var projectile: SpellProjectile = PROJECTILE_SCRIPT.new()
 	projectile.global_position = origin
 	projectile.direction = direction.normalized()
-	projectile.damage = _get_slash_wave_damage()
+	projectile.damage = max(1, int(round(float(_get_slash_wave_damage()) * damage_scale)))
 	projectile.speed = _get_slash_wave_speed()
 	projectile.radius = _get_slash_wave_radius()
 	projectile.pierce = 99
@@ -1847,8 +2120,8 @@ func _spawn_slash_flame_wave(origin: Vector2, direction: Vector2) -> SpellProjec
 	projectile.split_count = 3
 	projectile.split_spread = 0.34
 	projectile.split_generation = 0
-	projectile.split_max_generations = 1
-	projectile.split_damage_scale = 0.62
+	projectile.split_max_generations = 2 if _has_endgame_evolution("evo_blade_crimson_tide") else 1
+	projectile.split_damage_scale = 0.68 if _has_endgame_evolution("evo_blade_crimson_tide") else 0.62
 	projectile.split_speed_scale = 0.98
 	projectile.split_range_scale = 0.76
 	projectile.split_radius_scale = 0.82
@@ -1856,7 +2129,7 @@ func _spawn_slash_flame_wave(origin: Vector2, direction: Vector2) -> SpellProjec
 	projectile.split_child_pierce = 99
 	projectile.damage_falloff_on_hit = true
 	projectile.damage_falloff_factor = 0.80
-	projectile.min_damage_multiplier = 0.40
+	projectile.min_damage_multiplier = 0.55 if _has_endgame_evolution("evo_blade_crimson_tide") else 0.40
 	_register_projectile(projectile)
 	_spawn_effect(origin + direction.normalized() * 16.0, minf(_get_slash_wave_radius() * 1.8, 34.0), Color(1.0, 0.86, 0.54), Color(1.0, 0.42, 0.22), 0.14)
 	return projectile
@@ -1991,7 +2264,7 @@ func _perform_step_slash() -> bool:
 
 	_spawn_step_slash_effect(slash_center, direction, radius)
 	_spawn_effect(start_position, minf(radius * 0.36, 34.0), Color(1.0, 0.88, 0.70), Color(1.0, 0.56, 0.34), 0.16)
-	if _execution_mutation:
+	if _execution_mutation or _has_endgame_evolution("evo_blade_execution_storm"):
 		_trigger_execution_field(slash_center)
 	_trigger_void_pool_explosions(slash_center, radius + 24.0)
 
@@ -2019,10 +2292,13 @@ func _spawn_enemy(type_name: String, is_elite: bool, options: Dictionary = {}) -
 		return null
 
 	var enemy: EnemySoldier = ENEMY_SCRIPT.new()
+	var enemy_options: Dictionary = options.duplicate(true)
 	var spawn_position: Vector2 = options.get("spawn_position", _find_spawn_position(560.0, 980.0, 16.0))
 	var wave_rank := int(options.get("wave_rank", _get_wave_rank()))
+	if is_elite and not bool(enemy_options.get("boss", false)) and not enemy_options.has("elite_affixes"):
+		enemy_options["elite_affixes"] = _roll_elite_affixes(type_name, wave_rank)
 	enemy.global_position = spawn_position
-	enemy.configure(type_name, wave_rank, is_elite, _player, options)
+	enemy.configure(type_name, wave_rank, is_elite, _player, enemy_options)
 	var health_scale := 1.0 + _endless_enemy_health_bonus + (0.05 if _threat_phase >= 4 and not enemy.is_boss() else 0.0)
 	if enemy.is_boss():
 		var boss_health: int = max(1, int(round(float(_get_boss_health_reference()) * MODE_BOSS_HEALTH_MULTIPLIER)))
@@ -2453,6 +2729,7 @@ func _get_enemy_score_value(enemy: EnemySoldier) -> int:
 	var base := 10 + _get_wave_rank() * 3
 	if enemy.elite:
 		base += 26
+		base += enemy.get_elite_affix_count() * 8
 	if enemy.is_boss():
 		base += 180
 	return base
@@ -2713,6 +2990,7 @@ func _build_combo_upgrade_choices() -> Array[Dictionary]:
 		_append_combo_upgrade_candidate(candidates, "mut_nova_orbit", _orbit_level >= 2 and _nova_level >= 2 and not _nova_orbit_mutation, "变异: 轨道新星", "释放新星时，所有环轨卫星会同步抛出一轮小型爆裂。", ["奥术", "召唤", "变异"], "环轨核心 + 新星爆发会从自保 build 变成近身爆发 build。", "mutation", Color(1.0, 0.86, 0.52))
 		_append_combo_upgrade_candidate(candidates, "mut_singularity", _storm_level >= 3 and _orbit_level >= 2 and not _storm_singularity_mutation, "变异: 雷暴奇点", "雷暴命中后会把周围敌人往落点拽，并追加一次小范围爆轰。", ["雷暴", "控场", "变异"], "雷暴牵引 + 环轨核心能把战场挤成可控团块。", "mutation", Color(0.80, 0.92, 1.0))
 
+	_append_endgame_evolution_candidates(candidates)
 	_append_combo_generic_upgrade_candidates(candidates)
 	return _pick_combo_upgrade_choices(candidates)
 
@@ -2735,6 +3013,81 @@ func _get_build_path_definitions() -> Array[Dictionary]:
 			var path: Dictionary = path_variant
 			definitions.append(path)
 	return definitions
+
+
+func _get_build_path_definition_by_id(path_id: String) -> Dictionary:
+	for path in _get_build_path_definitions():
+		if String(path.get("id", "")) == path_id:
+			return path
+	return {}
+
+
+func _get_endgame_evolution_definitions_for_route(route_id: String) -> Array[Dictionary]:
+	var definitions: Array[Dictionary] = []
+	var route_variants = ENDGAME_EVOLUTION_DEFINITIONS.get(route_id, [])
+	if route_variants is Array:
+		for route_variant in route_variants:
+			var entry: Dictionary = route_variant
+			definitions.append(entry)
+	return definitions
+
+
+func _get_endgame_evolution_definition(key: String) -> Dictionary:
+	for route_id_variant in ENDGAME_EVOLUTION_DEFINITIONS.keys():
+		var route_id := String(route_id_variant)
+		for entry in _get_endgame_evolution_definitions_for_route(route_id):
+			if String(entry.get("key", "")) == key:
+				var resolved := entry.duplicate(true)
+				resolved["route_id"] = route_id
+				return resolved
+	return {}
+
+
+func _get_endgame_route_id_for_key(key: String) -> String:
+	var definition := _get_endgame_evolution_definition(key)
+	return String(definition.get("route_id", ""))
+
+
+func _has_endgame_evolution(key: String) -> bool:
+	return _selected_endgame_branches.values().has(key)
+
+
+func _has_endgame_evolution_for_route(route_id: String) -> bool:
+	return _selected_endgame_branches.has(route_id)
+
+
+func _get_selected_endgame_evolution(route_id: String) -> String:
+	return String(_selected_endgame_branches.get(route_id, ""))
+
+
+func _is_endgame_route_ready(path: Dictionary) -> bool:
+	if _run_time < 480.0:
+		return false
+	var route_id := String(path.get("id", ""))
+	if route_id.is_empty() or _has_endgame_evolution_for_route(route_id):
+		return false
+	return int(path.get("score", 0)) >= 10
+
+
+func _append_endgame_evolution_candidates(target: Array[Dictionary]) -> void:
+	var snapshot := _get_build_focus_snapshot()
+	var primary: Dictionary = snapshot.get("primary", {})
+	if primary.is_empty() or not _is_endgame_route_ready(primary):
+		return
+
+	var route_id := String(primary.get("id", ""))
+	for evolution in _get_endgame_evolution_definitions_for_route(route_id):
+		_append_combo_upgrade_candidate(
+			target,
+			String(evolution.get("key", "")),
+			not _has_endgame_evolution(String(evolution.get("key", ""))),
+			String(evolution.get("title", "终局分叉")),
+			String(evolution.get("desc", "")),
+			evolution.get("tags", []),
+			String(evolution.get("combo", "")),
+			"endgame",
+			evolution.get("accent", Color(1.0, 0.90, 0.64))
+		)
 
 
 func _get_upgrade_progress_value(key: String) -> int:
@@ -2906,6 +3259,14 @@ func _get_build_path_recommendations(path: Dictionary, count: int = 2) -> Array[
 
 
 func _get_upgrade_route_info(key: String) -> Dictionary:
+	var evolution_route_id := _get_endgame_route_id_for_key(key)
+	if not evolution_route_id.is_empty():
+		var route_path := _get_build_path_definition_by_id(evolution_route_id)
+		return {
+			"route": String(route_path.get("name", "终局路线")),
+			"route_hint": "8:00 后从该路线的两种终局形态里二选一。",
+		}
+
 	var related_paths: Array[Dictionary] = []
 	for path in _get_build_path_definitions():
 		var weights: Dictionary = path.get("weights", {})
@@ -2933,12 +3294,15 @@ func _get_upgrade_route_info(key: String) -> Dictionary:
 
 
 func _pick_combo_upgrade_choices(candidates: Array[Dictionary]) -> Array[Dictionary]:
+	var endgame_pool: Array[Dictionary] = []
 	var mutation_pool: Array[Dictionary] = []
 	var skill_pool: Array[Dictionary] = []
 	var support_pool: Array[Dictionary] = []
 	for candidate_variant in candidates:
 		var candidate: Dictionary = candidate_variant
 		match String(candidate.get("bucket", "skill")):
+			"endgame":
+				endgame_pool.append(candidate)
 			"mutation":
 				mutation_pool.append(candidate)
 			"support":
@@ -2947,6 +3311,21 @@ func _pick_combo_upgrade_choices(candidates: Array[Dictionary]) -> Array[Diction
 				skill_pool.append(candidate)
 
 	var result: Array[Dictionary] = []
+	if endgame_pool.size() >= 2:
+		result.append(endgame_pool[0])
+		result.append(endgame_pool[1])
+	elif not endgame_pool.is_empty():
+		result.append(_pop_random_combo_upgrade(endgame_pool))
+
+	if not endgame_pool.is_empty():
+		if not skill_pool.is_empty() and result.size() < 3:
+			result.append(_pop_random_combo_upgrade(skill_pool))
+		elif not support_pool.is_empty() and result.size() < 3:
+			result.append(_pop_random_combo_upgrade(support_pool))
+		while result.size() < 3 and not mutation_pool.is_empty():
+			result.append(_pop_random_combo_upgrade(mutation_pool))
+		return result
+
 	if not mutation_pool.is_empty():
 		result.append(_pop_random_combo_upgrade(mutation_pool))
 	if not skill_pool.is_empty():
@@ -2957,6 +3336,7 @@ func _pick_combo_upgrade_choices(candidates: Array[Dictionary]) -> Array[Diction
 		result.append(_pop_random_combo_upgrade(support_pool))
 
 	var remaining: Array[Dictionary] = []
+	remaining.append_array(endgame_pool)
 	remaining.append_array(mutation_pool)
 	remaining.append_array(skill_pool)
 	remaining.append_array(support_pool)
@@ -3020,6 +3400,11 @@ func _apply_character_upgrade_choice(index: int) -> void:
 			_storm_singularity_mutation = true
 		"mut_supercell":
 			_supercell_mutation = true
+		"evo_blade_crimson_tide", "evo_blade_pyre_forks", "evo_blade_execution_storm", "evo_blade_ring_dominion", "evo_thunder_arc_net", "evo_thunder_blast_relay", "evo_thunder_orb_overclock", "evo_thunder_storm_core", "evo_caster_orbit_overload", "evo_caster_supernova_lattice", "evo_caster_tempest_network", "evo_caster_singularity_prison":
+			var route_id := _get_endgame_route_id_for_key(String(choice.get("key", "")))
+			if route_id.is_empty():
+				return
+			_selected_endgame_branches[route_id] = String(choice.get("key", ""))
 		"stride":
 			_stride_level += 1
 		"vitality":
@@ -3449,8 +3834,26 @@ func _get_build_info_lines() -> Array[String]:
 			lines.append("联动提示: %s 已成型，继续补核心等级。" % String(primary.get("name", "当前路线")))
 		else:
 			lines.append("联动提示: 补 %s" % " / ".join(recommendations))
+	var endgame_summary := _get_endgame_evolution_summary()
+	if not endgame_summary.is_empty():
+		lines.append("终局进化: %s" % endgame_summary)
 	lines.append(_get_build_tag_summary())
 	return lines
+
+
+func _get_endgame_evolution_summary() -> String:
+	if _selected_endgame_branches.is_empty():
+		return ""
+	var labels: Array[String] = []
+	for route_id_variant in _selected_endgame_branches.keys():
+		var route_id := String(route_id_variant)
+		var key := String(_selected_endgame_branches.get(route_id_variant, ""))
+		var route_path := _get_build_path_definition_by_id(route_id)
+		var evolution := _get_endgame_evolution_definition(key)
+		if evolution.is_empty():
+			continue
+		labels.append("%s-%s" % [String(route_path.get("name", "路线")), String(evolution.get("title", "终局"))])
+	return " / ".join(labels)
 
 
 func _get_build_tag_summary() -> String:
@@ -3481,6 +3884,8 @@ func _get_build_tag_summary() -> String:
 			tags.append("[控场]")
 		if _nova_orbit_mutation or _storm_singularity_mutation:
 			tags.append("[变异]")
+	if not _selected_endgame_branches.is_empty():
+		tags.append("[终局分叉]")
 	return "构筑标签: %s" % " ".join(tags)
 
 
@@ -3729,6 +4134,60 @@ func _get_cooldown_multiplier() -> float:
 	return maxf(0.50, multiplier)
 
 
+func _get_extra_orbit_count_bonus() -> int:
+	if _has_endgame_evolution("evo_caster_orbit_overload"):
+		return 2
+	if _has_endgame_evolution("evo_blade_ring_dominion"):
+		return 2
+	return 0
+
+
+func _get_endgame_damage_multiplier(skill_group: String) -> float:
+	var multiplier := 1.0
+	match skill_group:
+		"slash_wave":
+			if _has_endgame_evolution("evo_blade_crimson_tide"):
+				multiplier *= 1.28
+			if _has_endgame_evolution("evo_blade_pyre_forks"):
+				multiplier *= 1.10
+		"blade_ring":
+			if _has_endgame_evolution("evo_blade_ring_dominion"):
+				multiplier *= 1.60
+		"execution":
+			if _has_endgame_evolution("evo_blade_execution_storm"):
+				multiplier *= 1.34
+		"nova":
+			if _has_endgame_evolution("evo_caster_supernova_lattice"):
+				multiplier *= 1.28
+		"orbit":
+			if _has_endgame_evolution("evo_caster_orbit_overload"):
+				multiplier *= 1.55
+		"storm":
+			if _has_endgame_evolution("evo_caster_tempest_network"):
+				multiplier *= 1.12
+		_:
+			pass
+	return multiplier
+
+
+func _get_extra_storm_targets_bonus() -> int:
+	if _has_endgame_evolution("evo_caster_tempest_network"):
+		return 2
+	return 0
+
+
+func _get_extra_nova_projectiles_bonus() -> int:
+	if _has_endgame_evolution("evo_caster_supernova_lattice"):
+		return 8
+	return 0
+
+
+func _get_extra_chain_targets_bonus() -> int:
+	if _has_endgame_evolution("evo_thunder_arc_net"):
+		return 1
+	return 0
+
+
 func _get_bolt_count() -> int:
 	return 1 + int(_bolt_level / 2)
 
@@ -3746,39 +4205,50 @@ func _get_bolt_cooldown() -> float:
 
 
 func _get_orbit_count() -> int:
-	return _orbit_level
+	return _orbit_level + _get_extra_orbit_count_bonus()
 
 
 func _get_orbit_damage() -> int:
-	return int(round((10.0 + float(max(_orbit_level - 1, 0)) * 4.0) * _get_spell_power_multiplier()))
+	return int(round((10.0 + float(max(_orbit_level - 1, 0)) * 4.0) * _get_spell_power_multiplier() * _get_endgame_damage_multiplier("orbit")))
 
 
 func _get_orbit_radius() -> float:
-	return 88.0 + float(max(_orbit_level - 1, 0)) * 12.0
+	var radius := 88.0 + float(max(_orbit_level - 1, 0)) * 12.0
+	if _has_endgame_evolution("evo_blade_ring_dominion"):
+		radius += 24.0
+	if _has_endgame_evolution("evo_caster_orbit_overload"):
+		radius += 18.0
+	return radius
 
 
 func _get_orbit_speed() -> float:
-	return 2.0 + float(_orbit_level) * 0.22
+	var speed := 2.0 + float(_orbit_level) * 0.22
+	if _has_endgame_evolution("evo_caster_orbit_overload"):
+		speed *= 1.22
+	return speed
 
 
 func _get_nova_projectile_count() -> int:
-	return 8 + _nova_level * 2
+	return 8 + _nova_level * 2 + _get_extra_nova_projectiles_bonus()
 
 
 func _get_nova_damage() -> int:
-	return int(round((20.0 + float(max(_nova_level - 1, 0)) * 7.0) * _get_spell_power_multiplier()))
+	return int(round((20.0 + float(max(_nova_level - 1, 0)) * 7.0) * _get_spell_power_multiplier() * _get_endgame_damage_multiplier("nova")))
 
 
 func _get_nova_cooldown() -> float:
-	return maxf(2.4, (5.6 - float(max(_nova_level - 1, 0)) * 0.45) * _get_cooldown_multiplier())
+	var cooldown := (5.6 - float(max(_nova_level - 1, 0)) * 0.45) * _get_cooldown_multiplier()
+	if _has_endgame_evolution("evo_caster_supernova_lattice"):
+		cooldown *= 0.76
+	return maxf(2.0, cooldown)
 
 
 func _get_storm_target_count() -> int:
-	return 2 + _storm_level
+	return 2 + _storm_level + _get_extra_storm_targets_bonus()
 
 
 func _get_storm_damage() -> int:
-	return int(round((28.0 + float(max(_storm_level - 1, 0)) * 9.0) * _get_spell_power_multiplier()))
+	return int(round((28.0 + float(max(_storm_level - 1, 0)) * 9.0) * _get_spell_power_multiplier() * _get_endgame_damage_multiplier("storm")))
 
 
 func _get_storm_cooldown() -> float:
@@ -3790,7 +4260,7 @@ func _get_lightning_power_multiplier() -> float:
 
 
 func _get_chain_target_count() -> int:
-	return 5 + max(_chain_level - 1, 0) + _get_ascension_chain_bonus()
+	return 5 + max(_chain_level - 1, 0) + _get_ascension_chain_bonus() + _get_extra_chain_targets_bonus()
 
 
 func _get_chain_damage() -> int:
@@ -3814,7 +4284,10 @@ func _get_chain_knockback() -> float:
 
 
 func _get_detonate_chance() -> float:
-	return minf(0.20 * float(_detonate_level), 0.75)
+	var chance := 0.20 * float(_detonate_level)
+	if _has_endgame_evolution("evo_thunder_blast_relay"):
+		chance += 0.15
+	return minf(chance, 0.90)
 
 
 func _get_detonate_damage() -> int:
@@ -3822,7 +4295,10 @@ func _get_detonate_damage() -> int:
 
 
 func _get_detonate_radius() -> float:
-	return 72.0 + float(max(_detonate_level - 1, 0)) * 18.0
+	var radius := 72.0 + float(max(_detonate_level - 1, 0)) * 18.0
+	if _has_endgame_evolution("evo_thunder_blast_relay"):
+		radius *= 1.28
+	return radius
 
 
 func _get_storm_orb_damage() -> int:
@@ -3834,19 +4310,28 @@ func _get_storm_orb_radius() -> float:
 
 
 func _get_storm_orb_duration() -> float:
-	return 5.0
+	return 8.0 if _has_endgame_evolution("evo_thunder_orb_overclock") else 5.0
 
 
 func _get_storm_orb_cooldown() -> float:
-	return maxf(3.0, (7.2 - float(max(_storm_orb_level - 1, 0)) * 0.42) * _get_cooldown_multiplier())
+	var cooldown := (7.2 - float(max(_storm_orb_level - 1, 0)) * 0.42) * _get_cooldown_multiplier()
+	if _has_endgame_evolution("evo_thunder_orb_overclock"):
+		cooldown *= 0.82
+	return maxf(2.6, cooldown)
 
 
 func _get_storm_orb_pulse_interval() -> float:
-	return maxf(0.28, 0.72 - float(max(_storm_orb_level - 1, 0)) * 0.08)
+	var interval := 0.72 - float(max(_storm_orb_level - 1, 0)) * 0.08
+	if _has_endgame_evolution("evo_thunder_orb_overclock"):
+		interval *= 0.68
+	return maxf(0.22, interval)
 
 
 func _get_storm_orb_target_count() -> int:
-	return min(_get_chain_target_count(), 2 + _storm_orb_level * 2 + int(_ascension_level > 0))
+	var bonus := 0
+	if _has_endgame_evolution("evo_thunder_orb_overclock"):
+		bonus = 3
+	return min(_get_chain_target_count(), 2 + _storm_orb_level * 2 + int(_ascension_level > 0) + bonus)
 
 
 func _get_storm_orb_cast_range() -> float:
@@ -3886,19 +4371,28 @@ func _get_slash_search_range() -> float:
 
 
 func _get_slash_wave_damage() -> int:
-	return int(round((14.0 + float(max(_slash_level - 1, 0)) * 4.0) * _get_spell_power_multiplier()))
+	return int(round((14.0 + float(max(_slash_level - 1, 0)) * 4.0) * _get_spell_power_multiplier() * _get_endgame_damage_multiplier("slash_wave")))
 
 
 func _get_slash_wave_range() -> float:
-	return 132.0 + float(max(_slash_level - 1, 0)) * 28.0
+	var range_value := 132.0 + float(max(_slash_level - 1, 0)) * 28.0
+	if _has_endgame_evolution("evo_blade_crimson_tide"):
+		range_value *= 1.48
+	return range_value
 
 
 func _get_slash_wave_radius() -> float:
-	return 14.0 + float(max(_slash_level - 1, 0)) * 1.8
+	var radius := 14.0 + float(max(_slash_level - 1, 0)) * 1.8
+	if _has_endgame_evolution("evo_blade_crimson_tide"):
+		radius *= 1.24
+	return radius
 
 
 func _get_slash_wave_speed() -> float:
-	return 460.0 + float(max(_slash_level - 1, 0)) * 8.0
+	var speed := 460.0 + float(max(_slash_level - 1, 0)) * 8.0
+	if _has_endgame_evolution("evo_blade_crimson_tide"):
+		speed *= 1.10
+	return speed
 
 
 func _get_slash_arc_span() -> float:
@@ -3914,19 +4408,25 @@ func _get_slash_knockback() -> float:
 
 
 func _get_blade_ring_count() -> int:
-	return _blade_ring_level
+	return _blade_ring_level + _get_extra_orbit_count_bonus()
 
 
 func _get_blade_ring_damage() -> int:
-	return int(round((12.0 + float(max(_blade_ring_level - 1, 0)) * 5.0) * _get_spell_power_multiplier()))
+	return int(round((12.0 + float(max(_blade_ring_level - 1, 0)) * 5.0) * _get_spell_power_multiplier() * _get_endgame_damage_multiplier("blade_ring")))
 
 
 func _get_blade_ring_radius() -> float:
-	return 74.0 + float(max(_blade_ring_level - 1, 0)) * 14.0
+	var radius := 74.0 + float(max(_blade_ring_level - 1, 0)) * 14.0
+	if _has_endgame_evolution("evo_blade_ring_dominion"):
+		radius += 28.0
+	return radius
 
 
 func _get_blade_ring_speed() -> float:
-	return 2.6 + float(_blade_ring_level) * 0.34
+	var speed := 2.6 + float(_blade_ring_level) * 0.34
+	if _has_endgame_evolution("evo_blade_ring_dominion"):
+		speed *= 1.18
+	return speed
 
 
 func _get_mooncut_projectile_count() -> int:
@@ -3964,7 +4464,10 @@ func _get_step_slash_radius() -> float:
 
 
 func _get_step_slash_cooldown() -> float:
-	return maxf(3.1, (6.4 - float(max(_step_slash_level - 1, 0)) * 0.50) * _get_cooldown_multiplier())
+	var cooldown := (6.4 - float(max(_step_slash_level - 1, 0)) * 0.50) * _get_cooldown_multiplier()
+	if _has_endgame_evolution("evo_blade_execution_storm"):
+		cooldown *= 0.72
+	return maxf(2.2, cooldown)
 
 
 func _get_step_slash_knockback() -> float:
@@ -3972,11 +4475,14 @@ func _get_step_slash_knockback() -> float:
 
 
 func _get_execution_radius() -> float:
-	return 92.0
+	var radius := 92.0
+	if _has_endgame_evolution("evo_blade_execution_storm"):
+		radius *= 1.34
+	return radius
 
 
 func _get_execution_damage() -> int:
-	return max(1, int(round(float(_get_step_slash_damage()) * 0.66)))
+	return max(1, int(round(float(_get_step_slash_damage()) * 0.66 * _get_endgame_damage_multiplier("execution"))))
 
 
 func _get_blade_mutation_text() -> String:

@@ -2,6 +2,14 @@ extends CharacterBody2D
 class_name EnemySoldier
 
 const SVG_MODEL_LIBRARY := preload("res://scripts/svg_model_library.gd")
+const ELITE_AFFIX_COLORS := {
+	"shielded": Color(0.42, 0.78, 1.0),
+	"splitter": Color(1.0, 0.76, 0.38),
+	"hunter": Color(1.0, 0.42, 0.34),
+	"snare": Color(0.80, 0.68, 1.0),
+	"deathburst": Color(1.0, 0.58, 0.30),
+	"dash": Color(0.64, 0.94, 1.0),
+}
 
 signal defeated(enemy, experience_value)
 signal special_attack(position, radius, primary_color, secondary_color)
@@ -13,6 +21,7 @@ var active: bool = true
 var archetype: String = "wisp"
 var elite: bool = false
 var boss: bool = false
+var elite_affixes: Array[String] = []
 var speed: float = 90.0
 var health: int = 18
 var max_health: int = 18
@@ -34,6 +43,9 @@ var _summon_type: String = "seer"
 var _special_cycle: int = 0
 var _boss_phase_index: int = 0
 var _boss_phase_thresholds := [0.70, 0.40, 0.15]
+var _elite_wave_rank: int = 1
+var _elite_affix_lookup: Dictionary = {}
+var _elite_affix_timers: Dictionary = {}
 var _shape_node: CollisionShape2D
 var _sprite: Sprite2D
 var _model_offset: Vector2 = Vector2.ZERO
@@ -53,6 +65,10 @@ func configure(type_name: String, wave_rank: int, is_elite: bool, player_target:
 	archetype = type_name
 	elite = is_elite
 	target = player_target
+	_elite_wave_rank = max(wave_rank, 1)
+	elite_affixes.clear()
+	_elite_affix_lookup.clear()
+	_elite_affix_timers.clear()
 	boss = bool(options.get("boss", false)) or archetype in ["storm_archon", "forge_tyrant", "void_matriarch"]
 	_phase = randf() * TAU
 	_special_timer = randf_range(1.1, 2.2)
@@ -135,8 +151,11 @@ func configure(type_name: String, wave_rank: int, is_elite: bool, player_target:
 		max_health = int(round(float(max_health) * 2.2))
 		touch_damage += 1
 		experience_value += 4
+		_configure_elite_affixes(options)
 
 	health = max_health
+	if elite and not boss and _has_elite_affix("shielded"):
+		set_shield(max(6, int(round(float(max_health) * 0.45))))
 	_update_shape()
 	_refresh_model()
 	queue_redraw()
@@ -166,6 +185,7 @@ func _physics_process(delta: float) -> void:
 	_facing_direction = direction
 
 	_process_special_behavior(to_player, direction)
+	_process_elite_affixes(delta, to_player, direction)
 
 	var desired_velocity := _build_desired_velocity(to_player, direction)
 	velocity = desired_velocity + _knockback
@@ -192,6 +212,9 @@ func take_damage(amount: int, impulse: Vector2 = Vector2.ZERO) -> void:
 	if amount <= 0 or health <= 0:
 		return
 
+	if elite and not boss and _has_elite_affix("shielded") and shield <= 0 and amount > 0:
+		amount = max(1, int(round(float(amount) * 0.86)))
+
 	if shield > 0:
 		var absorbed := mini(shield, amount)
 		shield -= absorbed
@@ -206,6 +229,7 @@ func take_damage(amount: int, impulse: Vector2 = Vector2.ZERO) -> void:
 
 	if health <= 0:
 		active = false
+		_trigger_elite_death_affixes()
 		defeated.emit(self, experience_value)
 		queue_free()
 
@@ -250,6 +274,17 @@ func get_boss_phase_index() -> int:
 	return _boss_phase_index
 
 
+func get_elite_affix_count() -> int:
+	return elite_affixes.size()
+
+
+func get_elite_affix_labels() -> Array[String]:
+	var labels: Array[String] = []
+	for affix_id in elite_affixes:
+		labels.append(_get_elite_affix_label(affix_id))
+	return labels
+
+
 func _process_special_behavior(to_player: Vector2, direction: Vector2) -> void:
 	if _special_timer > 0.0:
 		return
@@ -271,6 +306,36 @@ func _process_special_behavior(to_player: Vector2, direction: Vector2) -> void:
 			_use_forge_tyrant_skill(direction)
 		"void_matriarch":
 			_use_void_matriarch_skill(direction)
+
+
+func _process_elite_affixes(delta: float, to_player: Vector2, direction: Vector2) -> void:
+	if not elite or boss or elite_affixes.is_empty():
+		return
+
+	if _has_elite_affix("dash"):
+		var dash_timer := maxf(0.0, float(_elite_affix_timers.get("dash", 0.0)) - delta)
+		_elite_affix_timers["dash"] = dash_timer
+		if dash_timer <= 0.0 and _dash_time <= 0.0:
+			_dash_velocity = direction * speed * 3.8
+			_dash_time = 0.32
+			var rush_marker := global_position + direction * (_body_radius + 26.0)
+			special_attack.emit(rush_marker, 44.0, Color(0.72, 0.96, 1.0), Color(0.26, 0.64, 0.98))
+			if _player_in_radius(rush_marker, 44.0):
+				target.take_damage(1)
+			_elite_affix_timers["dash"] = randf_range(4.2, 5.4)
+
+	if _has_elite_affix("snare"):
+		var snare_timer := maxf(0.0, float(_elite_affix_timers.get("snare", 0.0)) - delta)
+		_elite_affix_timers["snare"] = snare_timer
+		if snare_timer <= 0.0:
+			var snare_radius := _get_snare_radius()
+			special_attack.emit(global_position, snare_radius, Color(0.84, 0.74, 1.0), Color(0.28, 0.18, 0.44))
+			if _player_in_radius(global_position, snare_radius):
+				target.take_damage(1 + int(_elite_wave_rank >= 7))
+			_elite_affix_timers["snare"] = randf_range(3.6, 4.8)
+
+	if _has_elite_affix("hunter") and to_player.length() > 200.0 and int(_phase * 10.0) % 9 == 0:
+		_knockback += direction * 10.0 * delta
 
 
 func _use_storm_archon_skill(direction: Vector2) -> void:
@@ -445,20 +510,21 @@ func _build_desired_velocity(to_player: Vector2, direction: Vector2) -> Vector2:
 		return _dash_velocity
 
 	var boss_phase_speed_bonus := 1.0 + float(_boss_phase_index) * 0.06
+	var elite_speed_multiplier := _get_elite_speed_multiplier(to_player.length())
 	match archetype:
 		"lancer":
 			if to_player.length() < 110.0:
-				return direction.orthogonal() * speed * 0.7
-			return direction * speed
+				return direction.orthogonal() * speed * 0.7 * elite_speed_multiplier
+			return direction * speed * elite_speed_multiplier
 		"brute":
-			return direction * speed
+			return direction * speed * elite_speed_multiplier
 		"embermage":
-			return direction * speed * 0.74 + direction.orthogonal() * cos(_phase * 1.6) * 62.0
+			return (direction * speed * 0.74 + direction.orthogonal() * cos(_phase * 1.6) * 62.0) * elite_speed_multiplier
 		"seer":
-			return direction * speed + direction.orthogonal() * sin(_phase) * 34.0
+			return (direction * speed + direction.orthogonal() * sin(_phase) * 34.0) * elite_speed_multiplier
 		"mireling":
 			var pull_speed := speed * (0.68 if to_player.length() < 120.0 else 1.0)
-			return direction * pull_speed + direction.orthogonal() * sin(_phase * 0.75) * 18.0
+			return (direction * pull_speed + direction.orthogonal() * sin(_phase * 0.75) * 18.0) * elite_speed_multiplier
 		"storm_archon":
 			return direction * speed * 0.74 * boss_phase_speed_bonus + direction.orthogonal() * _orbit_direction * (94.0 + float(_boss_phase_index) * 10.0)
 		"forge_tyrant":
@@ -470,7 +536,7 @@ func _build_desired_velocity(to_player: Vector2, direction: Vector2) -> Vector2:
 				pull *= -0.35
 			return orbit_velocity + pull
 		_:
-			return direction * speed
+			return direction * speed * elite_speed_multiplier
 
 
 func _draw() -> void:
@@ -490,6 +556,8 @@ func _draw() -> void:
 
 	if boss or elite or health < max_health or shield > 0:
 		_draw_health_bar(accent_color)
+	if elite and not boss and not elite_affixes.is_empty():
+		_draw_elite_affix_markers()
 
 
 func _draw_health_bar(fill_color: Color) -> void:
@@ -518,6 +586,26 @@ func _draw_boss_phase_pips(fill_color: Color) -> void:
 		draw_circle(Vector2(start_x + float(index) * spacing, y), 3.4, pip_color)
 
 
+func _draw_elite_affix_markers() -> void:
+	var marker_count := mini(elite_affixes.size(), 3)
+	if marker_count <= 0:
+		return
+	var spacing := 12.0
+	var start_x := -spacing * float(marker_count - 1) * 0.5
+	var y := -_body_radius - 28.0
+	for index in range(marker_count):
+		var affix_id := elite_affixes[index]
+		var color: Color = ELITE_AFFIX_COLORS.get(affix_id, Color(0.94, 0.94, 1.0))
+		var center := Vector2(start_x + float(index) * spacing, y)
+		var points := PackedVector2Array([
+			center + Vector2(0.0, -4.4),
+			center + Vector2(4.4, 0.0),
+			center + Vector2(0.0, 4.4),
+			center + Vector2(-4.4, 0.0),
+		])
+		draw_colored_polygon(points, color)
+
+
 func _check_boss_phase_transition() -> void:
 	if not boss or health <= 0:
 		return
@@ -536,6 +624,92 @@ func _get_effective_vitality_ratio() -> float:
 	var total_max := float(max(max_health + max_shield, 1))
 	var total_current := float(max(health + shield, 0))
 	return total_current / total_max
+
+
+func _configure_elite_affixes(options: Dictionary) -> void:
+	var affix_variants = options.get("elite_affixes", [])
+	if not (affix_variants is Array):
+		return
+
+	for affix_variant in affix_variants:
+		var affix_id := String(affix_variant)
+		if affix_id.is_empty() or _elite_affix_lookup.has(affix_id):
+			continue
+		elite_affixes.append(affix_id)
+		_elite_affix_lookup[affix_id] = true
+
+	if elite_affixes.is_empty():
+		return
+
+	experience_value += elite_affixes.size() * 2
+	for affix_id in elite_affixes:
+		match affix_id:
+			"hunter":
+				speed *= 1.08
+			"dash":
+				_elite_affix_timers["dash"] = randf_range(1.2, 2.1)
+			"snare":
+				_elite_affix_timers["snare"] = randf_range(1.6, 2.8)
+
+
+func _has_elite_affix(affix_id: String) -> bool:
+	return _elite_affix_lookup.has(affix_id)
+
+
+func _get_elite_speed_multiplier(distance_to_player: float) -> float:
+	if not elite or boss or not _has_elite_affix("hunter"):
+		return 1.0
+	return 1.28 if distance_to_player > 180.0 else 1.12
+
+
+func _get_snare_radius() -> float:
+	return _body_radius + 48.0
+
+
+func _trigger_elite_death_affixes() -> void:
+	if not elite or boss:
+		return
+
+	if _has_elite_affix("deathburst"):
+		var burst_radius := _body_radius + 42.0
+		special_attack.emit(global_position, burst_radius, Color(1.0, 0.78, 0.40), Color(0.96, 0.34, 0.18))
+		if _player_in_radius(global_position, burst_radius):
+			target.take_damage(1 + int(_elite_wave_rank >= 8))
+
+	if _has_elite_affix("splitter"):
+		summon_requested.emit(global_position, _get_splitter_spawn_type(), 2, 126.0)
+
+
+func _get_splitter_spawn_type() -> String:
+	match archetype:
+		"brute":
+			return "lancer"
+		"mireling":
+			return "seer"
+		"embermage":
+			return "wisp"
+		"seer":
+			return "wisp"
+		_:
+			return archetype if archetype != "lancer" else "wisp"
+
+
+func _get_elite_affix_label(affix_id: String) -> String:
+	match affix_id:
+		"shielded":
+			return "护盾"
+		"splitter":
+			return "分裂"
+		"hunter":
+			return "追猎"
+		"snare":
+			return "禁锢圈"
+		"deathburst":
+			return "死后爆裂"
+		"dash":
+			return "周期冲锋"
+		_:
+			return affix_id
 
 
 func _ensure_collision_shape() -> void:
