@@ -1,0 +1,10 @@
+﻿.godot/
+*.import
+.openclaw/
+tmp/
+release_bundle/
+Godot_v4.6.1-stable_export_templates.tpz
+*.zip
+build/*
+!build/web/
+!build/web/**
