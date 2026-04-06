@@ -22,6 +22,7 @@ const LIGHTNING_ORB_FIELD_SCRIPT := preload("res://scripts/lightning_orb_field.g
 const SATELLITE_SCRIPT := preload("res://scripts/spell_satellite.gd")
 const METEOR_HAZARD_SCRIPT := preload("res://scripts/meteor_hazard.gd")
 const POISON_CLOUD_SCRIPT := preload("res://scripts/poison_cloud.gd")
+const MAP_RULE_ZONE_SCRIPT := preload("res://scripts/map_rule_zone.gd")
 const HUD_SCRIPT := preload("res://scripts/hud.gd")
 const TITLE_SCREEN_SCRIPT := preload("res://scripts/title_screen.gd")
 const AUDIO_SCRIPT := preload("res://scripts/game_audio.gd")
@@ -91,6 +92,61 @@ const UPGRADE_LIMITS := {
 	"magnet": 4,
 	"mastery": 4,
 }
+const THREAT_PHASE_TIMES := [60.0, 180.0, 300.0, 420.0, 540.0]
+const THREAT_PHASE_LABELS := [
+	"00:00-01:00 清杂兵",
+	"01:00-03:00 冲脸压迫",
+	"03:00-05:00 精英压迫",
+	"05:00-07:00 地图机制",
+	"07:00-09:00 高压混编",
+	"09:00+ 首领前夜",
+]
+const THREAT_PHASE_MESSAGES := [
+	"杂兵潮正在成型，先稳住刷怪节奏。",
+	"01:00 冲脸兵入场，开始用走位拆突进。",
+	"03:00 第一次精英压迫开始，优先清高威胁目标。",
+	"05:00 地图规则启动，战场会主动逼你换决策。",
+	"07:00 高压混编开始，远程、控场和精英会一起压上来。",
+	"09:00 首领前夜，准备迎接最后的高压混战。",
+]
+const ENDLESS_WORLD_MUTATIONS := [
+	{
+		"id": "stormfront",
+		"name": "世界变异: 风暴前线",
+		"summary": "敌群刷新更快，倍率提升。",
+		"spawn_bonus": 0.55,
+		"score_bonus": 0.25,
+	},
+	{
+		"id": "hunters_mark",
+		"name": "世界变异: 猎杀指令",
+		"summary": "精英出现率大增，倍率继续上扬。",
+		"elite_bonus": 0.08,
+		"score_bonus": 0.22,
+	},
+	{
+		"id": "hazard_bloom",
+		"name": "世界变异: 灾厄扩散",
+		"summary": "地图规则更频繁，危险也更值分。",
+		"hazard_bonus": 0.22,
+		"score_bonus": 0.20,
+	},
+	{
+		"id": "predator_step",
+		"name": "世界变异: 捕食步调",
+		"summary": "敌人移动更快，压迫更强。",
+		"speed_bonus": 0.12,
+		"score_bonus": 0.18,
+	},
+	{
+		"id": "titan_blood",
+		"name": "世界变异: 泰坦血性",
+		"summary": "敌人与首领更耐打，首领循环更快。",
+		"health_bonus": 0.18,
+		"boss_scale": 0.90,
+		"score_bonus": 0.30,
+	},
+]
 const MAP_DEFINITIONS := [
 	{
 		"id": "sky_ruins",
@@ -232,6 +288,29 @@ var _boss_spawned: bool = false
 var _boss_defeated: bool = false
 var _boss_warning_shown: bool = false
 var _next_boss_spawn_time: float = 600.0
+var _threat_phase: int = 0
+var _pressure_wave_timer: float = 0.0
+var _map_rule_active: bool = false
+var _map_rule_timer: float = 0.0
+var _ruins_altar_zone: MapRuleZone = null
+var _ruins_altar_progress: float = 0.0
+var _ruins_altar_respawn_timer: float = 0.0
+var _ruins_altar_buff_timer: float = 0.0
+var _void_pool_timer: float = 0.0
+var _void_pools: Array[Dictionary] = []
+var _score: int = 0
+var _score_bonus_multiplier: float = 0.0
+var _pickup_heat_bonus: float = 0.0
+var _pickup_heat_timer: float = 0.0
+var _world_mutation_index: int = 0
+var _next_world_mutation_time: float = 180.0
+var _active_world_mutations: Array[String] = []
+var _endless_spawn_bonus: float = 0.0
+var _endless_elite_bonus: float = 0.0
+var _endless_enemy_speed_bonus: float = 0.0
+var _endless_enemy_health_bonus: float = 0.0
+var _endless_hazard_bonus: float = 0.0
+var _endless_boss_interval_scale: float = 1.0
 
 var _run_time: float = 0.0
 var _spawn_budget: float = 0.0
@@ -260,10 +339,13 @@ var _step_slash_level: int = 0
 var _flame_split_mutation: bool = false
 var _rend_mutation: bool = false
 var _execution_mutation: bool = false
+var _nova_orbit_mutation: bool = false
+var _storm_singularity_mutation: bool = false
 var _chain_level: int = 1
 var _detonate_level: int = 0
 var _storm_orb_level: int = 0
 var _ascension_level: int = 0
+var _supercell_mutation: bool = false
 
 var _bolt_timer: float = 0.0
 var _nova_timer: float = 1.4
@@ -417,6 +499,7 @@ func _process(delta: float) -> void:
 	_cleanup_timer += delta
 	_hud_refresh_timer += delta
 
+	_update_run_pacing(delta)
 	_update_spell_attacks(delta)
 	_update_environment_hazards(delta)
 
@@ -597,6 +680,10 @@ func _reset_runtime_collections() -> void:
 	_upgrade_choices.clear()
 	_boss_enemy = null
 	_thunder_orb_field = null
+	_ruins_altar_zone = null
+	_void_pools.clear()
+	if _player != null and is_instance_valid(_player):
+		_player.set_move_speed_multiplier(1.0)
 
 
 func _reset_progression_state() -> void:
@@ -611,6 +698,28 @@ func _reset_progression_state() -> void:
 	_kills = 0
 	_experience = 0.0
 	_xp_to_next = _get_xp_needed(_level)
+	_score = 0
+	_score_bonus_multiplier = 0.0
+	_pickup_heat_bonus = 0.0
+	_pickup_heat_timer = 0.0
+	_threat_phase = 0
+	_pressure_wave_timer = 8.0
+	_map_rule_active = false
+	_map_rule_timer = 0.0
+	_ruins_altar_progress = 0.0
+	_ruins_altar_respawn_timer = 0.0
+	_ruins_altar_buff_timer = 0.0
+	_void_pool_timer = 6.0
+	_void_pools.clear()
+	_world_mutation_index = 0
+	_next_world_mutation_time = 180.0
+	_active_world_mutations.clear()
+	_endless_spawn_bonus = 0.0
+	_endless_elite_bonus = 0.0
+	_endless_enemy_speed_bonus = 0.0
+	_endless_enemy_health_bonus = 0.0
+	_endless_hazard_bonus = 0.0
+	_endless_boss_interval_scale = 1.0
 
 	_bolt_level = 1
 	_orbit_level = 0
@@ -628,10 +737,13 @@ func _reset_progression_state() -> void:
 	_flame_split_mutation = false
 	_rend_mutation = false
 	_execution_mutation = false
+	_nova_orbit_mutation = false
+	_storm_singularity_mutation = false
 	_chain_level = 1
 	_detonate_level = 0
 	_storm_orb_level = 0
 	_ascension_level = 0
+	_supercell_mutation = false
 
 	_bolt_timer = 0.0
 	_nova_timer = 1.4
@@ -646,6 +758,8 @@ func _reset_progression_state() -> void:
 	_boss_defeated = false
 	_boss_warning_shown = false
 	_next_boss_spawn_time = _get_initial_boss_spawn_time()
+	if _player != null and is_instance_valid(_player):
+		_player.set_move_speed_multiplier(1.0)
 
 
 func _clear_node_children(node: Node) -> void:
@@ -666,6 +780,156 @@ func _update_message_timer(delta: float) -> void:
 	_message_timer = maxf(0.0, _message_timer - delta)
 	if _message_timer <= 0.0:
 		_hud.set_message("")
+
+
+func _update_run_pacing(delta: float) -> void:
+	_update_pickup_heat(delta)
+	_update_threat_phase(delta)
+	_update_map_rule_state(delta)
+	_update_endless_mutations()
+
+
+func _update_pickup_heat(delta: float) -> void:
+	if _pickup_heat_timer > 0.0:
+		_pickup_heat_timer = maxf(0.0, _pickup_heat_timer - delta)
+	if _pickup_heat_timer <= 0.0 and _pickup_heat_bonus > 0.0:
+		_pickup_heat_bonus = maxf(0.0, _pickup_heat_bonus - delta * 0.08)
+
+
+func _update_threat_phase(delta: float) -> void:
+	var next_phase := 0
+	for threshold in THREAT_PHASE_TIMES:
+		if _run_time >= threshold:
+			next_phase += 1
+	if next_phase > _threat_phase:
+		for phase in range(_threat_phase + 1, next_phase + 1):
+			_on_threat_phase_changed(phase)
+	_threat_phase = next_phase
+
+	if _threat_phase <= 0:
+		return
+
+	_pressure_wave_timer -= delta
+	if _pressure_wave_timer > 0.0:
+		return
+
+	_spawn_pressure_wave(_threat_phase)
+	_pressure_wave_timer = _get_pressure_wave_interval(_threat_phase)
+
+
+func _on_threat_phase_changed(phase: int) -> void:
+	if phase < THREAT_PHASE_MESSAGES.size():
+		_show_message(THREAT_PHASE_MESSAGES[phase], Color(1.0, 0.92, 0.66), 3.0)
+	if phase == 2:
+		_spawn_pressure_wave(phase, true)
+	elif phase == 3:
+		_map_rule_active = true
+		_map_rule_timer = 0.0
+		_spawn_pressure_wave(phase, true)
+	elif phase >= 4:
+		_spawn_pressure_wave(phase, true)
+
+
+func _get_pressure_wave_interval(phase: int) -> float:
+	match phase:
+		1:
+			return 24.0
+		2:
+			return 18.0
+		3:
+			return 15.0
+		4:
+			return 12.5
+		_:
+			return 10.5
+
+
+func _spawn_pressure_wave(phase: int, immediate: bool = false) -> void:
+	if _enemies.size() >= _get_active_enemy_cap():
+		return
+
+	var pressure_roles: Array[String] = []
+	var elite_roles: Array[String] = []
+	match phase:
+		1:
+			pressure_roles = ["diver", "fodder"]
+		2:
+			pressure_roles = ["diver", "ranged", "fodder"]
+			elite_roles = ["diver"]
+		3:
+			pressure_roles = ["ranged", "control", "diver"]
+			elite_roles = ["ranged"]
+		4:
+			pressure_roles = ["diver", "ranged", "control", "fodder"]
+			elite_roles = ["elite", "control"]
+		_:
+			pressure_roles = ["diver", "ranged", "control", "elite"]
+			elite_roles = ["elite", "ranged"]
+
+	var pack_size := 1 + phase
+	if immediate:
+		pack_size += 1
+	if _mobile_layout:
+		pack_size = maxi(2, pack_size - 1)
+
+	for index in range(pack_size):
+		if _enemies.size() >= _get_active_enemy_cap():
+			break
+		var role := pressure_roles[index % pressure_roles.size()]
+		var make_elite := not elite_roles.is_empty() and (immediate or phase >= 2) and index == 0
+		if make_elite:
+			role = elite_roles[0]
+		_spawn_role_enemy(role, make_elite)
+
+
+func _spawn_role_enemy(role: String, force_elite: bool = false) -> void:
+	var roster: Array[String] = _get_enemy_roster_for_role(role)
+	if roster.is_empty():
+		return
+	var type_name := roster[_rng.randi_range(0, roster.size() - 1)]
+	var is_elite := force_elite and type_name not in ["storm_archon", "forge_tyrant", "void_matriarch"]
+	_spawn_enemy(type_name, is_elite, {"wave_rank": _get_wave_rank() + int(force_elite)})
+
+
+func _get_enemy_roster_for_role(role: String) -> Array[String]:
+	match role:
+		"diver":
+			return ["lancer"]
+		"ranged":
+			return ["embermage"]
+		"control":
+			return ["seer", "mireling"]
+		"elite":
+			return ["brute", "mireling", "embermage"]
+		_:
+			return ["wisp", "brute"]
+
+
+func _update_map_rule_state(delta: float) -> void:
+	if not _map_rule_active:
+		if _ruins_altar_buff_timer > 0.0:
+			_ruins_altar_buff_timer = maxf(0.0, _ruins_altar_buff_timer - delta)
+		if _player != null and is_instance_valid(_player):
+			_player.set_move_speed_multiplier(1.0)
+		return
+
+	if _ruins_altar_buff_timer > 0.0:
+		_ruins_altar_buff_timer = maxf(0.0, _ruins_altar_buff_timer - delta)
+
+	match _selected_map_id:
+		"sky_ruins":
+			_update_sky_ruins_rule(delta)
+		"ember_forge":
+			_update_ember_forge_rule(delta)
+		"void_marsh":
+			_update_void_marsh_rule(delta)
+
+
+func _update_endless_mutations() -> void:
+	if not _is_endless_mode() or _run_time < _next_world_mutation_time:
+		return
+	_apply_next_world_mutation()
+	_next_world_mutation_time += 180.0
 
 
 func _update_spell_attacks(delta: float) -> void:
@@ -774,6 +1038,237 @@ func _pick_hazard_focus_position(min_distance: float, max_distance: float) -> Ve
 	return _player.global_position + Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU)) * _rng.randf_range(min_distance, max_distance)
 
 
+func _update_sky_ruins_rule(delta: float) -> void:
+	if _ruins_altar_zone == null or not is_instance_valid(_ruins_altar_zone):
+		_ruins_altar_respawn_timer = maxf(0.0, _ruins_altar_respawn_timer - delta)
+		if _ruins_altar_respawn_timer <= 0.0:
+			_spawn_ruins_altar()
+		return
+
+	var radius := _ruins_altar_zone.radius
+	var inside := _player != null and is_instance_valid(_player) and _player.global_position.distance_to(_ruins_altar_zone.global_position) <= radius + _player.get_body_radius()
+	var nearby_pressure := _count_enemies_in_radius(_ruins_altar_zone.global_position, radius * 1.2)
+	if inside:
+		var pressure_bonus := minf(0.55, float(nearby_pressure) * 0.03)
+		_ruins_altar_progress = minf(1.0, _ruins_altar_progress + delta * (0.34 + pressure_bonus))
+	else:
+		_ruins_altar_progress = maxf(0.0, _ruins_altar_progress - delta * 0.10)
+
+	_ruins_altar_zone.progress = _ruins_altar_progress
+	_ruins_altar_zone.sublabel = "驻足夺取，当前 %.0f%%" % (_ruins_altar_progress * 100.0)
+
+	if _ruins_altar_progress < 1.0:
+		return
+
+	_spawn_effect(_ruins_altar_zone.global_position, radius * 1.08, Color(0.86, 0.96, 1.0), Color(0.38, 0.72, 1.0), 0.36)
+	_damage_enemies_in_radius(_ruins_altar_zone.global_position, radius * 1.12, max(8, int(round(float(_get_wave_rank()) * 1.8))), 240.0, 8)
+	_award_score(90 + _get_wave_rank() * 16)
+	_ruins_altar_zone.queue_free()
+	_ruins_altar_zone = null
+	_ruins_altar_progress = 0.0
+	_ruins_altar_respawn_timer = 34.0
+	_ruins_altar_buff_timer = 22.0
+	_show_message("祭坛被夺取: 20 秒冷却加速与冲榜倍率提升。", Color(0.86, 0.96, 1.0), 2.8)
+
+
+func _spawn_ruins_altar() -> void:
+	if _hazard_root == null or not is_instance_valid(_hazard_root):
+		return
+	_ruins_altar_zone = MAP_RULE_ZONE_SCRIPT.new()
+	_ruins_altar_zone.global_position = _pick_hazard_focus_position(180.0, 320.0)
+	_ruins_altar_zone.radius = 92.0
+	_ruins_altar_zone.primary_color = Color(0.40, 0.76, 1.0, 0.92)
+	_ruins_altar_zone.secondary_color = Color(0.92, 0.98, 1.0, 0.84)
+	_ruins_altar_zone.label = "争夺祭坛"
+	_ruins_altar_zone.sublabel = "站进圈内完成抢占"
+	_ruins_altar_zone.icon_style = "altar"
+	_ruins_altar_zone.progress = 0.0
+	_hazard_root.add_child(_ruins_altar_zone)
+	_show_message("天空遗迹规则启动: 祭坛已显现，站圈可夺取强势增益。", Color(0.84, 0.94, 1.0), 2.8)
+
+
+func _update_ember_forge_rule(delta: float) -> void:
+	_map_rule_timer += delta
+	var interval := maxf(6.8, 11.0 - float(_threat_phase) * 0.8 - _endless_hazard_bonus * 8.0)
+	if _map_rule_timer < interval:
+		return
+	_map_rule_timer = 0.0
+	_trigger_forge_flame_pattern()
+
+
+func _trigger_forge_flame_pattern() -> void:
+	if _player == null or not is_instance_valid(_player):
+		return
+	var horizontal := _rng.randf() < 0.5
+	var lane_count := 2 + int(_threat_phase >= 4)
+	var spacing := 132.0 if horizontal else 148.0
+	var base_center := _player.global_position + Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU)) * _rng.randf_range(40.0, 120.0)
+	for lane in range(lane_count):
+		var lane_offset := (float(lane) - float(lane_count - 1) * 0.5) * spacing
+		var start_position := base_center + (Vector2(-430.0, lane_offset) if horizontal else Vector2(lane_offset, -430.0))
+		var end_position := base_center + (Vector2(430.0, lane_offset) if horizontal else Vector2(lane_offset, 430.0))
+		_spawn_forge_lane_warning(start_position, end_position, 48.0 + float(_threat_phase) * 4.0, 0.82)
+
+	_show_message("熔炉喷口开启: 观察火线，横移换位。", Color(1.0, 0.84, 0.56), 2.2)
+
+
+func _spawn_forge_lane_warning(start_position: Vector2, end_position: Vector2, width: float, warning_duration: float) -> void:
+	var segments := 6
+	for index in range(segments):
+		var t := float(index) / float(max(segments - 1, 1))
+		var marker_position := start_position.lerp(end_position, t)
+		var meteor: MeteorHazard = METEOR_HAZARD_SCRIPT.new()
+		meteor.global_position = marker_position
+		meteor.warning_duration = warning_duration
+		meteor.linger_duration = 0.26
+		meteor.damage_radius = width * 0.68
+		meteor.current_health_ratio = 0.0
+		meteor.knockback = 0.0
+		meteor.impact.connect(_on_forge_lane_marker_impact)
+		_hazard_root.add_child(meteor)
+
+	var timer := get_tree().create_timer(warning_duration, false)
+	timer.timeout.connect(_trigger_forge_lane_damage.bind(start_position, end_position, width))
+
+
+func _on_forge_lane_marker_impact(position: Vector2, radius: float, _current_health_ratio: float, _knockback: float) -> void:
+	_spawn_effect(position, radius * 1.16, Color(1.0, 0.82, 0.48), Color(0.96, 0.30, 0.16), 0.24)
+
+
+func _trigger_forge_lane_damage(start_position: Vector2, end_position: Vector2, width: float) -> void:
+	_apply_line_current_health_damage(start_position, end_position, width, 0.16, 260.0)
+	for index in range(7):
+		var t := float(index) / 6.0
+		var effect_position := start_position.lerp(end_position, t)
+		_spawn_effect(effect_position, width * 0.92, Color(1.0, 0.80, 0.44), Color(0.92, 0.24, 0.12), 0.20)
+	_audio.play_enemy_shot(true)
+
+
+func _update_void_marsh_rule(delta: float) -> void:
+	var player_speed_scale := 1.0
+	_void_pool_timer -= delta
+	if _void_pool_timer <= 0.0:
+		_spawn_void_pool("mud" if _rng.randf() < 0.5 else "pool")
+		_void_pool_timer = maxf(6.2, 10.4 - float(_threat_phase) * 0.7 - _endless_hazard_bonus * 7.0)
+
+	for index in range(_void_pools.size() - 1, -1, -1):
+		var pool: Dictionary = _void_pools[index]
+		var node := pool.get("node", null) as MapRuleZone
+		if node == null or not is_instance_valid(node):
+			_void_pools.remove_at(index)
+			continue
+
+		pool["lifetime"] = float(pool.get("lifetime", 0.0)) - delta
+		pool["pulse_timer"] = float(pool.get("pulse_timer", 0.0)) - delta
+		if float(pool.get("lifetime", 0.0)) <= 0.0:
+			node.queue_free()
+			_void_pools.remove_at(index)
+			continue
+
+		var radius := float(pool.get("radius", 84.0))
+		var center := node.global_position
+		if String(pool.get("kind", "mud")) == "mud":
+			if _player != null and is_instance_valid(_player) and center.distance_to(_player.global_position) <= radius + _player.get_body_radius():
+				player_speed_scale = minf(player_speed_scale, 0.64)
+			node.sublabel = "减速泥潭"
+		else:
+			if float(pool.get("pulse_timer", 0.0)) <= 0.0:
+				_apply_area_max_health_damage_over_time(center, radius, 0.006, 0.55, 80.0)
+				pool["pulse_timer"] = 0.55
+			if _should_trigger_void_pool(node, radius):
+				_explode_void_pool(pool)
+				_void_pools.remove_at(index)
+				continue
+			node.sublabel = "可引爆毒池"
+
+		_void_pools[index] = pool
+
+	if _player != null and is_instance_valid(_player):
+		_player.set_move_speed_multiplier(player_speed_scale)
+
+
+func _spawn_void_pool(kind: String) -> void:
+	if _hazard_root == null or not is_instance_valid(_hazard_root):
+		return
+	var zone := MAP_RULE_ZONE_SCRIPT.new()
+	zone.global_position = _pick_hazard_focus_position(140.0, 300.0)
+	zone.radius = 82.0 if kind == "mud" else 76.0
+	zone.icon_style = kind
+	zone.progress = -1.0
+	if kind == "mud":
+		zone.primary_color = Color(0.48, 0.72, 0.40, 0.90)
+		zone.secondary_color = Color(0.86, 0.96, 0.82, 0.82)
+		zone.label = "泥潭"
+	else:
+		zone.primary_color = Color(0.62, 0.88, 0.44, 0.92)
+		zone.secondary_color = Color(0.84, 0.98, 0.70, 0.82)
+		zone.label = "毒池"
+	_hazard_root.add_child(zone)
+	_void_pools.append({
+		"node": zone,
+		"kind": kind,
+		"radius": zone.radius,
+		"lifetime": 15.0 if kind == "mud" else 13.0,
+		"pulse_timer": 0.55,
+	})
+
+
+func _should_trigger_void_pool(node: MapRuleZone, radius: float) -> bool:
+	for projectile_variant in _projectiles:
+		var projectile: SpellProjectile = projectile_variant
+		if projectile == null or not is_instance_valid(projectile):
+			continue
+		if projectile.global_position.distance_to(node.global_position) <= radius:
+			return true
+	return false
+
+
+func _explode_void_pool(pool: Dictionary) -> void:
+	var node := pool.get("node", null) as MapRuleZone
+	if node == null or not is_instance_valid(node):
+		return
+	var center := node.global_position
+	var radius := float(pool.get("radius", 76.0)) * 1.16
+	_spawn_effect(center, radius * 1.08, Color(0.86, 0.98, 0.62), Color(0.24, 0.50, 0.18), 0.32)
+	_apply_area_current_health_damage(center, radius, 0.14, 220.0)
+	node.queue_free()
+
+
+func _trigger_void_pool_explosions(center: Vector2, radius: float) -> void:
+	for index in range(_void_pools.size() - 1, -1, -1):
+		var pool: Dictionary = _void_pools[index]
+		if String(pool.get("kind", "")) != "pool":
+			continue
+		var node := pool.get("node", null) as MapRuleZone
+		if node == null or not is_instance_valid(node):
+			_void_pools.remove_at(index)
+			continue
+		var pool_radius := float(pool.get("radius", 76.0))
+		if center.distance_to(node.global_position) <= radius + pool_radius:
+			_explode_void_pool(pool)
+			_void_pools.remove_at(index)
+
+
+func _apply_next_world_mutation() -> void:
+	var mutation: Dictionary = ENDLESS_WORLD_MUTATIONS[_world_mutation_index % ENDLESS_WORLD_MUTATIONS.size()]
+	_world_mutation_index += 1
+	_active_world_mutations.append(String(mutation.get("name", "世界变异")))
+	_endless_spawn_bonus += float(mutation.get("spawn_bonus", 0.0))
+	_endless_elite_bonus += float(mutation.get("elite_bonus", 0.0))
+	_endless_enemy_speed_bonus += float(mutation.get("speed_bonus", 0.0))
+	_endless_enemy_health_bonus += float(mutation.get("health_bonus", 0.0))
+	_endless_hazard_bonus += float(mutation.get("hazard_bonus", 0.0))
+	_endless_boss_interval_scale *= float(mutation.get("boss_scale", 1.0))
+	_score_bonus_multiplier += float(mutation.get("score_bonus", 0.0))
+	_show_message("%s: %s" % [String(mutation.get("name", "世界变异")), String(mutation.get("summary", ""))], Color(1.0, 0.92, 0.64), 3.0)
+
+
+func _get_latest_world_mutation_name() -> String:
+	if _active_world_mutations.is_empty():
+		return "无"
+	return _active_world_mutations[_active_world_mutations.size() - 1]
+
+
 func _fire_bolts() -> void:
 	if _player == null or not is_instance_valid(_player):
 		return
@@ -828,6 +1323,17 @@ func _cast_nova() -> void:
 		projectile.tint = Color(0.98, 0.72, 0.30)
 		_register_projectile(projectile)
 
+	if _nova_orbit_mutation and not _satellites.is_empty():
+		for satellite_variant in _satellites:
+			var satellite: SpellSatellite = satellite_variant
+			if satellite == null or not is_instance_valid(satellite):
+				continue
+			var direction := (satellite.global_position - _player.global_position).normalized()
+			if direction == Vector2.ZERO:
+				direction = Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU))
+			_spawn_nova_satellite_shard(satellite.global_position, direction)
+
+	_trigger_void_pool_explosions(_player.global_position, 160.0)
 	_spawn_effect(_player.global_position, 72.0, Color(0.98, 0.84, 0.42), Color(1.0, 0.40, 0.20), 0.34)
 	_audio.play_player_shot("power")
 
@@ -845,6 +1351,10 @@ func _cast_storm() -> void:
 			continue
 		_spawn_effect(target.global_position, 56.0, Color(0.84, 0.94, 1.0), Color(0.26, 0.60, 1.0), 0.30)
 		target.take_damage(_get_storm_damage())
+		if _storm_singularity_mutation:
+			_pull_enemies_toward_point(target.global_position, 132.0, 220.0)
+			_damage_enemies_in_radius(target.global_position, 64.0, max(1, int(round(float(_get_storm_damage()) * 0.42))), 180.0, 4)
+		_trigger_void_pool_explosions(target.global_position, 72.0)
 
 	_audio.play_player_shot("power")
 
@@ -914,6 +1424,7 @@ func _emit_chain_lightning(origin: Vector2, max_targets: int, initial_range: flo
 		if impulse_direction == Vector2.ZERO:
 			impulse_direction = Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU))
 		target.take_damage(damage, impulse_direction * knockback)
+		_trigger_void_pool_explosions(target_position, 36.0)
 		hit_enemies.append(target)
 		current_origin = target_position
 		current_range = bounce_range
@@ -1031,6 +1542,17 @@ func _try_trigger_detonate(position: Vector2) -> void:
 			continue
 		_spawn_lightning_link_effect(position, target.global_position, 5.4)
 	_damage_enemies_in_radius(position, _get_detonate_radius(), _get_detonate_damage(), 240.0)
+	_trigger_void_pool_explosions(position, _get_detonate_radius() + 18.0)
+	if _supercell_mutation:
+		_emit_chain_lightning(
+			position,
+			3 + int(_storm_orb_level > 0),
+			_get_detonate_radius() + 42.0,
+			_get_chain_bounce_range() * 0.72,
+			max(1, int(round(float(_get_chain_damage()) * 0.54))),
+			_get_chain_knockback() * 0.76,
+			false
+		)
 
 
 func _spawn_lightning_link_effect(start_position: Vector2, end_position: Vector2, thickness: float = 8.0) -> void:
@@ -1100,6 +1622,7 @@ func _perform_steel_slash() -> bool:
 	)
 	_spawn_slash_effect(_player.global_position, direction, _get_slash_range(), _get_slash_arc_span())
 	var slash_wave := _spawn_slash_flame_wave(_player.global_position + direction * 18.0, direction)
+	_trigger_void_pool_explosions(_player.global_position + direction * _get_slash_range() * 0.48, _get_slash_range() * 0.70)
 
 	if hit_count <= 0 and slash_wave == null:
 		return false
@@ -1175,6 +1698,7 @@ func _cast_mooncut() -> bool:
 		_spawn_blade_wave(primary_direction.rotated(0.44), 0.88, 0.96)
 		_spawn_blade_wave(primary_direction.rotated(-0.44), 0.88, 0.96)
 
+	_trigger_void_pool_explosions(_player.global_position + primary_direction * 160.0, 120.0)
 	_spawn_effect(_player.global_position + primary_direction * 18.0, 42.0, Color(0.92, 0.94, 1.0), Color(0.96, 0.50, 0.36), 0.20)
 	_audio.play_player_shot("spread")
 	return true
@@ -1199,6 +1723,40 @@ func _spawn_blade_wave(direction: Vector2, damage_scale: float = 1.0, speed_scal
 	projectile.secondary_tint = Color(1.0, 0.58, 0.38, 0.52)
 	projectile.visual_style = "blade_wave"
 	_register_projectile(projectile)
+
+
+func _spawn_nova_satellite_shard(origin: Vector2, direction: Vector2) -> void:
+	if _projectile_root == null or not is_instance_valid(_projectile_root):
+		return
+	if direction == Vector2.ZERO:
+		direction = Vector2.RIGHT
+
+	var projectile: SpellProjectile = PROJECTILE_SCRIPT.new()
+	projectile.global_position = origin
+	projectile.direction = direction.normalized()
+	projectile.damage = max(1, int(round(float(_get_nova_damage()) * 0.55)))
+	projectile.speed = 520.0
+	projectile.radius = 8.0
+	projectile.pierce = 1
+	projectile.max_distance = 240.0
+	projectile.knockback = 180.0
+	projectile.tint = Color(1.0, 0.84, 0.48)
+	projectile.secondary_tint = Color(0.98, 0.96, 0.74, 0.56)
+	_register_projectile(projectile)
+
+
+func _pull_enemies_toward_point(center: Vector2, radius: float, force: float) -> void:
+	for enemy_variant in _enemies:
+		var enemy: EnemySoldier = enemy_variant
+		if enemy == null or not is_instance_valid(enemy):
+			continue
+		var distance := center.distance_to(enemy.global_position)
+		if distance > radius + enemy.get_body_radius():
+			continue
+		var impulse := center - enemy.global_position
+		if impulse == Vector2.ZERO:
+			impulse = Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU))
+		enemy.apply_impulse(impulse.normalized() * force)
 
 
 func _register_projectile(projectile: SpellProjectile) -> void:
@@ -1241,6 +1799,7 @@ func _perform_step_slash() -> bool:
 	_spawn_effect(start_position, minf(radius * 0.36, 34.0), Color(1.0, 0.88, 0.70), Color(1.0, 0.56, 0.34), 0.16)
 	if _execution_mutation:
 		_trigger_execution_field(slash_center)
+	_trigger_void_pool_explosions(slash_center, radius + 24.0)
 
 	_audio.play_player_shot("power")
 	return true
@@ -1256,7 +1815,7 @@ func _spawn_regular_enemies() -> void:
 	while _spawn_budget >= 1.0 and _enemies.size() < _get_active_enemy_cap():
 		_spawn_budget -= 1.0
 		var enemy_type := _pick_weighted_enemy_type()
-		var elite_chance := minf(0.22, 0.04 + float(_get_wave_rank()) * 0.012)
+		var elite_chance := minf(0.34, 0.04 + float(_get_wave_rank()) * 0.012 + float(max(_threat_phase - 1, 0)) * 0.018 + _endless_elite_bonus)
 		var is_elite := not _boss_spawned and _run_time >= 90.0 and _rng.randf() < elite_chance
 		_spawn_enemy(enemy_type, is_elite)
 
@@ -1270,6 +1829,13 @@ func _spawn_enemy(type_name: String, is_elite: bool, options: Dictionary = {}) -
 	var wave_rank := int(options.get("wave_rank", _get_wave_rank()))
 	enemy.global_position = spawn_position
 	enemy.configure(type_name, wave_rank, is_elite, _player, options)
+	var health_scale := 1.0 + _endless_enemy_health_bonus + (0.05 if _threat_phase >= 4 and not enemy.is_boss() else 0.0)
+	if health_scale != 1.0:
+		enemy.max_health = max(1, int(round(float(enemy.max_health) * health_scale)))
+		enemy.health = enemy.max_health
+	var speed_scale := 1.0 + _endless_enemy_speed_bonus + float(max(_threat_phase - 2, 0)) * 0.03
+	if speed_scale != 1.0:
+		enemy.speed *= speed_scale
 	enemy.defeated.connect(_on_enemy_defeated)
 	enemy.special_attack.connect(_on_enemy_special_attack)
 	enemy.summon_requested.connect(_on_enemy_summon_requested)
@@ -1317,6 +1883,19 @@ func _find_spawn_position(min_distance: float, max_distance: float, radius: floa
 
 
 func _pick_weighted_enemy_type() -> String:
+	if _threat_phase >= 4 and _rng.randf() < 0.26:
+		var late_role_pool: Array[String] = ["diver", "ranged", "control", "fodder"]
+		var role: String = late_role_pool[_rng.randi_range(0, late_role_pool.size() - 1)]
+		var roster: Array[String] = _get_enemy_roster_for_role(role)
+		if not roster.is_empty():
+			return roster[_rng.randi_range(0, roster.size() - 1)]
+	elif _threat_phase >= 2 and _rng.randf() < 0.16:
+		var mid_role_pool: Array[String] = ["diver", "ranged", "control"]
+		var role: String = mid_role_pool[_rng.randi_range(0, mid_role_pool.size() - 1)]
+		var roster: Array[String] = _get_enemy_roster_for_role(role)
+		if not roster.is_empty():
+			return roster[_rng.randi_range(0, roster.size() - 1)]
+
 	var wave_weights: Dictionary = {}
 	var last_wave: Dictionary = {}
 	for wave_variant in _current_map.get("waves", []):
@@ -1529,8 +2108,9 @@ func _roll_hazard_interval() -> float:
 
 	var base_range: Vector2 = _current_map.get("hazard_interval", Vector2(5.8, 8.0))
 	var intensity := clampf(_run_time / 360.0, 0.0, 1.0)
-	var min_interval := maxf(1.8, base_range.x * lerpf(1.0, 0.76, intensity))
-	var max_interval := maxf(min_interval + 0.2, base_range.y * lerpf(1.0, 0.82, intensity))
+	var hazard_scale := maxf(0.58, 1.0 - _endless_hazard_bonus)
+	var min_interval := maxf(1.8, base_range.x * lerpf(1.0, 0.76, intensity) * hazard_scale)
+	var max_interval := maxf(min_interval + 0.2, base_range.y * lerpf(1.0, 0.82, intensity) * hazard_scale)
 	return _rng.randf_range(min_interval, max_interval)
 
 
@@ -1554,6 +2134,28 @@ func _apply_area_max_health_damage_over_time(center: Vector2, radius: float, rat
 		_accumulate_dot_damage(actor, raw_damage, knockback, center)
 
 
+func _apply_line_current_health_damage(start_position: Vector2, end_position: Vector2, width: float, current_health_ratio: float, knockback: float) -> void:
+	if current_health_ratio <= 0.0:
+		return
+
+	var actors: Array[Node] = []
+	if _player != null and is_instance_valid(_player) and _player.is_alive():
+		if _distance_to_segment(_player.global_position, start_position, end_position) <= width + _player.get_body_radius():
+			actors.append(_player)
+
+	for enemy_variant in _enemies:
+		var enemy: EnemySoldier = enemy_variant
+		if enemy == null or not is_instance_valid(enemy):
+			continue
+		if _distance_to_segment(enemy.global_position, start_position, end_position) <= width + enemy.get_body_radius():
+			actors.append(enemy)
+
+	for actor in actors:
+		var damage := maxi(1, int(ceili(_get_actor_current_health(actor) * current_health_ratio)))
+		var center := _get_actor_position(actor)
+		_apply_damage_to_actor(actor, damage, knockback, center)
+
+
 func _get_actors_in_area(center: Vector2, radius: float) -> Array[Node]:
 	var actors: Array[Node] = []
 	if _player != null and is_instance_valid(_player) and _player.is_alive():
@@ -1567,6 +2169,17 @@ func _get_actors_in_area(center: Vector2, radius: float) -> Array[Node]:
 		if center.distance_to(enemy.global_position) <= radius + enemy.get_body_radius():
 			actors.append(enemy)
 	return actors
+
+
+func _count_enemies_in_radius(center: Vector2, radius: float) -> int:
+	var count := 0
+	for enemy_variant in _enemies:
+		var enemy: EnemySoldier = enemy_variant
+		if enemy == null or not is_instance_valid(enemy):
+			continue
+		if center.distance_to(enemy.global_position) <= radius + enemy.get_body_radius():
+			count += 1
+	return count
 
 
 func _apply_damage_to_actor(actor: Node, damage: int, knockback: float, center: Vector2) -> void:
@@ -1622,6 +2235,75 @@ func _get_actor_max_health(actor: Node) -> float:
 		var enemy := actor as EnemySoldier
 		return float(enemy.max_health)
 	return 0.0
+
+
+func _get_actor_position(actor: Node) -> Vector2:
+	if actor == null or not is_instance_valid(actor):
+		return Vector2.ZERO
+	if actor is Node2D:
+		return (actor as Node2D).global_position
+	return Vector2.ZERO
+
+
+func _get_enemy_score_value(enemy: EnemySoldier) -> int:
+	if enemy == null:
+		return 0
+	var base := 10 + _get_wave_rank() * 3
+	if enemy.elite:
+		base += 26
+	if enemy.is_boss():
+		base += 180
+	return base
+
+
+func _award_score(base_points: int) -> void:
+	if base_points <= 0:
+		return
+	_score += maxi(1, int(round(float(base_points) * _get_score_multiplier())))
+
+
+func _get_score_multiplier() -> float:
+	var multiplier := 1.0 + _score_bonus_multiplier + _pickup_heat_bonus
+	multiplier += _get_low_health_score_bonus()
+	if _ruins_altar_buff_timer > 0.0:
+		multiplier += 0.25
+	return maxf(1.0, multiplier)
+
+
+func _get_low_health_score_bonus() -> float:
+	if _player == null or not is_instance_valid(_player) or _player.max_health <= 0:
+		return 0.0
+	var health_ratio := float(_player.health) / float(_player.max_health)
+	if health_ratio > 0.35:
+		return 0.0
+	var missing_ratio := clampf((0.35 - health_ratio) / 0.35, 0.0, 1.0)
+	return lerpf(0.14, 0.40, missing_ratio)
+
+
+func _handle_risky_pickup(position: Vector2, value: int) -> void:
+	if _player == null or not is_instance_valid(_player):
+		return
+	var nearby_enemies := _count_enemies_in_radius(_player.global_position, 132.0)
+	if nearby_enemies < 2:
+		return
+	_pickup_heat_bonus = minf(0.50, _pickup_heat_bonus + 0.04 + float(nearby_enemies - 2) * 0.02)
+	_pickup_heat_timer = maxf(_pickup_heat_timer, 5.0)
+	_award_score(8 + value * 4 + nearby_enemies * 5)
+	if _message_timer <= 0.1:
+		_show_message("贴脸拾取: 倍率升温，继续冒险能拿更多分。", Color(1.0, 0.92, 0.60), 1.4)
+
+
+func _spawn_elite_cache(position: Vector2) -> void:
+	_spawn_effect(position, 64.0, Color(1.0, 0.92, 0.64), Color(0.98, 0.54, 0.24), 0.30)
+	for index in range(4):
+		var angle := TAU * float(index) / 4.0 + _rng.randf_range(-0.2, 0.2)
+		_spawn_orb(position + Vector2.RIGHT.rotated(angle) * _rng.randf_range(14.0, 32.0), 2)
+	if _player != null and is_instance_valid(_player):
+		_player.heal(1)
+	_pickup_heat_bonus = minf(0.60, _pickup_heat_bonus + 0.10)
+	_pickup_heat_timer = maxf(_pickup_heat_timer, 6.0)
+	_award_score(54 + _get_wave_rank() * 5)
+	_show_message("精英宝箱: 经验爆裂，倍率与续航同步抬升。", Color(1.0, 0.92, 0.64), 1.8)
 
 
 func _spawn_orb(position: Vector2, value: int) -> void:
@@ -1698,7 +2380,7 @@ func _open_level_up() -> void:
 
 
 func _build_upgrade_choices() -> Array[Dictionary]:
-	return _build_character_upgrade_choices()
+	return _build_combo_upgrade_choices()
 
 	var candidates: Array[Dictionary] = []
 	_append_upgrade_candidate(candidates, "bolt", _bolt_level < int(UPGRADE_LIMITS.get("bolt", 7)), "奥术弹 +1", "提升奥术弹伤害、数量与穿透。")
@@ -1776,6 +2458,108 @@ func _append_generic_upgrade_candidates(target: Array[Dictionary]) -> void:
 	_append_upgrade_candidate(target, "cache", true, "战备缓存", "立刻获得当前等级经验条的 35%。")
 
 
+func _append_combo_upgrade_candidate(
+	target: Array[Dictionary],
+	key: String,
+	enabled: bool,
+	title: String,
+	desc: String,
+	tags: Array[String],
+	combo: String,
+	bucket: String,
+	accent: Color
+) -> void:
+	if not enabled:
+		return
+	target.append({
+		"key": key,
+		"title": title,
+		"desc": desc,
+		"tags": tags.duplicate(),
+		"combo": combo,
+		"bucket": bucket,
+		"accent": accent,
+	})
+
+
+func _build_combo_upgrade_choices() -> Array[Dictionary]:
+	var candidates: Array[Dictionary] = []
+	if _is_thunder_character():
+		_append_combo_upgrade_candidate(candidates, "chain", _is_upgrade_available("chain", _chain_level), "连锁闪电 +1", "普通技能额外连锁 1 个目标，并继续拉长起跳与弹跳范围。", ["闪电", "连锁", "远程"], "和爆裂、雷球一起形成全屏导电链。", "skill", Color(0.44, 0.80, 1.0))
+		_append_combo_upgrade_candidate(candidates, "detonate", _is_upgrade_available("detonate", _detonate_level), "电荷爆裂", "击败敌人后概率爆炸，越往后越适合当清场和连锁的中继点。", ["闪电", "击杀", "爆裂"], "击杀爆炸会把链路延展到下一片怪群。", "skill", Color(0.84, 0.96, 1.0))
+		_append_combo_upgrade_candidate(candidates, "storm_orb", _is_upgrade_available("storm_orb", _storm_orb_level), "雷球领域", "抛出一颗持续 5 秒的雷球领域，持续电击附近敌人。", ["领域", "闪电", "召唤"], "用雷球定点锁场，再让连锁和爆裂接管残局。", "skill", Color(0.64, 0.88, 1.0))
+		_append_combo_upgrade_candidate(candidates, "ascension", _ascension_level < 1, "雷霆进化", "连锁闪电额外 +5 链，闪电伤害暴涨，并解锁雷暴追击。", ["终局", "进化", "闪电"], "适合把整套闪电 build 推到终局清图。", "mutation", Color(0.98, 0.92, 0.68))
+		_append_combo_upgrade_candidate(candidates, "mut_supercell", _chain_level >= 3 and _detonate_level >= 2 and _storm_orb_level >= 1 and not _supercell_mutation, "变异: 超导回响", "电荷爆裂会额外再放出一轮迷你连锁，让爆点继续滚雪球。", ["闪电", "爆裂", "变异"], "连锁闪电 + 击杀爆炸 + 雷球领域三件套完成闭环。", "mutation", Color(0.90, 0.96, 1.0))
+	elif _is_blade_character():
+		_append_combo_upgrade_candidate(candidates, "slash", _is_upgrade_available("slash", _slash_level), "钢刃斩 +1", "强化半圆挥击，并继续延长扇形火焰刀气的推进距离和覆盖宽度。", ["火焰", "近战", "刀气"], "刀气会穿透敌人并递减到 40%，越长越像推进波。", "skill", Color(1.0, 0.58, 0.34))
+		_append_combo_upgrade_candidate(candidates, "blade_ring", _is_upgrade_available("blade_ring", _blade_ring_level), "旋刀护环", "增加或强化贴身旋刀，为近战 build 提供稳定护体。", ["近战", "护体", "旋刀"], "站场越稳，越能贪刀收完刀气后段。", "skill", Color(0.88, 0.94, 1.0))
+		_append_combo_upgrade_candidate(candidates, "mooncut", _is_upgrade_available("mooncut", _mooncut_level), "残月斩", "向前抛出月牙刀波，补足中距离的斩线输出。", ["剑气", "中程", "穿透"], "和钢刃斩一起做双波清线。", "skill", Color(1.0, 0.70, 0.42))
+		_append_combo_upgrade_candidate(candidates, "step_slash", _is_upgrade_available("step_slash", _step_slash_level), "踏空圆斩", "在脚下爆发圆斩，把贴脸敌人扫开并创造接刀空间。", ["近战", "爆发", "位移"], "适合保底清身位，再让刀气穿群。", "skill", Color(1.0, 0.86, 0.46))
+		_append_combo_upgrade_candidate(candidates, "mut_flame_split", _slash_level >= 4 and _blade_ring_level >= 2 and not _flame_split_mutation, "变异: 焰刃分裂", "钢刃斩挥出的火焰刀气命中后会分裂为三道副刀气。", ["火焰", "分裂", "变异"], "火焰刀气 + 分裂 + 穿透衰减会直接改打法。", "mutation", Color(1.0, 0.88, 0.70))
+		_append_combo_upgrade_candidate(candidates, "mut_rend", _mooncut_level >= 3 and not _rend_mutation, "变异: 裂月", "残月斩额外生成两道交叉刀波，前场覆盖更满。", ["剑气", "交叉", "变异"], "把残月从补刀技抬成主力清线技。", "mutation", Color(1.0, 0.80, 0.60))
+		_append_combo_upgrade_candidate(candidates, "mut_execution", _step_slash_level >= 3 and _slash_level >= 4 and not _execution_mutation, "变异: 处决场", "踏空圆斩命中后会追加一次范围处决，专治贴脸混编。", ["近战", "终结", "变异"], "圆斩先稳住，再靠处决二次爆场。", "mutation", Color(1.0, 0.90, 0.70))
+	else:
+		_append_combo_upgrade_candidate(candidates, "bolt", _is_upgrade_available("bolt", _bolt_level), "奥术箭 +1", "继续增加数量、穿透和基础输出，让远程清线更稳定。", ["奥术", "远程", "穿透"], "环轨和雷暴会把漏掉的敌人补进奥术箭线路。", "skill", Color(0.44, 0.84, 1.0))
+		_append_combo_upgrade_candidate(candidates, "orbit", _is_upgrade_available("orbit", _orbit_level), "环轨核心", "新增或强化环轨卫星，补出贴身护体层。", ["召唤", "护体", "轨道"], "适合搭配新星做近身爆发联动。", "skill", Color(0.42, 0.98, 0.90))
+		_append_combo_upgrade_candidate(candidates, "nova", _is_upgrade_available("nova", _nova_level), "新星爆发", "释放一轮环形爆裂投射物，让法师也能硬切近圈。", ["奥术", "爆发", "范围"], "环轨越多，新星的爆发站位越自由。", "skill", Color(1.0, 0.80, 0.36))
+		_append_combo_upgrade_candidate(candidates, "storm", _is_upgrade_available("storm", _storm_level), "雷暴牵引", "召唤雷暴锁定附近敌人，提供补刀和压制。", ["雷暴", "锁定", "控场"], "奥术箭收残，雷暴点关键目标。", "skill", Color(0.64, 0.80, 1.0))
+		_append_combo_upgrade_candidate(candidates, "mut_nova_orbit", _orbit_level >= 2 and _nova_level >= 2 and not _nova_orbit_mutation, "变异: 轨道新星", "释放新星时，所有环轨卫星会同步抛出一轮小型爆裂。", ["奥术", "召唤", "变异"], "环轨核心 + 新星爆发会从自保 build 变成近身爆发 build。", "mutation", Color(1.0, 0.86, 0.52))
+		_append_combo_upgrade_candidate(candidates, "mut_singularity", _storm_level >= 3 and _orbit_level >= 2 and not _storm_singularity_mutation, "变异: 雷暴奇点", "雷暴命中后会把周围敌人往落点拽，并追加一次小范围爆轰。", ["雷暴", "控场", "变异"], "雷暴牵引 + 环轨核心能把战场挤成可控团块。", "mutation", Color(0.80, 0.92, 1.0))
+
+	_append_combo_generic_upgrade_candidates(candidates)
+	return _pick_combo_upgrade_choices(candidates)
+
+
+func _append_combo_generic_upgrade_candidates(target: Array[Dictionary]) -> void:
+	_append_combo_upgrade_candidate(target, "stride", _is_upgrade_available("stride", _stride_level), "步幅矩阵", "提高移速，方便抢祭坛、穿火线和贴脸拾取奖励。", ["机动", "节奏"], "高手向的换位组件。", "support", Color(0.78, 0.92, 1.0))
+	_append_combo_upgrade_candidate(target, "vitality", _is_upgrade_available("vitality", _vitality_level), "生命织网", "提高生命上限，并给冒险换收益留更多容错空间。", ["生存", "续航"], "更敢压血线吃倍率。", "support", Color(0.92, 0.98, 0.84))
+	_append_combo_upgrade_candidate(target, "focus", _is_upgrade_available("focus", _focus_level), "聚焦镜片", "缩短全部技能冷却，把联动循环压得更紧。", ["循环", "冷却"], "适合任何依赖技能接力的构筑。", "support", Color(0.88, 0.92, 1.0))
+	_append_combo_upgrade_candidate(target, "magnet", _is_upgrade_available("magnet", _magnet_level), "磁引场", "扩大经验球吸附范围，更容易打出贴脸拾取和连升节奏。", ["拾取", "经济"], "想冲榜时价值很高。", "support", Color(1.0, 0.90, 0.64))
+	_append_combo_upgrade_candidate(target, "mastery", _is_upgrade_available("mastery", _mastery_level), "战斗精要", "提高法术威力与经验收益，让核心联动更早成型。", ["成长", "收益"], "偏中后期的构筑加速器。", "support", Color(1.0, 0.82, 0.52))
+	_append_combo_upgrade_candidate(target, "repair", true, "战地修复", "立即恢复 3 点生命，适合高压波次里强行续一口气。", ["应急", "续航"], "把残血倍率安全换成继续冲分。", "support", Color(0.96, 0.98, 0.88))
+	_append_combo_upgrade_candidate(target, "cache", true, "战备缓存", "立即获得当前等级经验条的 35%，加速下一次联动成型。", ["经济", "节奏"], "想追关键变异时最直接。", "support", Color(1.0, 0.88, 0.58))
+
+
+func _pick_combo_upgrade_choices(candidates: Array[Dictionary]) -> Array[Dictionary]:
+	var mutation_pool: Array[Dictionary] = []
+	var skill_pool: Array[Dictionary] = []
+	var support_pool: Array[Dictionary] = []
+	for candidate_variant in candidates:
+		var candidate: Dictionary = candidate_variant
+		match String(candidate.get("bucket", "skill")):
+			"mutation":
+				mutation_pool.append(candidate)
+			"support":
+				support_pool.append(candidate)
+			_:
+				skill_pool.append(candidate)
+
+	var result: Array[Dictionary] = []
+	if not mutation_pool.is_empty():
+		result.append(_pop_random_combo_upgrade(mutation_pool))
+	if not skill_pool.is_empty():
+		result.append(_pop_random_combo_upgrade(skill_pool))
+	elif not mutation_pool.is_empty() and result.size() < 2:
+		result.append(_pop_random_combo_upgrade(mutation_pool))
+	if not support_pool.is_empty() and result.size() < 3:
+		result.append(_pop_random_combo_upgrade(support_pool))
+
+	var remaining: Array[Dictionary] = []
+	remaining.append_array(mutation_pool)
+	remaining.append_array(skill_pool)
+	remaining.append_array(support_pool)
+	while result.size() < 3 and not remaining.is_empty():
+		result.append(_pop_random_combo_upgrade(remaining))
+	return result
+
+
+func _pop_random_combo_upgrade(pool: Array[Dictionary]) -> Dictionary:
+	var pick_index := _rng.randi_range(0, pool.size() - 1)
+	var choice := pool[pick_index]
+	pool.remove_at(pick_index)
+	return choice
+
+
 func _is_upgrade_available(key: String, current_level: int) -> bool:
 	if _is_endless_mode():
 		return true
@@ -1818,6 +2602,12 @@ func _apply_character_upgrade_choice(index: int) -> void:
 			_rend_mutation = true
 		"mut_execution":
 			_execution_mutation = true
+		"mut_nova_orbit":
+			_nova_orbit_mutation = true
+		"mut_singularity":
+			_storm_singularity_mutation = true
+		"mut_supercell":
+			_supercell_mutation = true
 		"stride":
 			_stride_level += 1
 		"vitality":
@@ -1962,6 +2752,69 @@ func _update_character_hud() -> void:
 		spell_lines,
 		skill_entries
 	)
+
+
+func _update_character_hud_v2() -> void:
+	if _player == null or not is_instance_valid(_player):
+		return
+
+	var spell_lines: Array[String] = []
+	var skill_entries := _build_hud_skill_entries_v2()
+	if _is_thunder_character():
+		spell_lines = [
+			"连锁闪电 %d 级  连锁 %d" % [_chain_level, _get_chain_target_count()],
+			"电荷爆裂 %d 级  概率 %.0f%%" % [_detonate_level, _get_detonate_chance() * 100.0],
+			"雷球领域 %d 级  半径 %.0f" % [_storm_orb_level, _get_storm_orb_radius()],
+			"雷霆进化 %d 级  雷暴 %.0f%%" % [_ascension_level, _get_thunder_strike_proc_chance() * 100.0],
+		]
+	elif _is_blade_character():
+		spell_lines = [
+			"钢刃斩 %d 级  刀气推进 %.0f" % [_slash_level, _get_slash_wave_range()],
+			"旋刀护环 %d 级  刀刃 %d" % [_blade_ring_level, _get_blade_ring_count()],
+			"残月斩 %d 级  刀波 %d  穿透 %d" % [_mooncut_level, _get_mooncut_projectile_count(), _get_mooncut_pierce()],
+			"踏空圆斩 %d 级  半径 %.0f" % [_step_slash_level, _get_step_slash_radius()],
+			"变异技能: %s" % _get_blade_mutation_text(),
+		]
+	else:
+		spell_lines = [
+			"奥术箭 %d 级  数量 %d  穿透 %d" % [_bolt_level, _get_bolt_count(), _get_bolt_pierce()],
+			"环轨核心 %d 级  卫星 %d" % [_orbit_level, _get_orbit_count()],
+			"新星爆发 %d 级  投射物 %d" % [_nova_level, _get_nova_projectile_count()],
+			"雷暴牵引 %d 级  目标 %d" % [_storm_level, _get_storm_target_count()],
+		]
+
+	spell_lines.insert(0, _get_build_tag_summary())
+	var threat_text := "%s   %s   倍率 x%.2f   得分 %d   %s" % [
+		_get_objective_text(),
+		_get_threat_phase_name(),
+		_get_score_multiplier(),
+		_score,
+		_get_map_rule_status_text(),
+	]
+	_hud.set_run_stats(
+		_level,
+		_player.health,
+		_player.max_health,
+		_experience / maxf(_xp_to_next, 1.0),
+		_format_time(_run_time),
+		_kills,
+		threat_text,
+		spell_lines,
+		skill_entries
+	)
+
+
+func _build_hud_skill_entries_v2() -> Array[Dictionary]:
+	var entries := _build_hud_skill_entries()
+	for index in range(entries.size()):
+		var entry: Dictionary = entries[index]
+		var extra_tags := _get_skill_tags(String(entry.get("icon_id", "")))
+		var tooltip := String(entry.get("tooltip", ""))
+		if not extra_tags.is_empty():
+			tooltip = "%s\n标签: %s" % [tooltip, " ".join(extra_tags)]
+		entry["tooltip"] = tooltip
+		entries[index] = entry
+	return entries
 
 
 func _build_hud_skill_entries() -> Array[Dictionary]:
@@ -2152,8 +3005,87 @@ func _make_hud_skill_entry(
 	}
 
 
+func _get_skill_tags(icon_id: String) -> Array[String]:
+	match icon_id:
+		"chain":
+			return ["[闪电]", "[连锁]"]
+		"detonate":
+			return ["[爆裂]", "[击杀]"]
+		"storm_orb":
+			return ["[领域]", "[召唤]"]
+		"ascension":
+			return ["[进化]", "[终局]"]
+		"slash":
+			return ["[火焰]", "[近战]"]
+		"blade_ring":
+			return ["[护体]", "[旋刀]"]
+		"mooncut":
+			return ["[剑气]", "[穿透]"]
+		"step_slash":
+			return ["[爆发]", "[位移]"]
+		"orbit":
+			return ["[召唤]", "[轨道]"]
+		"nova":
+			return ["[奥术]", "[爆发]"]
+		"storm":
+			return ["[雷暴]", "[锁定]"]
+		_:
+			return ["[奥术]", "[远程]"]
+
+
+func _get_build_tag_summary() -> String:
+	var tags: Array[String] = []
+	if _is_thunder_character():
+		tags = ["[闪电]", "[连锁]"]
+		if _detonate_level > 0:
+			tags.append("[爆裂]")
+		if _storm_orb_level > 0:
+			tags.append("[领域]")
+		if _ascension_level > 0 or _supercell_mutation:
+			tags.append("[终局]")
+	elif _is_blade_character():
+		tags = ["[火焰]", "[近战]", "[刀气]"]
+		if _flame_split_mutation:
+			tags.append("[分裂]")
+		if _execution_mutation:
+			tags.append("[处决]")
+		if _rend_mutation:
+			tags.append("[剑气]")
+	else:
+		tags = ["[奥术]", "[远程]"]
+		if _orbit_level > 0:
+			tags.append("[召唤]")
+		if _nova_level > 0:
+			tags.append("[爆发]")
+		if _storm_level > 0:
+			tags.append("[控场]")
+		if _nova_orbit_mutation or _storm_singularity_mutation:
+			tags.append("[变异]")
+	return "构筑标签: %s" % " ".join(tags)
+
+
+func _get_threat_phase_name() -> String:
+	return THREAT_PHASE_LABELS[min(_threat_phase, THREAT_PHASE_LABELS.size() - 1)]
+
+
+func _get_map_rule_status_text() -> String:
+	match _selected_map_id:
+		"sky_ruins":
+			if _ruins_altar_zone != null and is_instance_valid(_ruins_altar_zone):
+				return "祭坛 %.0f%%" % (_ruins_altar_progress * 100.0)
+			if _ruins_altar_buff_timer > 0.0:
+				return "祭坛祝福 %.0fs" % _ruins_altar_buff_timer
+			return "祭坛待刷新"
+		"ember_forge":
+			return "熔炉喷火已启动" if _map_rule_active else "熔炉静默"
+		"void_marsh":
+			return "沼泽池 %d" % _void_pools.size() if _map_rule_active else "沼泽未沸腾"
+		_:
+			return "规则平稳"
+
+
 func _update_hud() -> void:
-	_update_character_hud()
+	_update_character_hud_v2()
 	return
 
 	if _player == null or not is_instance_valid(_player):
@@ -2352,15 +3284,24 @@ func _get_player_pickup_radius() -> float:
 
 
 func _get_spell_power_multiplier() -> float:
-	return 1.0 + float(_mastery_level) * 0.16
+	var multiplier := 1.0 + float(_mastery_level) * 0.16
+	if _ruins_altar_buff_timer > 0.0:
+		multiplier += 0.12
+	return multiplier
 
 
 func _get_xp_gain_multiplier() -> float:
-	return 1.0 + float(_mastery_level) * 0.10
+	var multiplier := 1.0 + float(_mastery_level) * 0.10
+	if _ruins_altar_buff_timer > 0.0:
+		multiplier += 0.08
+	return multiplier
 
 
 func _get_cooldown_multiplier() -> float:
-	return maxf(0.58, 1.0 - float(_focus_level) * 0.08)
+	var multiplier := 1.0 - float(_focus_level) * 0.08
+	if _ruins_altar_buff_timer > 0.0:
+		multiplier *= 0.88
+	return maxf(0.50, multiplier)
 
 
 func _get_bolt_count() -> int:
@@ -2899,6 +3840,7 @@ func _on_projectile_split_requested(projectile: SpellProjectile) -> void:
 func _on_orb_collected(orb: ExperienceOrb, value: int) -> void:
 	_orbs.erase(orb)
 	_experience += float(value) * _get_xp_gain_multiplier()
+	_handle_risky_pickup(orb.global_position, value)
 	_audio.play_pickup()
 	while _experience >= _xp_to_next and _state == GameState.PLAYING:
 		_experience -= _xp_to_next
@@ -2913,6 +3855,9 @@ func _on_enemy_defeated(enemy: EnemySoldier, experience_value: int) -> void:
 	_clear_dot_damage_buffer(enemy)
 	_kills += 1
 	_spawn_orb(enemy.global_position, experience_value)
+	_award_score(_get_enemy_score_value(enemy))
+	if enemy.elite and not enemy.is_boss():
+		_spawn_elite_cache(enemy.global_position)
 	if _is_thunder_character() and enemy != _boss_enemy:
 		_try_trigger_detonate(enemy.global_position)
 	if enemy == _boss_enemy:
@@ -3169,7 +4114,7 @@ func _get_initial_boss_spawn_time() -> float:
 
 
 func _get_endless_boss_interval() -> float:
-	return maxf(150.0, _get_initial_boss_spawn_time() * 0.35)
+	return maxf(108.0, _get_initial_boss_spawn_time() * 0.35 * _endless_boss_interval_scale)
 
 
 func _schedule_next_boss_spawn(delay: float = -1.0) -> void:
@@ -3189,7 +4134,9 @@ func _get_active_enemy_cap() -> int:
 	var map_cap := _max_enemy_count + int(_current_map.get("enemy_cap_bonus", 0))
 	var opening_cap := 38 if _mobile_layout else 52
 	var growth := mini(max(0, map_cap - opening_cap), int(_run_time / 14.0))
-	return clampi(opening_cap + growth, 24, max(24, map_cap))
+	var phase_bonus := _threat_phase * (3 if _mobile_layout else 4)
+	var endless_bonus := int(round(_endless_spawn_bonus * 10.0))
+	return clampi(opening_cap + growth + phase_bonus + endless_bonus, 24, max(24, map_cap + 28))
 
 
 func _get_spawn_rate() -> float:
@@ -3203,6 +4150,8 @@ func _get_spawn_rate() -> float:
 		threat_rate += 0.80
 	if _run_time >= 480.0:
 		threat_rate += 1.10
+	threat_rate += float(_threat_phase) * 0.14
+	threat_rate += _endless_spawn_bonus
 	return threat_rate
 
 

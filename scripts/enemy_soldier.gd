@@ -186,8 +186,7 @@ func take_damage(amount: int, impulse: Vector2 = Vector2.ZERO) -> void:
 
 	health = max(0, health - amount)
 	_flash_timer = 0.14
-	var knockback_scale := 0.22 if boss else 1.0
-	_knockback += impulse * knockback_scale * (1.0 / maxf(_body_radius, 1.0))
+	_apply_impulse_internal(impulse)
 	_update_visual_state()
 	queue_redraw()
 
@@ -199,6 +198,17 @@ func take_damage(amount: int, impulse: Vector2 = Vector2.ZERO) -> void:
 
 func get_body_radius() -> float:
 	return _body_radius
+
+
+func apply_impulse(impulse: Vector2) -> void:
+	if impulse == Vector2.ZERO or health <= 0:
+		return
+	_apply_impulse_internal(impulse)
+
+
+func _apply_impulse_internal(impulse: Vector2) -> void:
+	var knockback_scale := 0.22 if boss else 1.0
+	_knockback += impulse * knockback_scale * (1.0 / maxf(_body_radius, 1.0))
 
 
 func is_boss() -> bool:

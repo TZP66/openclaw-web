@@ -263,7 +263,7 @@ func _apply_upgrade_state() -> void:
 			button.disabled = true
 			continue
 		var choice: Dictionary = _upgrade_choices_state[index]
-		button.text = "%d. %s\n%s" % [index + 1, String(choice.get("title", "强化")), String(choice.get("desc", ""))]
+		button.text = _format_upgrade_choice_text(index, choice)
 		button.visible = true
 		button.disabled = false
 	return
@@ -278,9 +278,27 @@ func _apply_upgrade_state() -> void:
 			continue
 
 		var choice: Dictionary = _upgrade_choices_state[index]
-		button.text = "%d. %s\n%s" % [index + 1, String(choice.get("title", "强化")), String(choice.get("desc", ""))]
+		button.text = _format_upgrade_choice_text(index, choice)
 		button.visible = true
 		button.disabled = false
+
+
+func _format_upgrade_choice_text(index: int, choice: Dictionary) -> String:
+	var lines: Array[String] = []
+	lines.append("%d. %s" % [index + 1, String(choice.get("title", "强化"))])
+	var tag_values = choice.get("tags", [])
+	if tag_values is Array:
+		var tags := tag_values as Array
+		if not tags.is_empty():
+			var tag_parts: Array[String] = []
+			for tag_variant in tags:
+				tag_parts.append("[%s]" % String(tag_variant))
+			lines.append(" ".join(tag_parts))
+	var combo := String(choice.get("combo", ""))
+	if not combo.is_empty():
+		lines.append("联动: %s" % combo)
+	lines.append(String(choice.get("desc", "")))
+	return "\n".join(lines)
 
 
 func _apply_result_state() -> void:
@@ -464,7 +482,7 @@ func _build_ui() -> void:
 	_upgrade_title = _make_label(22 if _mobile_layout else 30, Color(0.98, 0.94, 0.54), HORIZONTAL_ALIGNMENT_CENTER)
 	_upgrade_title.position = Vector2(24.0, 18.0)
 	_upgrade_title.size = Vector2(_upgrade_panel.size.x - 48.0, 56.0)
-	_upgrade_title.text = "选择一项强化"
+	_upgrade_title.text = "选择一项联动组件"
 	_upgrade_panel.add_child(_upgrade_title)
 
 	for index in range(3):
@@ -475,8 +493,8 @@ func _build_ui() -> void:
 		button.clip_text = false
 		button.pressed.connect(_on_upgrade_button_pressed.bind(index))
 		if _mobile_layout and not mobile_landscape:
-			button.position = Vector2(18.0, 84.0 + float(index) * 154.0)
-			button.size = Vector2(_upgrade_panel.size.x - 36.0, 132.0)
+			button.position = Vector2(18.0, 84.0 + float(index) * 164.0)
+			button.size = Vector2(_upgrade_panel.size.x - 36.0, 144.0)
 		else:
 			button.position = Vector2(24.0 + float(index) * ((_upgrade_panel.size.x - 78.0) / 3.0), 96.0)
 			button.size = Vector2((_upgrade_panel.size.x - 96.0) / 3.0, _upgrade_panel.size.y - 128.0)

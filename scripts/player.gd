@@ -8,6 +8,7 @@ signal died
 
 var active: bool = false
 var move_speed: float = 240.0
+var move_speed_multiplier: float = 1.0
 var max_health: int = 8
 var health: int = 8
 var pickup_radius: float = 140.0
@@ -53,7 +54,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		_motion_phase = move_toward(_motion_phase, 0.0, delta * 8.0)
 
-	velocity = input_vector * move_speed
+	velocity = input_vector * move_speed * move_speed_multiplier
 	move_and_slide()
 	_update_visual_state()
 
@@ -61,6 +62,7 @@ func _physics_process(delta: float) -> void:
 func reset_for_run(start_position: Vector2, new_max_health: int, new_speed: float, new_pickup_radius: float) -> void:
 	global_position = start_position
 	move_speed = new_speed
+	move_speed_multiplier = 1.0
 	max_health = max(1, new_max_health)
 	health = max_health
 	pickup_radius = new_pickup_radius
@@ -82,6 +84,10 @@ func set_build_stats(new_speed: float, new_max_health: int, new_pickup_radius: f
 	pickup_radius = new_pickup_radius
 	health = clampi(int(round(health_ratio * float(max_health))), 1, max_health)
 	_update_visual_state()
+
+
+func set_move_speed_multiplier(multiplier: float) -> void:
+	move_speed_multiplier = clampf(multiplier, 0.25, 2.4)
 
 
 func set_character(new_character_id: String) -> void:
