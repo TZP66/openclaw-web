@@ -120,6 +120,14 @@ func _draw_icon(icon_id: String, rect: Rect2, color: Color) -> void:
 			_draw_nova_icon(rect, color)
 		"storm":
 			_draw_storm_icon(rect, color)
+		"chain":
+			_draw_chain_icon(rect, color)
+		"detonate":
+			_draw_detonate_icon(rect, color)
+		"storm_orb":
+			_draw_storm_orb_icon(rect, color)
+		"ascension":
+			_draw_ascension_icon(rect, color)
 		"slash":
 			_draw_slash_icon(rect, color)
 		"blade_ring":
@@ -175,6 +183,56 @@ func _draw_storm_icon(rect: Rect2, color: Color) -> void:
 	draw_circle(center + Vector2(rect.size.x * 0.20, -rect.size.y * 0.04), rect.size.x * 0.16, cloud_color)
 	draw_rect(Rect2(center + Vector2(-rect.size.x * 0.30, -rect.size.y * 0.02), Vector2(rect.size.x * 0.60, rect.size.y * 0.20)), cloud_color, true)
 	_draw_bolt_icon(Rect2(rect.position + Vector2(rect.size.x * 0.30, rect.size.y * 0.24), rect.size * 0.40), color)
+
+
+func _draw_chain_icon(rect: Rect2, color: Color) -> void:
+	var left := rect.position + Vector2(rect.size.x * 0.18, rect.size.y * 0.66)
+	var mid := rect.position + Vector2(rect.size.x * 0.48, rect.size.y * 0.26)
+	var right := rect.position + Vector2(rect.size.x * 0.80, rect.size.y * 0.58)
+	draw_circle(left, rect.size.x * 0.10, Color(color.r, color.g, color.b, 0.82))
+	draw_circle(mid, rect.size.x * 0.10, Color(0.98, 0.99, 1.0))
+	draw_circle(right, rect.size.x * 0.10, Color(color.r, color.g, color.b, 0.82))
+	draw_line(left, mid, color, maxf(3.0, rect.size.x * 0.08))
+	draw_line(mid, right, Color(0.98, 0.99, 1.0), maxf(3.0, rect.size.x * 0.08))
+	_draw_bolt_icon(Rect2(rect.position + Vector2(rect.size.x * 0.34, rect.size.y * 0.24), rect.size * 0.28), color)
+
+
+func _draw_detonate_icon(rect: Rect2, color: Color) -> void:
+	var center := rect.get_center()
+	var outer := minf(rect.size.x, rect.size.y) * 0.34
+	draw_circle(center, outer, Color(color.r, color.g, color.b, 0.22))
+	var burst := PackedVector2Array()
+	for index in range(10):
+		var angle := TAU * float(index) / 10.0 - PI * 0.5
+		var radius := outer * (1.55 if index % 2 == 0 else 0.92)
+		burst.append(center + Vector2.RIGHT.rotated(angle) * radius)
+	draw_colored_polygon(burst, Color(color.r, color.g, color.b, 0.78))
+	_draw_bolt_icon(Rect2(center - rect.size * 0.16, rect.size * 0.32), Color(0.98, 0.99, 1.0))
+
+
+func _draw_storm_orb_icon(rect: Rect2, color: Color) -> void:
+	var center := rect.get_center()
+	var radius := minf(rect.size.x, rect.size.y) * 0.22
+	draw_circle(center, radius * 1.36, Color(color.r, color.g, color.b, 0.16))
+	draw_circle(center, radius, color)
+	draw_arc(center, radius * 1.86, 0.0, TAU, 28, Color(0.94, 0.98, 1.0, 0.82), maxf(2.0, rect.size.x * 0.05))
+	draw_arc(center, radius * 1.36, -1.5, 1.2, 18, Color(color.r, color.g, color.b, 0.92), maxf(2.0, rect.size.x * 0.05))
+	_draw_bolt_icon(Rect2(rect.position + Vector2(rect.size.x * 0.56, rect.size.y * 0.26), rect.size * 0.26), Color(0.98, 0.99, 1.0))
+
+
+func _draw_ascension_icon(rect: Rect2, color: Color) -> void:
+	var crown := PackedVector2Array([
+		rect.position + Vector2(rect.size.x * 0.18, rect.size.y * 0.80),
+		rect.position + Vector2(rect.size.x * 0.28, rect.size.y * 0.38),
+		rect.position + Vector2(rect.size.x * 0.46, rect.size.y * 0.58),
+		rect.position + Vector2(rect.size.x * 0.60, rect.size.y * 0.20),
+		rect.position + Vector2(rect.size.x * 0.74, rect.size.y * 0.58),
+		rect.position + Vector2(rect.size.x * 0.90, rect.size.y * 0.34),
+		rect.position + Vector2(rect.size.x * 0.82, rect.size.y * 0.80),
+	])
+	draw_colored_polygon(crown, Color(color.r, color.g, color.b, 0.30))
+	draw_line(rect.position + Vector2(rect.size.x * 0.22, rect.size.y * 0.82), rect.position + Vector2(rect.size.x * 0.80, rect.size.y * 0.82), color, maxf(3.0, rect.size.x * 0.08))
+	_draw_bolt_icon(Rect2(rect.position + Vector2(rect.size.x * 0.36, rect.size.y * 0.16), rect.size * 0.32), Color(0.98, 0.99, 1.0))
 
 
 func _draw_slash_icon(rect: Rect2, color: Color) -> void:

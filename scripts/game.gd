@@ -17,6 +17,8 @@ const ORB_SCRIPT := preload("res://scripts/experience_orb.gd")
 const EFFECT_SCRIPT := preload("res://scripts/explosion_effect.gd")
 const SLASH_EFFECT_SCRIPT := preload("res://scripts/slash_effect.gd")
 const STEP_SLASH_EFFECT_SCRIPT := preload("res://scripts/step_slash_effect.gd")
+const LIGHTNING_CHAIN_EFFECT_SCRIPT := preload("res://scripts/lightning_chain_effect.gd")
+const LIGHTNING_ORB_FIELD_SCRIPT := preload("res://scripts/lightning_orb_field.gd")
 const SATELLITE_SCRIPT := preload("res://scripts/spell_satellite.gd")
 const METEOR_HAZARD_SCRIPT := preload("res://scripts/meteor_hazard.gd")
 const POISON_CLOUD_SCRIPT := preload("res://scripts/poison_cloud.gd")
@@ -54,6 +56,14 @@ const CHARACTER_DEFINITIONS := [
 		"detail": "初始技能改为半圆挥击接短火焰刀气，生命更高，近身压制与中距补刀更强。",
 		"accent": Color(0.98, 0.54, 0.36),
 	},
+	{
+		"id": "thunder",
+		"name": "闪电哥",
+		"title": "雷链行者",
+		"summary": "依靠连锁闪电、爆裂电荷与雷球领域持续清场，擅长连环处决与大范围压制。",
+		"detail": "基础技能会自动丢出连锁闪电，能在敌群之间跳跃；后续可解锁击杀爆炸、雷球领域与雷霆进化。",
+		"accent": Color(0.42, 0.78, 1.0),
+	},
 ]
 
 const PLAYER_START := Vector2.ZERO
@@ -71,6 +81,10 @@ const UPGRADE_LIMITS := {
 	"blade_ring": 4,
 	"mooncut": 4,
 	"step_slash": 4,
+	"chain": 7,
+	"detonate": 4,
+	"storm_orb": 4,
+	"ascension": 1,
 	"stride": 4,
 	"vitality": 4,
 	"focus": 4,
@@ -246,6 +260,10 @@ var _step_slash_level: int = 0
 var _flame_split_mutation: bool = false
 var _rend_mutation: bool = false
 var _execution_mutation: bool = false
+var _chain_level: int = 1
+var _detonate_level: int = 0
+var _storm_orb_level: int = 0
+var _ascension_level: int = 0
 
 var _bolt_timer: float = 0.0
 var _nova_timer: float = 1.4
@@ -253,11 +271,14 @@ var _storm_timer: float = 3.0
 var _slash_timer: float = 0.0
 var _mooncut_timer: float = 1.2
 var _step_slash_timer: float = 2.4
+var _chain_timer: float = 0.0
+var _storm_orb_timer: float = 1.8
 var _touch_move_vector: Vector2 = Vector2.ZERO
 var _touch_pointer_id: int = -1
 var _touch_pointer_origin: Vector2 = Vector2.ZERO
 var _touch_mouse_active: bool = false
 var _dot_damage_buffers: Dictionary = {}
+var _thunder_orb_field: Node2D = null
 
 var _rng := RandomNumberGenerator.new()
 
@@ -575,6 +596,7 @@ func _reset_runtime_collections() -> void:
 	_satellites.clear()
 	_upgrade_choices.clear()
 	_boss_enemy = null
+	_thunder_orb_field = null
 
 
 func _reset_progression_state() -> void:
@@ -606,6 +628,10 @@ func _reset_progression_state() -> void:
 	_flame_split_mutation = false
 	_rend_mutation = false
 	_execution_mutation = false
+	_chain_level = 1
+	_detonate_level = 0
+	_storm_orb_level = 0
+	_ascension_level = 0
 
 	_bolt_timer = 0.0
 	_nova_timer = 1.4
@@ -613,6 +639,8 @@ func _reset_progression_state() -> void:
 	_slash_timer = 0.0
 	_mooncut_timer = 1.2
 	_step_slash_timer = 2.4
+	_chain_timer = 0.0
+	_storm_orb_timer = 1.8
 
 	_boss_spawned = false
 	_boss_defeated = false
@@ -641,8 +669,17 @@ func _update_message_timer(delta: float) -> void:
 
 
 func _update_spell_attacks(delta: float) -> void:
-	if _is_blade_character():
+	var candidates: Array[Dictionary] = []
+	if false and _is_thunder_character():
+		_append_upgrade_candidate(candidates, "chain", _is_upgrade_available("chain", _chain_level), "连锁闪电 +1", "普通技能额外连锁 1 个目标，并提升闪电伤害与搜索距离。")
+		_append_upgrade_candidate(candidates, "detonate", _is_upgrade_available("detonate", _detonate_level), "电荷爆裂", "击败敌人后有概率引发雷电爆炸，升级提高概率与爆炸范围。")
+		_append_upgrade_candidate(candidates, "storm_orb", _is_upgrade_available("storm_orb", _storm_orb_level), "雷球领域", "投出一个持续 5 秒的闪电球，周期性对附近敌人释放连锁闪电。")
+		_append_upgrade_candidate(candidates, "ascension", _ascension_level < 1, "雷霆进化", "连锁闪电额外 +5 跳，全部闪电伤害 +200%，攻击有 50% 概率召唤雷暴打击。")
+	elif _is_blade_character():
 		_update_blade_attacks(delta)
+		return
+	if _is_thunder_character():
+		_update_thunder_attacks(delta)
 		return
 
 	_bolt_timer -= delta
@@ -810,6 +847,201 @@ func _cast_storm() -> void:
 		target.take_damage(_get_storm_damage())
 
 	_audio.play_player_shot("power")
+
+
+func _update_thunder_attacks(delta: float) -> void:
+	_chain_timer -= delta
+	if _chain_timer <= 0.0:
+		if _cast_chain_lightning_attack():
+			_chain_timer += _get_chain_cooldown()
+		else:
+			_chain_timer = 0.12
+
+	if _storm_orb_level > 0:
+		_storm_orb_timer -= delta
+		if _storm_orb_timer <= 0.0:
+			if _cast_storm_orb():
+				_storm_orb_timer += _get_storm_orb_cooldown()
+			else:
+				_storm_orb_timer = 0.24
+
+
+func _cast_chain_lightning_attack() -> bool:
+	if _player == null or not is_instance_valid(_player):
+		return false
+
+	var origin := _player.global_position
+	var facing := _player.get_facing_direction()
+	if facing != Vector2.ZERO:
+		origin += facing.normalized() * 18.0
+	var hit_enemies := _emit_chain_lightning(
+		origin,
+		_get_chain_target_count(),
+		_get_chain_initial_range(),
+		_get_chain_bounce_range(),
+		_get_chain_damage(),
+		_get_chain_knockback(),
+		true
+	)
+	if hit_enemies.is_empty():
+		return false
+
+	var first_target := hit_enemies[0]
+	if first_target != null and is_instance_valid(first_target):
+		var next_facing := (first_target.global_position - _player.global_position).normalized()
+		if next_facing != Vector2.ZERO:
+			_player.set_facing_direction(next_facing)
+	_spawn_effect(_player.global_position, 24.0, Color(0.82, 0.96, 1.0), Color(0.36, 0.68, 1.0), 0.16)
+	_audio.play_player_shot("power" if hit_enemies.size() >= 4 else "spread")
+	return true
+
+
+func _emit_chain_lightning(origin: Vector2, max_targets: int, initial_range: float, bounce_range: float, damage: int, knockback: float, allow_thunder_strike: bool) -> Array[EnemySoldier]:
+	var hit_enemies: Array[EnemySoldier] = []
+	if max_targets <= 0 or damage <= 0:
+		return hit_enemies
+
+	var current_origin := origin
+	var current_range := initial_range
+	for bounce_index in range(max_targets):
+		var target := _get_chain_target_from_origin(current_origin, hit_enemies, current_range)
+		if target == null:
+			break
+		var target_position := target.global_position
+		_spawn_lightning_link_effect(current_origin, target_position, 8.8 if bounce_index == 0 else 7.2)
+		_spawn_effect(target_position, 20.0 if bounce_index == 0 else 15.0, Color(0.86, 0.98, 1.0), Color(0.32, 0.62, 1.0), 0.12)
+		var impulse_direction := (target_position - current_origin).normalized()
+		if impulse_direction == Vector2.ZERO:
+			impulse_direction = Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU))
+		target.take_damage(damage, impulse_direction * knockback)
+		hit_enemies.append(target)
+		current_origin = target_position
+		current_range = bounce_range
+
+	if allow_thunder_strike and _ascension_level > 0 and not hit_enemies.is_empty() and _rng.randf() < _get_thunder_strike_proc_chance():
+		var strike_index := _rng.randi_range(0, hit_enemies.size() - 1)
+		var strike_target := hit_enemies[strike_index]
+		if strike_target != null and is_instance_valid(strike_target):
+			_trigger_thunder_strike(strike_target.global_position)
+
+	return hit_enemies
+
+
+func _get_chain_target_from_origin(origin: Vector2, excluded: Array[EnemySoldier], max_distance: float) -> EnemySoldier:
+	var nearest: EnemySoldier = null
+	var nearest_distance_sq := max_distance * max_distance
+	for enemy_variant in _enemies:
+		var enemy: EnemySoldier = enemy_variant
+		if enemy == null or not is_instance_valid(enemy):
+			continue
+		if excluded.has(enemy):
+			continue
+		var distance_sq := origin.distance_squared_to(enemy.global_position)
+		if distance_sq > nearest_distance_sq:
+			continue
+		nearest_distance_sq = distance_sq
+		nearest = enemy
+	return nearest
+
+
+func _cast_storm_orb() -> bool:
+	if _player == null or not is_instance_valid(_player):
+		return false
+	if _effect_root == null or not is_instance_valid(_effect_root):
+		return false
+
+	var target_position := _get_storm_orb_target_position()
+	if target_position == Vector2.ZERO and _player.global_position == Vector2.ZERO and _enemies.is_empty():
+		return false
+
+	if _thunder_orb_field != null and is_instance_valid(_thunder_orb_field):
+		_thunder_orb_field.queue_free()
+
+	var field = LIGHTNING_ORB_FIELD_SCRIPT.new()
+	field.global_position = target_position
+	field.duration = _get_storm_orb_duration()
+	field.radius = _get_storm_orb_radius()
+	field.pulse_interval = _get_storm_orb_pulse_interval()
+	field.primary_color = Color(0.44, 0.78, 1.0)
+	field.secondary_color = Color(0.90, 0.98, 1.0)
+	field.pulse_requested.connect(_on_lightning_orb_pulse)
+	_effect_root.add_child(field)
+	_thunder_orb_field = field
+
+	var throw_direction := (target_position - _player.global_position).normalized()
+	if throw_direction == Vector2.ZERO:
+		throw_direction = _player.get_facing_direction()
+	if throw_direction == Vector2.ZERO:
+		throw_direction = Vector2.RIGHT
+	_player.set_facing_direction(throw_direction)
+	_spawn_lightning_link_effect(_player.global_position + throw_direction * 18.0, target_position, 6.2)
+	_spawn_effect(target_position, field.radius * 0.26, Color(0.86, 0.98, 1.0), Color(0.32, 0.62, 1.0), 0.18)
+	_audio.play_player_shot("power")
+	return true
+
+
+func _get_storm_orb_target_position() -> Vector2:
+	if _player == null or not is_instance_valid(_player):
+		return PLAYER_START
+
+	var targets := _get_nearest_enemies(_player.global_position, 1, _get_storm_orb_cast_range())
+	if not targets.is_empty():
+		var target := targets[0]
+		if target != null and is_instance_valid(target):
+			return target.global_position
+
+	var direction := _player.get_facing_direction()
+	if direction == Vector2.ZERO:
+		direction = Vector2.RIGHT.rotated(_run_time * 0.35)
+	if direction == Vector2.ZERO:
+		direction = Vector2.RIGHT
+	return _player.global_position + direction.normalized() * minf(_get_storm_orb_cast_range() * 0.58, 230.0)
+
+
+func _on_lightning_orb_pulse(origin: Vector2) -> void:
+	_spawn_effect(origin, _get_storm_orb_radius() * 0.30, Color(0.84, 0.97, 1.0), Color(0.30, 0.60, 1.0), 0.14)
+	_emit_chain_lightning(
+		origin,
+		_get_storm_orb_target_count(),
+		_get_storm_orb_radius(),
+		_get_chain_bounce_range(),
+		_get_storm_orb_damage(),
+		_get_chain_knockback() * 0.82,
+		true
+	)
+
+
+func _trigger_thunder_strike(position: Vector2) -> void:
+	var strike_radius := _get_thunder_strike_radius()
+	_spawn_lightning_link_effect(position + Vector2(0.0, -strike_radius * 2.4), position, 10.0)
+	_spawn_effect(position, strike_radius, Color(0.92, 0.99, 1.0), Color(0.40, 0.68, 1.0), 0.18)
+	_damage_enemies_in_radius(position, strike_radius, _get_thunder_strike_damage(), 280.0)
+
+
+func _try_trigger_detonate(position: Vector2) -> void:
+	if _detonate_level <= 0:
+		return
+	if _rng.randf() > _get_detonate_chance():
+		return
+
+	_spawn_effect(position, _get_detonate_radius(), Color(0.88, 0.98, 1.0), Color(0.34, 0.62, 1.0), 0.28)
+	var arc_targets := _get_nearest_enemies(position, 4, _get_detonate_radius() + 40.0)
+	for target in arc_targets:
+		if target == null or not is_instance_valid(target):
+			continue
+		_spawn_lightning_link_effect(position, target.global_position, 5.4)
+	_damage_enemies_in_radius(position, _get_detonate_radius(), _get_detonate_damage(), 240.0)
+
+
+func _spawn_lightning_link_effect(start_position: Vector2, end_position: Vector2, thickness: float = 8.0) -> void:
+	if _effect_root == null or not is_instance_valid(_effect_root):
+		return
+	var effect = LIGHTNING_CHAIN_EFFECT_SCRIPT.new()
+	effect.thickness = thickness
+	effect.primary_color = Color(0.82, 0.96, 1.0)
+	effect.secondary_color = Color(0.34, 0.62, 1.0)
+	effect.configure_link(start_position, end_position, _rng.randi())
+	_effect_root.add_child(effect)
 
 
 func _update_blade_attacks(delta: float) -> void:
@@ -1408,7 +1640,15 @@ func _sync_satellites() -> void:
 	if _player == null or not is_instance_valid(_player):
 		return
 
-	if _is_blade_character():
+	var spell_lines: Array[String] = []
+	if false and _is_thunder_character():
+		spell_lines = [
+			"连锁闪电 %d 级  连锁 %d" % [_chain_level, _get_chain_target_count()],
+			"电荷爆裂 %d 级  概率 %.0f%%" % [_detonate_level, _get_detonate_chance() * 100.0],
+			"雷球领域 %d 级  半径 %.0f" % [_storm_orb_level, _get_storm_orb_radius()],
+			"雷霆进化 %d 级  雷暴 %.0f%%" % [_ascension_level, _get_thunder_strike_proc_chance() * 100.0],
+		]
+	elif _is_blade_character():
 		var blade_ring_count := _get_blade_ring_count()
 		for index in range(blade_ring_count):
 			var blade_satellite: SpellSatellite = SATELLITE_SCRIPT.new()
@@ -1495,7 +1735,12 @@ func _append_upgrade_candidate(target: Array[Dictionary], key: String, enabled: 
 
 func _build_character_upgrade_choices() -> Array[Dictionary]:
 	var candidates: Array[Dictionary] = []
-	if _is_blade_character():
+	if _is_thunder_character():
+		_append_upgrade_candidate(candidates, "chain", _is_upgrade_available("chain", _chain_level), "连锁闪电 +1", "普通技能额外连锁 1 个目标，并提升闪电伤害与搜索距离。")
+		_append_upgrade_candidate(candidates, "detonate", _is_upgrade_available("detonate", _detonate_level), "电荷爆裂", "击败敌人后有概率引发雷电爆炸，升级提高概率与爆炸范围。")
+		_append_upgrade_candidate(candidates, "storm_orb", _is_upgrade_available("storm_orb", _storm_orb_level), "雷球领域", "投出一个持续 5 秒的闪电球，周期性对附近敌人释放连锁闪电。")
+		_append_upgrade_candidate(candidates, "ascension", _ascension_level < 1, "雷霆进化", "连锁闪电额外 +5 跳，全部闪电伤害 +200%，攻击有 50% 概率召唤雷暴打击。")
+	elif _is_blade_character():
 		_append_upgrade_candidate(candidates, "slash", _is_upgrade_available("slash", _slash_level), "钢刃斩 +1", "提升半圆挥击伤害，并延长火焰刀气的推进距离与波及范围。")
 		_append_upgrade_candidate(candidates, "blade_ring", _is_upgrade_available("blade_ring", _blade_ring_level), "旋刃护环", "新增或强化围绕角色旋转的刀刃。")
 		_append_upgrade_candidate(candidates, "mooncut", _is_upgrade_available("mooncut", _mooncut_level), "残月斩", "向敌人方向释放月牙刀波。")
@@ -1559,6 +1804,14 @@ func _apply_character_upgrade_choice(index: int) -> void:
 			_mooncut_level += 1
 		"step_slash":
 			_step_slash_level += 1
+		"chain":
+			_chain_level += 1
+		"detonate":
+			_detonate_level += 1
+		"storm_orb":
+			_storm_orb_level += 1
+		"ascension":
+			_ascension_level = max(_ascension_level, 1)
 		"mut_flame_split":
 			_flame_split_mutation = true
 		"mut_rend":
@@ -1668,7 +1921,14 @@ func _update_character_hud() -> void:
 
 	var spell_lines: Array[String] = []
 	var skill_entries := _build_hud_skill_entries()
-	if _is_blade_character():
+	if _is_thunder_character():
+		spell_lines = [
+			"连锁闪电 %d 级  连锁 %d" % [_chain_level, _get_chain_target_count()],
+			"电荷爆裂 %d 级  概率 %.0f%%" % [_detonate_level, _get_detonate_chance() * 100.0],
+			"雷球领域 %d 级  半径 %.0f" % [_storm_orb_level, _get_storm_orb_radius()],
+			"雷霆进化 %d 级  雷暴 %.0f%%" % [_ascension_level, _get_thunder_strike_proc_chance() * 100.0],
+		]
+	elif _is_blade_character():
 		spell_lines = [
 			"钢刃斩 %d 级  半圆挥击  刀气 %.0f" % [_slash_level, _get_slash_wave_range()],
 			"旋刃护环 %d 级  刀刃 %d" % [_blade_ring_level, _get_blade_ring_count()],
@@ -1705,6 +1965,57 @@ func _update_character_hud() -> void:
 
 
 func _build_hud_skill_entries() -> Array[Dictionary]:
+	if _is_thunder_character():
+		return [
+			_make_hud_skill_entry(
+				"连锁闪电",
+				"chain",
+				_chain_level,
+				true,
+				false,
+				maxf(_chain_timer, 0.0),
+				_get_chain_cooldown(),
+				Color(0.48, 0.82, 1.0),
+				"连锁闪电 Lv.%d\n可攻击 %d 个敌人\n起跳范围 %.0f，跳跃范围 %.0f\n伤害 %d，冷却 %.1fs" % [_chain_level, _get_chain_target_count(), _get_chain_initial_range(), _get_chain_bounce_range(), _get_chain_damage(), _get_chain_cooldown()],
+				"x%d" % _get_chain_target_count()
+			),
+			_make_hud_skill_entry(
+				"电荷爆裂",
+				"detonate",
+				_detonate_level,
+				_detonate_level > 0,
+				true,
+				0.0,
+				0.0,
+				Color(0.88, 0.96, 1.0),
+				"电荷爆裂 Lv.%d\n击败敌人时有 %.0f%% 概率爆炸\n爆炸半径 %.0f，伤害 %d" % [_detonate_level, _get_detonate_chance() * 100.0, _get_detonate_radius(), _get_detonate_damage()],
+				"%.0f%%" % (_get_detonate_chance() * 100.0)
+			),
+			_make_hud_skill_entry(
+				"雷球领域",
+				"storm_orb",
+				_storm_orb_level,
+				_storm_orb_level > 0,
+				false,
+				maxf(_storm_orb_timer, 0.0),
+				_get_storm_orb_cooldown(),
+				Color(0.64, 0.88, 1.0),
+				"雷球领域 Lv.%d\n持续 %.1fs，半径 %.0f\n每次脉冲最多连锁 %d 个目标\n伤害 %d，冷却 %.1fs" % [_storm_orb_level, _get_storm_orb_duration(), _get_storm_orb_radius(), _get_storm_orb_target_count(), _get_storm_orb_damage(), _get_storm_orb_cooldown()],
+				"x%d" % _get_storm_orb_target_count()
+			),
+			_make_hud_skill_entry(
+				"雷霆进化",
+				"ascension",
+				_ascension_level,
+				_ascension_level > 0,
+				true,
+				0.0,
+				0.0,
+				Color(0.98, 0.92, 0.68),
+				"雷霆进化 Lv.%d\n连锁闪电 +%d\n全部闪电伤害 +200%%\n攻击有 %.0f%% 概率触发雷暴打击" % [_ascension_level, _get_ascension_chain_bonus(), _get_thunder_strike_proc_chance() * 100.0],
+				"进化"
+			),
+		]
 	if _is_blade_character():
 		return [
 			_make_hud_skill_entry(
@@ -2014,17 +2325,29 @@ func _cleanup_far_entities() -> void:
 			_orbs.remove_at(index)
 
 func _get_player_speed() -> float:
-	var base_speed := 248.0 if _is_blade_character() else 240.0
+	var base_speed := 240.0
+	if _is_blade_character():
+		base_speed = 248.0
+	elif _is_thunder_character():
+		base_speed = 244.0
 	return base_speed + float(_stride_level) * 22.0
 
 
 func _get_player_max_health() -> int:
-	var base_health := 10 if _is_blade_character() else 8
+	var base_health := 8
+	if _is_blade_character():
+		base_health = 10
+	elif _is_thunder_character():
+		base_health = 9
 	return base_health + _vitality_level * 2
 
 
 func _get_player_pickup_radius() -> float:
-	var base_radius := 132.0 if _is_blade_character() else 140.0
+	var base_radius := 140.0
+	if _is_blade_character():
+		base_radius = 132.0
+	elif _is_thunder_character():
+		base_radius = 146.0
 	return base_radius + float(_magnet_level) * 50.0
 
 
@@ -2094,6 +2417,90 @@ func _get_storm_damage() -> int:
 
 func _get_storm_cooldown() -> float:
 	return maxf(2.8, (6.0 - float(max(_storm_level - 1, 0)) * 0.48) * _get_cooldown_multiplier())
+
+
+func _get_lightning_power_multiplier() -> float:
+	return _get_spell_power_multiplier() * (3.0 if _ascension_level > 0 else 1.0)
+
+
+func _get_chain_target_count() -> int:
+	return 5 + max(_chain_level - 1, 0) + _get_ascension_chain_bonus()
+
+
+func _get_chain_damage() -> int:
+	return int(round((20.0 + float(max(_chain_level - 1, 0)) * 6.0) * _get_lightning_power_multiplier()))
+
+
+func _get_chain_cooldown() -> float:
+	return maxf(0.30, (0.86 - float(max(_chain_level - 1, 0)) * 0.04) * _get_cooldown_multiplier())
+
+
+func _get_chain_initial_range() -> float:
+	return 360.0 + float(max(_chain_level - 1, 0)) * 18.0
+
+
+func _get_chain_bounce_range() -> float:
+	return 188.0 + float(max(_chain_level - 1, 0)) * 10.0
+
+
+func _get_chain_knockback() -> float:
+	return 168.0 + float(max(_chain_level - 1, 0)) * 10.0
+
+
+func _get_detonate_chance() -> float:
+	return minf(0.20 * float(_detonate_level), 0.75)
+
+
+func _get_detonate_damage() -> int:
+	return int(round((18.0 + float(max(_detonate_level - 1, 0)) * 12.0) * _get_lightning_power_multiplier()))
+
+
+func _get_detonate_radius() -> float:
+	return 72.0 + float(max(_detonate_level - 1, 0)) * 18.0
+
+
+func _get_storm_orb_damage() -> int:
+	return int(round((16.0 + float(max(_storm_orb_level - 1, 0)) * 8.0) * _get_lightning_power_multiplier()))
+
+
+func _get_storm_orb_radius() -> float:
+	return 132.0 + float(max(_storm_orb_level - 1, 0)) * 18.0
+
+
+func _get_storm_orb_duration() -> float:
+	return 5.0
+
+
+func _get_storm_orb_cooldown() -> float:
+	return maxf(3.0, (7.2 - float(max(_storm_orb_level - 1, 0)) * 0.42) * _get_cooldown_multiplier())
+
+
+func _get_storm_orb_pulse_interval() -> float:
+	return maxf(0.28, 0.72 - float(max(_storm_orb_level - 1, 0)) * 0.08)
+
+
+func _get_storm_orb_target_count() -> int:
+	return min(_get_chain_target_count(), 2 + _storm_orb_level * 2 + int(_ascension_level > 0))
+
+
+func _get_storm_orb_cast_range() -> float:
+	return 460.0 + float(max(_storm_orb_level - 1, 0)) * 22.0
+
+
+func _get_ascension_chain_bonus() -> int:
+	return 5 * _ascension_level
+
+
+func _get_thunder_strike_proc_chance() -> float:
+	return 0.5 if _ascension_level > 0 else 0.0
+
+
+func _get_thunder_strike_damage() -> int:
+	return int(round((34.0 + float(max(_chain_level - 1, 0)) * 9.0) * _get_lightning_power_multiplier()))
+
+
+func _get_thunder_strike_radius() -> float:
+	return 82.0 + float(max(_storm_orb_level - 1, 0)) * 10.0
 
 
 func _get_slash_target_count() -> int:
@@ -2406,7 +2813,13 @@ func _handle_menu_map_selected(map_id: String) -> void:
 
 func _update_menu_preview() -> void:
 	var skill_lines: Array[String] = []
-	if _is_blade_character():
+	if _is_thunder_character():
+		skill_lines = [
+			"角色：闪电哥",
+			"基础技能：连锁闪电，可攻击 5 个敌人",
+			"后续技能：电荷爆裂、雷球领域、雷霆进化",
+		]
+	elif _is_blade_character():
 		skill_lines = [
 			"角色：刀客",
 			"初始技能：钢刃斩",
@@ -2500,6 +2913,8 @@ func _on_enemy_defeated(enemy: EnemySoldier, experience_value: int) -> void:
 	_clear_dot_damage_buffer(enemy)
 	_kills += 1
 	_spawn_orb(enemy.global_position, experience_value)
+	if _is_thunder_character() and enemy != _boss_enemy:
+		_try_trigger_detonate(enemy.global_position)
 	if enemy == _boss_enemy:
 		_boss_enemy = null
 		_boss_spawned = false
@@ -2731,6 +3146,10 @@ func _get_current_character_name() -> String:
 
 func _is_blade_character() -> bool:
 	return _selected_character_id == "blade"
+
+
+func _is_thunder_character() -> bool:
+	return _selected_character_id == "thunder"
 
 
 func _get_current_map_name() -> String:
