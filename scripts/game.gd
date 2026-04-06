@@ -30,7 +30,13 @@ const HISTORY_SAVE_PATH := "user://run_records.cfg"
 const DEFAULT_MASTER_VOLUME := 0.82
 const MAX_RECENT_RUNS := 8
 const RUN_MODE_NORMAL := "normal"
+const RUN_MODE_HARD := "hard"
 const RUN_MODE_ENDLESS := "endless"
+const NORMAL_ENEMY_HEALTH_STEP := 1.0
+const HARD_ENEMY_HEALTH_STEP := 1.5
+const ENDLESS_ENEMY_HEALTH_STEP := 2.0
+const MODE_BOSS_HEALTH_MULTIPLIER := 3.0
+const MODE_BOSS_SHIELD_RATIO := 1.0 / 3.0
 const DEFAULT_CAREER_STATS := {
 	"total_runs": 0,
 	"total_victories": 0,
@@ -174,10 +180,10 @@ const MAP_DEFINITIONS := [
 		},
 		"waves": [
 			{"until": 100.0, "weights": {"wisp": 1.0}},
-			{"until": 220.0, "weights": {"wisp": 0.74, "lancer": 0.26}},
-			{"until": 360.0, "weights": {"wisp": 0.58, "lancer": 0.42}},
-			{"until": 500.0, "weights": {"wisp": 0.40, "lancer": 0.60}},
-			{"until": 999.0, "weights": {"wisp": 0.26, "lancer": 0.74}},
+			{"until": 220.0, "weights": {"wisp": 0.68, "lancer": 0.22, "seer": 0.10}},
+			{"until": 360.0, "weights": {"wisp": 0.50, "lancer": 0.32, "seer": 0.18}},
+			{"until": 500.0, "weights": {"wisp": 0.34, "lancer": 0.42, "seer": 0.24}},
+			{"until": 999.0, "weights": {"wisp": 0.20, "lancer": 0.52, "seer": 0.28}},
 		],
 	},
 	{
@@ -207,10 +213,10 @@ const MAP_DEFINITIONS := [
 		},
 		"waves": [
 			{"until": 120.0, "weights": {"brute": 1.0}},
-			{"until": 260.0, "weights": {"brute": 0.78, "embermage": 0.22}},
-			{"until": 420.0, "weights": {"brute": 0.62, "embermage": 0.38}},
-			{"until": 560.0, "weights": {"brute": 0.50, "embermage": 0.50}},
-			{"until": 999.0, "weights": {"brute": 0.38, "embermage": 0.62}},
+			{"until": 260.0, "weights": {"brute": 0.66, "embermage": 0.34}},
+			{"until": 420.0, "weights": {"brute": 0.52, "embermage": 0.48}},
+			{"until": 560.0, "weights": {"brute": 0.40, "embermage": 0.60}},
+			{"until": 999.0, "weights": {"brute": 0.28, "embermage": 0.72}},
 		],
 	},
 	{
@@ -240,10 +246,10 @@ const MAP_DEFINITIONS := [
 		},
 		"waves": [
 			{"until": 110.0, "weights": {"seer": 1.0}},
-			{"until": 250.0, "weights": {"seer": 0.72, "mireling": 0.28}},
-			{"until": 390.0, "weights": {"seer": 0.56, "mireling": 0.44}},
-			{"until": 540.0, "weights": {"seer": 0.42, "mireling": 0.58}},
-			{"until": 999.0, "weights": {"seer": 0.28, "mireling": 0.72}},
+			{"until": 250.0, "weights": {"seer": 0.78, "mireling": 0.22}},
+			{"until": 390.0, "weights": {"seer": 0.64, "mireling": 0.36}},
+			{"until": 540.0, "weights": {"seer": 0.50, "mireling": 0.50}},
+			{"until": 999.0, "weights": {"seer": 0.36, "mireling": 0.64}},
 		],
 	},
 ]
@@ -305,6 +311,8 @@ var _pickup_heat_timer: float = 0.0
 var _world_mutation_index: int = 0
 var _next_world_mutation_time: float = 180.0
 var _active_world_mutations: Array[String] = []
+var _mode_scaling_minute: int = 0
+var _last_spawned_enemy_health: int = 0
 var _endless_spawn_bonus: float = 0.0
 var _endless_elite_bonus: float = 0.0
 var _endless_enemy_speed_bonus: float = 0.0
@@ -714,6 +722,8 @@ func _reset_progression_state() -> void:
 	_world_mutation_index = 0
 	_next_world_mutation_time = 180.0
 	_active_world_mutations.clear()
+	_mode_scaling_minute = 0
+	_last_spawned_enemy_health = 0
 	_endless_spawn_bonus = 0.0
 	_endless_elite_bonus = 0.0
 	_endless_enemy_speed_bonus = 0.0
@@ -784,6 +794,7 @@ func _update_message_timer(delta: float) -> void:
 
 func _update_run_pacing(delta: float) -> void:
 	_update_pickup_heat(delta)
+	_update_mode_health_scaling()
 	_update_threat_phase(delta)
 	_update_map_rule_state(delta)
 	_update_endless_mutations()
@@ -794,6 +805,64 @@ func _update_pickup_heat(delta: float) -> void:
 		_pickup_heat_timer = maxf(0.0, _pickup_heat_timer - delta)
 	if _pickup_heat_timer <= 0.0 and _pickup_heat_bonus > 0.0:
 		_pickup_heat_bonus = maxf(0.0, _pickup_heat_bonus - delta * 0.08)
+
+
+func _update_mode_health_scaling() -> void:
+	var current_minute := _get_mode_elapsed_minutes()
+	if current_minute <= _mode_scaling_minute:
+		return
+
+	var step := _get_mode_enemy_health_step()
+	for minute_step in range(_mode_scaling_minute + 1, current_minute + 1):
+		if not is_equal_approx(step, 1.0):
+			for enemy in _enemies:
+				if enemy == null or not is_instance_valid(enemy) or enemy.is_boss():
+					continue
+				enemy.scale_vitality(step, false)
+			if _last_spawned_enemy_health > 0:
+				_last_spawned_enemy_health = max(1, int(round(float(_last_spawned_enemy_health) * step)))
+			_show_message("%s强化: 小怪生命提升到 %.2fx。" % [_get_current_run_mode_name(), snappedf(_get_enemy_health_multiplier_for_minute(minute_step), 0.01)], Color(1.0, 0.76, 0.46), 2.2)
+
+	_mode_scaling_minute = current_minute
+
+
+func _get_mode_elapsed_minutes() -> int:
+	return int(floor(_run_time / 60.0))
+
+
+func _get_mode_enemy_health_step() -> float:
+	match _current_run_mode_id:
+		RUN_MODE_ENDLESS:
+			return ENDLESS_ENEMY_HEALTH_STEP
+		RUN_MODE_HARD:
+			return HARD_ENEMY_HEALTH_STEP
+		_:
+			return NORMAL_ENEMY_HEALTH_STEP
+
+
+func _get_enemy_health_multiplier() -> float:
+	return _get_enemy_health_multiplier_for_minute(_get_mode_elapsed_minutes())
+
+
+func _get_enemy_health_multiplier_for_minute(minute: int) -> float:
+	return pow(_get_mode_enemy_health_step(), float(max(minute, 0)))
+
+
+func _get_boss_health_reference() -> int:
+	if _last_spawned_enemy_health > 0:
+		return _last_spawned_enemy_health
+
+	var reference_health := 0
+	for enemy in _enemies:
+		if enemy == null or not is_instance_valid(enemy) or enemy.is_boss():
+			continue
+		reference_health = max(reference_health, enemy.max_health)
+	if reference_health > 0:
+		return reference_health
+
+	var fallback_health := 64.0 * _get_enemy_health_multiplier()
+	fallback_health *= 1.0 + _endless_enemy_health_bonus
+	return max(48, int(round(fallback_health)))
 
 
 func _update_threat_phase(delta: float) -> void:
@@ -852,19 +921,19 @@ func _spawn_pressure_wave(phase: int, immediate: bool = false) -> void:
 	var elite_roles: Array[String] = []
 	match phase:
 		1:
-			pressure_roles = ["diver", "fodder"]
+			pressure_roles = ["diver", "fodder", "ranged"]
 		2:
-			pressure_roles = ["diver", "ranged", "fodder"]
-			elite_roles = ["diver"]
+			pressure_roles = ["diver", "ranged", "fodder", "ranged"]
+			elite_roles = ["ranged", "diver"]
 		3:
-			pressure_roles = ["ranged", "control", "diver"]
+			pressure_roles = ["ranged", "control", "diver", "ranged"]
 			elite_roles = ["ranged"]
 		4:
-			pressure_roles = ["diver", "ranged", "control", "fodder"]
-			elite_roles = ["elite", "control"]
+			pressure_roles = ["diver", "ranged", "control", "ranged", "fodder"]
+			elite_roles = ["ranged", "elite"]
 		_:
-			pressure_roles = ["diver", "ranged", "control", "elite"]
-			elite_roles = ["elite", "ranged"]
+			pressure_roles = ["diver", "ranged", "control", "elite", "ranged"]
+			elite_roles = ["ranged", "elite"]
 
 	var pack_size := 1 + phase
 	if immediate:
@@ -878,7 +947,7 @@ func _spawn_pressure_wave(phase: int, immediate: bool = false) -> void:
 		var role := pressure_roles[index % pressure_roles.size()]
 		var make_elite := not elite_roles.is_empty() and (immediate or phase >= 2) and index == 0
 		if make_elite:
-			role = elite_roles[0]
+			role = elite_roles[min(index, elite_roles.size() - 1)]
 		_spawn_role_enemy(role, make_elite)
 
 
@@ -896,11 +965,11 @@ func _get_enemy_roster_for_role(role: String) -> Array[String]:
 		"diver":
 			return ["lancer"]
 		"ranged":
-			return ["embermage"]
+			return ["embermage", "seer"]
 		"control":
 			return ["seer", "mireling"]
 		"elite":
-			return ["brute", "mireling", "embermage"]
+			return ["brute", "mireling", "embermage", "seer"]
 		_:
 			return ["wisp", "brute"]
 
@@ -1830,9 +1899,16 @@ func _spawn_enemy(type_name: String, is_elite: bool, options: Dictionary = {}) -
 	enemy.global_position = spawn_position
 	enemy.configure(type_name, wave_rank, is_elite, _player, options)
 	var health_scale := 1.0 + _endless_enemy_health_bonus + (0.05 if _threat_phase >= 4 and not enemy.is_boss() else 0.0)
-	if health_scale != 1.0:
+	if enemy.is_boss():
+		var boss_health: int = max(1, int(round(float(_get_boss_health_reference()) * MODE_BOSS_HEALTH_MULTIPLIER)))
+		enemy.max_health = boss_health
+		enemy.health = boss_health
+		enemy.set_shield(max(1, int(round(float(boss_health) * MODE_BOSS_SHIELD_RATIO))))
+	else:
+		health_scale *= _get_enemy_health_multiplier()
 		enemy.max_health = max(1, int(round(float(enemy.max_health) * health_scale)))
 		enemy.health = enemy.max_health
+		_last_spawned_enemy_health = enemy.max_health
 	var speed_scale := 1.0 + _endless_enemy_speed_bonus + float(max(_threat_phase - 2, 0)) * 0.03
 	if speed_scale != 1.0:
 		enemy.speed *= speed_scale
@@ -1883,14 +1959,14 @@ func _find_spawn_position(min_distance: float, max_distance: float, radius: floa
 
 
 func _pick_weighted_enemy_type() -> String:
-	if _threat_phase >= 4 and _rng.randf() < 0.26:
-		var late_role_pool: Array[String] = ["diver", "ranged", "control", "fodder"]
+	if _threat_phase >= 4 and _rng.randf() < 0.38:
+		var late_role_pool: Array[String] = ["diver", "ranged", "ranged", "control", "fodder"]
 		var role: String = late_role_pool[_rng.randi_range(0, late_role_pool.size() - 1)]
 		var roster: Array[String] = _get_enemy_roster_for_role(role)
 		if not roster.is_empty():
 			return roster[_rng.randi_range(0, roster.size() - 1)]
-	elif _threat_phase >= 2 and _rng.randf() < 0.16:
-		var mid_role_pool: Array[String] = ["diver", "ranged", "control"]
+	elif _threat_phase >= 2 and _rng.randf() < 0.26:
+		var mid_role_pool: Array[String] = ["diver", "ranged", "control", "ranged"]
 		var role: String = mid_role_pool[_rng.randi_range(0, mid_role_pool.size() - 1)]
 		var roster: Array[String] = _get_enemy_roster_for_role(role)
 		if not roster.is_empty():
@@ -2561,7 +2637,7 @@ func _pop_random_combo_upgrade(pool: Array[Dictionary]) -> Dictionary:
 
 
 func _is_upgrade_available(key: String, current_level: int) -> bool:
-	if _is_endless_mode():
+	if _is_unbounded_upgrade_mode():
 		return true
 	return current_level < int(UPGRADE_LIMITS.get(key, current_level + 1))
 
@@ -3122,11 +3198,11 @@ func _get_objective_text() -> String:
 		var remaining_endless := maxf(0.0, _get_boss_spawn_time() - _run_time)
 		return "%s   无尽模式   下次首领 %s" % [_get_current_map_name(), _format_time(remaining_endless)]
 	if _boss_defeated:
-		return "%s 已肃清" % _get_current_map_name()
+		return "%s   %s   已肃清" % [_get_current_map_name(), _get_current_run_mode_name()]
 	if _boss_spawned and _boss_enemy != null and is_instance_valid(_boss_enemy):
-		return "%s   首领：%s" % [_get_current_map_name(), _get_current_boss_name()]
+		return "%s   %s   首领：%s" % [_get_current_map_name(), _get_current_run_mode_name(), _get_current_boss_name()]
 	var remaining := maxf(0.0, _get_boss_spawn_time() - _run_time)
-	return "%s   首领倒计时 %s" % [_get_current_map_name(), _format_time(remaining)]
+	return "%s   %s   首领倒计时 %s" % [_get_current_map_name(), _get_current_run_mode_name(), _format_time(remaining)]
 
 
 func _open_pause_menu() -> void:
@@ -3181,7 +3257,7 @@ func _end_run_as_surrender() -> void:
 	_hud.hide_pause_menu()
 	var record_result := _record_map_best_kills(_selected_map_id, _kills)
 	_record_run_history(false, true)
-	var mode_label := "无尽模式" if _is_endless_mode() else "当前战斗"
+	var mode_label := _get_current_run_mode_name()
 	_hud.show_result(
 		"主动结束",
 		"你主动结束了 %s，在 %s 中坚持了 %s，击败了 %d 名敌人。角色：%s。%s" % [mode_label, _get_current_map_name(), _format_time(_run_time), _kills, _get_current_character_name(), _build_record_result_suffix(record_result)],
@@ -4070,15 +4146,35 @@ func _sanitize_character_id(character_id: String) -> String:
 
 
 func _sanitize_run_mode(run_mode_id: String) -> String:
-	return RUN_MODE_ENDLESS if run_mode_id == RUN_MODE_ENDLESS else RUN_MODE_NORMAL
+	match run_mode_id:
+		RUN_MODE_ENDLESS:
+			return RUN_MODE_ENDLESS
+		RUN_MODE_HARD:
+			return RUN_MODE_HARD
+		_:
+			return RUN_MODE_NORMAL
 
 
 func _get_current_run_mode_name() -> String:
-	return "无尽模式" if _current_run_mode_id == RUN_MODE_ENDLESS else "普通模式"
+	match _current_run_mode_id:
+		RUN_MODE_ENDLESS:
+			return "无尽模式"
+		RUN_MODE_HARD:
+			return "困难模式"
+		_:
+			return "普通模式"
 
 
 func _is_endless_mode() -> bool:
 	return _current_run_mode_id == RUN_MODE_ENDLESS
+
+
+func _is_hard_mode() -> bool:
+	return _current_run_mode_id == RUN_MODE_HARD
+
+
+func _is_unbounded_upgrade_mode() -> bool:
+	return _is_endless_mode() or _is_hard_mode()
 
 
 func _get_current_character_definition() -> Dictionary:

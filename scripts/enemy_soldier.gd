@@ -15,6 +15,8 @@ var boss: bool = false
 var speed: float = 90.0
 var health: int = 18
 var max_health: int = 18
+var shield: int = 0
+var max_shield: int = 0
 var touch_damage: int = 1
 var experience_value: int = 1
 
@@ -56,6 +58,8 @@ func configure(type_name: String, wave_rank: int, is_elite: bool, player_target:
 	_orbit_direction = 1.0 if randf() < 0.5 else -1.0
 	_summon_type = String(options.get("summon_type", "seer"))
 	_special_cycle = randi() % 3
+	shield = 0
+	max_shield = 0
 
 	match archetype:
 		"lancer":
@@ -184,7 +188,12 @@ func take_damage(amount: int, impulse: Vector2 = Vector2.ZERO) -> void:
 	if amount <= 0 or health <= 0:
 		return
 
-	health = max(0, health - amount)
+	if shield > 0:
+		var absorbed := mini(shield, amount)
+		shield -= absorbed
+		amount -= absorbed
+	if amount > 0:
+		health = max(0, health - amount)
 	_flash_timer = 0.14
 	_apply_impulse_internal(impulse)
 	_update_visual_state()
@@ -198,6 +207,23 @@ func take_damage(amount: int, impulse: Vector2 = Vector2.ZERO) -> void:
 
 func get_body_radius() -> float:
 	return _body_radius
+
+
+func set_shield(amount: int) -> void:
+	max_shield = max(amount, 0)
+	shield = max_shield
+	queue_redraw()
+
+
+func scale_vitality(multiplier: float, include_shield: bool = false) -> void:
+	if multiplier <= 0.0:
+		return
+	max_health = max(1, int(round(float(max_health) * multiplier)))
+	health = max(1, int(round(float(health) * multiplier)))
+	if include_shield and max_shield > 0:
+		max_shield = max(1, int(round(float(max_shield) * multiplier)))
+		shield = max(0, int(round(float(shield) * multiplier)))
+	queue_redraw()
 
 
 func apply_impulse(impulse: Vector2) -> void:
@@ -401,7 +427,7 @@ func _draw() -> void:
 	elif elite:
 		draw_arc(Vector2.ZERO, _body_radius + 8.0, 0.0, TAU, 42, Color(accent_color.r, accent_color.g, accent_color.b, 0.46), 2.4)
 
-	if boss or elite or health < max_health:
+	if boss or elite or health < max_health or shield > 0:
 		_draw_health_bar(accent_color)
 
 
@@ -410,6 +436,11 @@ func _draw_health_bar(fill_color: Color) -> void:
 	var bar_width := _body_radius * 2.0 + (18.0 if boss else 8.0)
 	var bar_y := -_body_radius - (22.0 if boss else 14.0)
 	draw_rect(Rect2(-bar_width * 0.5, bar_y, bar_width, 5.0 if boss else 4.0), Color(0.10, 0.08, 0.10, 0.62))
+	if max_shield > 0:
+		var shield_ratio := float(shield) / float(max(max_shield, 1))
+		var shield_y := bar_y - 5.0
+		draw_rect(Rect2(-bar_width * 0.5, shield_y, bar_width, 3.0), Color(0.08, 0.14, 0.22, 0.72))
+		draw_rect(Rect2(-bar_width * 0.5, shield_y, bar_width * shield_ratio, 3.0), Color(0.42, 0.76, 1.0, 0.94))
 	draw_rect(Rect2(-bar_width * 0.5, bar_y, bar_width * health_ratio, 5.0 if boss else 4.0), fill_color)
 
 

@@ -15,15 +15,22 @@ const RUN_MODE_DEFINITIONS := [
 	{
 		"id": "normal",
 		"name": "普通模式",
-		"summary": "10 分钟后首领来袭，击败后通关。",
-		"detail": "适合完整体验一局标准流程。",
+		"summary": "小怪每分钟维持前一分钟的 1 倍生命，10 分钟后首领来袭。",
+		"detail": "首领生命取最后一次刷出的非 Boss 敌人生命的 3 倍，并附带 1/3 血量护盾；适合标准节奏通关。",
 		"accent": Color(0.46, 0.84, 1.0),
+	},
+	{
+		"id": "hard",
+		"name": "困难模式",
+		"summary": "每分钟小怪血量变成上一分钟的 1.5 倍，首领会带护盾压场。",
+		"detail": "首领生命取最后一次刷出的非 Boss 敌人生命的 3 倍，并附带 1/3 血量护盾；技能与辅助升级都不封顶。",
+		"accent": Color(1.0, 0.72, 0.34),
 	},
 	{
 		"id": "endless",
 		"name": "无尽模式",
-		"summary": "每张地图都能持续推进，只会因死亡或暂停主动结束而终止。",
-		"detail": "等级与技能升级无上限，首领会周期性反复来袭。",
+		"summary": "每分钟小怪血量变成上一分钟的 2 倍，只会因死亡或暂停主动结束而终止。",
+		"detail": "首领生命取最后一次刷出的非 Boss 敌人生命的 3 倍，并附带 1/3 血量护盾；技能与辅助升级都不封顶。",
 		"accent": Color(0.98, 0.58, 0.34),
 	},
 ]
@@ -457,7 +464,7 @@ func _build_mode_select_step(root: VBoxContainer, compact: bool) -> void:
 	var intro := _card(0, Color(mode_accent.r * 0.12 + 0.06, mode_accent.g * 0.10 + 0.07, mode_accent.b * 0.10 + 0.10, 0.98), Color(mode_accent.r, mode_accent.g, mode_accent.b, 0.82))
 	var intro_box := _card_box(intro, 16 if compact else 18)
 	intro_box.add_child(_label("第 3 步：选择模式并开始", 24 if compact else 30, Color(1.0, 0.95, 0.76)))
-	var intro_text := _label("最后只选择普通模式或无尽模式，然后直接开始。", 12 if compact else 15, Color(0.88, 0.94, 0.99))
+	var intro_text := _label("最后在普通、困难、无尽三种模式中确认一项，然后直接开始。", 12 if compact else 15, Color(0.88, 0.94, 0.99))
 	intro_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro_box.add_child(intro_text)
 	root.add_child(intro)
@@ -769,7 +776,7 @@ func _refresh_dynamic_v2() -> void:
 			_detail_title.text = String(selected_mode.get("name", "普通模式"))
 			_detail_meta.text = String(selected_mode.get("summary", ""))
 			_detail_body.text = String(selected_mode.get("detail", ""))
-			_detail_hint.text = "无尽模式仅在死亡或暂停自杀时结束，等级与技能升级都不封顶。" if _selected_mode_id == "endless" else "普通模式在首领被击退后结束本局。"
+			_detail_hint.text = _mode_detail_hint_text(_selected_mode_id)
 			if _start_button != null:
 				_start_button.text = "开始游戏"
 				_apply_primary_button_style(_start_button, _mode_accent(selected_mode), _mode_accent(selected_mode).lightened(0.18))
@@ -1060,6 +1067,16 @@ func _map_accent(map_info: Dictionary) -> Color:
 
 func _mode_accent(mode_info: Dictionary) -> Color:
 	return mode_info.get("accent", Color(0.72, 0.88, 1.0))
+
+
+func _mode_detail_hint_text(mode_id: String) -> String:
+	match mode_id:
+		"endless":
+			return "无尽模式每分钟按 2.0x 抬高小怪血量，Boss 继承最后一只小怪血量做 3 倍强化，并带 1/3 护盾。"
+		"hard":
+			return "困难模式每分钟按 1.5x 抬高小怪血量，Boss 也会按最后一只小怪血量做 3 倍强化并附带护盾。"
+		_:
+			return "普通模式的小怪每分钟维持 1.0x，Boss 同样会按最后一只小怪血量做 3 倍强化并附带护盾。"
 
 
 func _has_map_id(map_id: String) -> bool:
