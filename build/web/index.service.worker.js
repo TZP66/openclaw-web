@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1775465711|4429445';
+const CACHE_VERSION = '1775469691|4876203';
 /** @type {string} */
 const CACHE_PREFIX = '钢翼秘术旅团-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
