@@ -259,7 +259,7 @@ func _apply_spell_lines() -> void:
 	if _spell_lines_label == null:
 		return
 	var rendered_lines: Array[String] = []
-	var max_lines := 2 if _mobile_layout and not _portrait_layout else 3
+	var max_lines := 2
 	for index in range(min(_current_spell_lines.size(), max_lines)):
 		rendered_lines.append(_current_spell_lines[index])
 	_spell_lines_label.text = "\n".join(rendered_lines)
@@ -310,13 +310,13 @@ func _format_upgrade_choice_text(index: int, choice: Dictionary) -> String:
 			lines.append(" ".join(tag_parts))
 	var route := String(choice.get("route", ""))
 	if not route.is_empty():
-		lines.append("璺嚎: %s" % route)
+		lines.append("路线: %s" % route)
 	var combo := String(choice.get("combo", ""))
 	if not combo.is_empty():
 		lines.append("联动: %s" % combo)
 	var route_hint := String(choice.get("route_hint", ""))
 	if not route_hint.is_empty():
-		lines.append("鏂瑰悜: %s" % route_hint)
+		lines.append("方向: %s" % route_hint)
 	lines.append(String(choice.get("desc", "")))
 	return "\n".join(lines)
 

@@ -68,6 +68,67 @@ const CHARACTER_MODELS := {
 <circle cx='86' cy='38' r='2.8' fill='#140f14'/>
 </svg>""",
 	},
+	"alchemist": {
+		"id": "alchemist",
+		"game_height": 92.0,
+		"game_offset": Vector2(0.0, -8.0),
+		"svg": """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'>
+<circle cx='80' cy='84' r='44' fill='#a7dd68' opacity='0.14'/>
+<circle cx='80' cy='82' r='34' fill='none' stroke='#eef8bf' stroke-width='4' opacity='0.30'/>
+<path d='M80 22L110 50L114 120Q80 146 46 120L50 50Z' fill='#365028' stroke='#162514' stroke-width='6' stroke-linejoin='round'/>
+<path d='M80 42L102 60L104 110Q80 128 56 110L58 60Z' fill='#172313'/>
+<circle cx='80' cy='38' r='14' fill='#f2c4a3' stroke='#24141c' stroke-width='4'/>
+<path d='M66 28Q80 14 94 28' fill='none' stroke='#d7f4ac' stroke-width='6' stroke-linecap='round'/>
+<path d='M54 62L42 106' stroke='#162414' stroke-width='8' stroke-linecap='round'/>
+<path d='M106 60L118 104' stroke='#162414' stroke-width='8' stroke-linecap='round'/>
+<path d='M62 84L98 84' stroke='#dced84' stroke-width='6' stroke-linecap='round'/>
+<path d='M114 34L126 50L118 72L102 64L104 42Z' fill='#d1f06d' stroke='#28401c' stroke-width='4' stroke-linejoin='round'/>
+<path d='M118 46L134 46L128 66L112 66Z' fill='none' stroke='#f5ffd2' stroke-width='4' stroke-linejoin='round'/>
+<circle cx='74' cy='38' r='2.8' fill='#140f14'/>
+<circle cx='86' cy='38' r='2.8' fill='#140f14'/>
+</svg>""",
+	},
+	"ranger": {
+		"id": "ranger",
+		"game_height": 92.0,
+		"game_offset": Vector2(0.0, -8.0),
+		"svg": """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'>
+<circle cx='80' cy='84' r='44' fill='#f0d778' opacity='0.12'/>
+<path d='M80 22L108 50L112 120Q80 146 48 120L52 50Z' fill='#42513a' stroke='#162016' stroke-width='6' stroke-linejoin='round'/>
+<path d='M80 42L100 60L102 110Q80 128 58 110L60 60Z' fill='#1b2419'/>
+<circle cx='80' cy='38' r='14' fill='#efc3a1' stroke='#24141b' stroke-width='4'/>
+<path d='M66 28Q80 14 94 28' fill='none' stroke='#f7ebb0' stroke-width='6' stroke-linecap='round'/>
+<path d='M54 62L40 108' stroke='#182116' stroke-width='8' stroke-linecap='round'/>
+<path d='M106 60L118 106' stroke='#182116' stroke-width='8' stroke-linecap='round'/>
+<path d='M62 84L98 84' stroke='#f2d265' stroke-width='6' stroke-linecap='round'/>
+<path d='M118 26Q136 40 132 72' fill='none' stroke='#6e4c2a' stroke-width='7' stroke-linecap='round'/>
+<path d='M110 34Q124 48 120 70' fill='none' stroke='#f7f3e4' stroke-width='4' stroke-linecap='round'/>
+<path d='M44 60L64 46L68 74L48 86L38 70Z' fill='#7f9368' stroke='#24311e' stroke-width='4' stroke-linejoin='round'/>
+<circle cx='74' cy='38' r='2.8' fill='#140f14'/>
+<circle cx='86' cy='38' r='2.8' fill='#140f14'/>
+</svg>""",
+	},
+	"warden": {
+		"id": "warden",
+		"game_height": 94.0,
+		"game_offset": Vector2(0.0, -8.0),
+		"svg": """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'>
+<circle cx='80' cy='84' r='46' fill='#74edd0' opacity='0.12'/>
+<circle cx='80' cy='82' r='36' fill='none' stroke='#d7fff4' stroke-width='4' opacity='0.30'/>
+<path d='M80 22L108 48L114 120Q80 146 46 120L52 48Z' fill='#244f4b' stroke='#102624' stroke-width='6' stroke-linejoin='round'/>
+<path d='M80 42L100 58L104 110Q80 128 56 110L60 58Z' fill='#102725'/>
+<circle cx='80' cy='38' r='14' fill='#f1c4a3' stroke='#24141c' stroke-width='4'/>
+<path d='M66 28Q80 14 94 28' fill='none' stroke='#d4fff2' stroke-width='6' stroke-linecap='round'/>
+<path d='M54 62L42 108' stroke='#112322' stroke-width='8' stroke-linecap='round'/>
+<path d='M106 60L118 106' stroke='#112322' stroke-width='8' stroke-linecap='round'/>
+<path d='M62 84L98 84' stroke='#8ff5de' stroke-width='6' stroke-linecap='round'/>
+<path d='M112 30L136 38L128 84L104 76Z' fill='#b8fff2' stroke='#28524d' stroke-width='4' stroke-linejoin='round'/>
+<path d='M118 40L126 72' stroke='#56d9be' stroke-width='4' stroke-linecap='round'/>
+<circle cx='120' cy='54' r='10' fill='none' stroke='#e8fff8' stroke-width='4' opacity='0.6'/>
+<circle cx='74' cy='38' r='2.8' fill='#140f14'/>
+<circle cx='86' cy='38' r='2.8' fill='#140f14'/>
+</svg>""",
+	},
 }
 
 const ENEMY_MODELS := {

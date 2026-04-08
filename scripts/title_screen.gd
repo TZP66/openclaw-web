@@ -50,6 +50,10 @@ var _select_step: SelectFlowStep = SelectFlowStep.CHARACTER
 var _volume_ratio := 0.82
 
 var _scroll_root: ScrollContainer
+var _character_strip_scroll: ScrollContainer
+var _map_strip_scroll: ScrollContainer
+var _character_grid_scroll: ScrollContainer
+var _map_grid_scroll: ScrollContainer
 var _home_status: Label
 var _home_preview: TextureRect
 var _detail_character_preview: TextureRect
@@ -59,6 +63,7 @@ var _detail_body: Label
 var _detail_hint: Label
 var _boss_preview: TextureRect
 var _start_button: Button
+var _select_summary_label: Label
 var _volume_slider: HSlider
 var _volume_value: Label
 var _character_cards: Array[Dictionary] = []
@@ -216,6 +221,10 @@ func _rebuild_ui() -> void:
 	for child in get_children():
 		child.queue_free()
 	_scroll_root = null
+	_character_strip_scroll = null
+	_map_strip_scroll = null
+	_character_grid_scroll = null
+	_map_grid_scroll = null
 	_home_status = null
 	_home_preview = null
 	_detail_character_preview = null
@@ -225,6 +234,7 @@ func _rebuild_ui() -> void:
 	_detail_hint = null
 	_boss_preview = null
 	_start_button = null
+	_select_summary_label = null
 	_volume_slider = null
 	_volume_value = null
 	_character_cards.clear()
@@ -256,7 +266,7 @@ func _build_ui() -> void:
 	shell.add_child(_scroll_root)
 	var root := VBoxContainer.new()
 	root.custom_minimum_size.x = shell.size.x - 28
-	root.add_theme_constant_override("separation", 14)
+	root.add_theme_constant_override("separation", 12)
 	_scroll_root.add_child(root)
 	root.add_child(_header())
 	match _page:
@@ -271,8 +281,19 @@ func _header() -> Control:
 	row.add_theme_constant_override("separation", 12)
 	var labels := VBoxContainer.new()
 	labels.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	labels.add_child(_label("钢翼秘术旅团", 32 if not _mobile_layout else 22, Color(0.98, 0.99, 1.0)))
-	labels.add_child(_label(_page_tip_v2(), 16 if not _mobile_layout else 12, Color(0.82, 0.92, 0.98)))
+	labels.add_child(_label("钢翼秘术旅团", 26 if not _mobile_layout else 22, Color(0.98, 0.99, 1.0)))
+	labels.add_child(_label(_page_tip_v2(), 13 if not _mobile_layout else 12, Color(0.82, 0.92, 0.98)))
+	if _page == MenuPage.SELECT:
+		var flow := HBoxContainer.new()
+		flow.add_theme_constant_override("separation", 8)
+		flow.add_child(_select_flow_label(SelectFlowStep.CHARACTER))
+		flow.add_child(_label(">", 12 if not _mobile_layout else 11, Color(0.48, 0.60, 0.70)))
+		flow.add_child(_select_flow_label(SelectFlowStep.MAP))
+		flow.add_child(_label(">", 12 if not _mobile_layout else 11, Color(0.48, 0.60, 0.70)))
+		flow.add_child(_select_flow_label(SelectFlowStep.MODE))
+		labels.add_child(flow)
+		_select_summary_label = _label("", 11 if not _mobile_layout else 10, Color(0.72, 0.82, 0.90))
+		labels.add_child(_select_summary_label)
 	row.add_child(labels)
 	if _page != MenuPage.HOME:
 		var back := _button("返回主菜单", 16 if _mobile_layout else 18)
@@ -327,36 +348,45 @@ func _build_select_v2(root: VBoxContainer) -> void:
 func _build_character_select_step(root: VBoxContainer, compact: bool) -> void:
 	var selected_character := _selected_character()
 	var accent: Color = selected_character.get("accent", Color(0.56, 0.80, 1.0))
-
-	var intro := _card(0, Color(accent.r * 0.12 + 0.06, accent.g * 0.10 + 0.07, accent.b * 0.10 + 0.10, 0.98), Color(accent.r, accent.g, accent.b, 0.82))
-	var intro_box := _card_box(intro, 16 if compact else 18)
-	intro_box.add_child(_label("第 1 步：选择角色", 24 if compact else 30, Color(1.0, 0.95, 0.76)))
-	var intro_text := _label("先确定本局角色，下一步只进入地图选择。流程拆成三步后，界面会更清楚。", 12 if compact else 15, Color(0.88, 0.94, 0.99))
-	intro_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	intro_box.add_child(intro_text)
-	root.add_child(intro)
+	var viewport_height := get_viewport().get_visible_rect().size.y
 
 	var layout: BoxContainer = VBoxContainer.new() if compact else HBoxContainer.new()
-	layout.add_theme_constant_override("separation", 14)
+	layout.add_theme_constant_override("separation", 16 if not compact else 14)
 	root.add_child(layout)
 
-	var char_section := _section_shell_v2("角色列表", "点击角色卡切换，确认后进入地图选择。", accent, 0)
+	var char_section := _section_shell_v2("角色", "选择一名本局主角。", accent, 0)
 	char_section.get("panel").size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	layout.add_child(char_section.get("panel"))
-	var char_grid := GridContainer.new()
-	char_grid.columns = 2 if _character_definitions.size() > 1 else 1
-	char_grid.add_theme_constant_override("h_separation", 12 if not compact else 10)
-	char_grid.add_theme_constant_override("v_separation", 12 if not compact else 10)
-	char_section.get("content").add_child(char_grid)
-	for i in range(_character_definitions.size()):
-		var char_entry := _character_card_v2(i)
-		_character_cards.append(char_entry)
-		char_grid.add_child(char_entry.get("panel"))
+	if compact:
+		var char_tip := _label("左右滑动切换角色", 11, Color(0.84, 0.92, 0.98))
+		char_section.get("content").add_child(char_tip)
+		var char_strip := _carousel_strip(192.0, accent)
+		_character_strip_scroll = char_strip.get("scroll") as ScrollContainer
+		char_section.get("content").add_child(char_strip.get("panel") as Panel)
+		var char_row: HBoxContainer = char_strip.get("row") as HBoxContainer
+		for i in range(_character_definitions.size()):
+			var char_entry := _character_card_v2(i)
+			_character_cards.append(char_entry)
+			char_row.add_child(char_entry.get("panel"))
+	else:
+		var char_scroll := _selection_grid_scroll(minf(maxf(viewport_height - 300.0, 280.0), 520.0))
+		_character_grid_scroll = char_scroll
+		char_section.get("content").add_child(char_scroll)
+		var char_grid := GridContainer.new()
+		char_grid.columns = 3
+		char_grid.add_theme_constant_override("h_separation", 12)
+		char_grid.add_theme_constant_override("v_separation", 12)
+		char_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		char_scroll.add_child(char_grid)
+		for i in range(_character_definitions.size()):
+			var char_entry := _character_card_v2(i)
+			_character_cards.append(char_entry)
+			char_grid.add_child(char_entry.get("panel"))
 
 	var detail := _card(0, Color(0.10, 0.13, 0.18, 0.98), Color(accent.r, accent.g, accent.b, 0.82))
 	detail.custom_minimum_size.x = 360 if not compact else 0
 	layout.add_child(detail)
-	var detail_box := _card_box(detail, 16 if compact else 18)
+	var detail_box := _card_box(detail, 14 if compact else 16)
 	var detail_bar := ColorRect.new()
 	detail_bar.custom_minimum_size = Vector2(0, 8)
 	detail_bar.color = accent
@@ -393,36 +423,45 @@ func _build_character_select_step(root: VBoxContainer, compact: bool) -> void:
 func _build_map_select_step(root: VBoxContainer, compact: bool) -> void:
 	var selected_map := _selected_map()
 	var map_accent := _map_accent(selected_map)
-
-	var intro := _card(0, Color(0.08, 0.11, 0.16, 0.98), Color(map_accent.r, map_accent.g, map_accent.b, 0.82))
-	var intro_box := _card_box(intro, 16 if compact else 18)
-	intro_box.add_child(_label("第 2 步：选择地图", 24 if compact else 30, Color(1.0, 0.95, 0.76)))
-	var intro_text := _label("这一屏只保留地图列表和地图简报，确认后进入模式选择。", 12 if compact else 15, Color(0.88, 0.94, 0.99))
-	intro_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	intro_box.add_child(intro_text)
-	root.add_child(intro)
+	var viewport_height := get_viewport().get_visible_rect().size.y
 
 	var layout: BoxContainer = VBoxContainer.new() if compact else HBoxContainer.new()
-	layout.add_theme_constant_override("separation", 14)
+	layout.add_theme_constant_override("separation", 16 if not compact else 14)
 	root.add_child(layout)
 
-	var map_section := _section_shell_v2("地图选择", "这里只选地图。当前地图保持高亮，确认后进入模式选择。", map_accent, 0)
+	var map_section := _section_shell_v2("地图", "选择本局战场。", map_accent, 0)
 	map_section.get("panel").size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	layout.add_child(map_section.get("panel"))
-	var map_grid := GridContainer.new()
-	map_grid.columns = 1 if compact else 2
-	map_grid.add_theme_constant_override("h_separation", 12 if not compact else 10)
-	map_grid.add_theme_constant_override("v_separation", 12 if not compact else 10)
-	map_section.get("content").add_child(map_grid)
-	for i in range(_map_definitions.size()):
-		var map_entry := _map_card_v2(i, true)
-		_map_cards.append(map_entry)
-		map_grid.add_child(map_entry.get("panel"))
+	if compact:
+		var map_tip := _label("左右滑动切换地图", 11, Color(0.84, 0.92, 0.98))
+		map_section.get("content").add_child(map_tip)
+		var map_strip := _carousel_strip(216.0, map_accent)
+		_map_strip_scroll = map_strip.get("scroll") as ScrollContainer
+		map_section.get("content").add_child(map_strip.get("panel") as Panel)
+		var map_row: HBoxContainer = map_strip.get("row") as HBoxContainer
+		for i in range(_map_definitions.size()):
+			var map_entry := _map_card_v2(i, true)
+			_map_cards.append(map_entry)
+			map_row.add_child(map_entry.get("panel"))
+	else:
+		var map_scroll := _selection_grid_scroll(minf(maxf(viewport_height - 300.0, 300.0), 540.0))
+		_map_grid_scroll = map_scroll
+		map_section.get("content").add_child(map_scroll)
+		var map_grid := GridContainer.new()
+		map_grid.columns = 2
+		map_grid.add_theme_constant_override("h_separation", 12)
+		map_grid.add_theme_constant_override("v_separation", 12)
+		map_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		map_scroll.add_child(map_grid)
+		for i in range(_map_definitions.size()):
+			var map_entry := _map_card_v2(i, true)
+			_map_cards.append(map_entry)
+			map_grid.add_child(map_entry.get("panel"))
 
 	var detail := _card(0, Color(0.10, 0.13, 0.18, 0.98), Color(map_accent.r, map_accent.g, map_accent.b, 0.80))
 	detail.custom_minimum_size.x = 392 if not compact else 0
 	layout.add_child(detail)
-	var detail_box := _card_box(detail, 16 if compact else 18)
+	var detail_box := _card_box(detail, 14 if compact else 16)
 	var detail_bar := ColorRect.new()
 	detail_bar.custom_minimum_size = Vector2(0, 8)
 	detail_bar.color = map_accent
@@ -439,48 +478,36 @@ func _build_map_select_step(root: VBoxContainer, compact: bool) -> void:
 	detail_box.add_child(boss_box)
 	boss_box.add_child(_label("首领预览", 11 if compact else 13, Color(0.82, 0.90, 0.98)))
 	_boss_preview = _preview()
-	_boss_preview.custom_minimum_size = Vector2(128, 128) if compact else Vector2(176, 176)
-	boss_box.add_child(_preview_frame_v2(_boss_preview, Vector2(0, 142) if compact else Vector2(0, 192), Color(0.18, 0.12, 0.10, 0.98), Color(0.92, 0.58, 0.36, 0.86), 18 if compact else 22))
+	_boss_preview.custom_minimum_size = Vector2(120, 120) if compact else Vector2(144, 144)
+	boss_box.add_child(_preview_frame_v2(_boss_preview, Vector2(0, 132) if compact else Vector2(0, 156), Color(0.18, 0.12, 0.10, 0.98), Color(0.92, 0.58, 0.36, 0.86), 18 if compact else 20))
 	_detail_body = _label("", 12 if compact else 15, Color(0.92, 0.96, 0.99))
 	_detail_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_detail_hint = _label("", 11 if compact else 13, Color(0.80, 0.88, 0.95))
 	_detail_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail_box.add_child(_detail_body)
-	var launch_panel := _card(0, Color(0.11, 0.15, 0.20, 0.98), Color(0.30, 0.40, 0.50, 0.86))
-	detail_box.add_child(launch_panel)
-	var launch_box := _card_box(launch_panel, 14)
-	launch_box.add_child(_label("下一步", 14 if compact else 16, Color(1.0, 0.90, 0.66)))
-	launch_box.add_child(_detail_hint)
+	detail_box.add_child(_detail_hint)
 	_start_button = _button("下一步：选择模式", 18 if compact else 21)
-	_start_button.custom_minimum_size = Vector2(0, 56 if compact else 60)
+	_start_button.custom_minimum_size = Vector2(0, 54 if compact else 56)
 	_start_button.pressed.connect(_on_start_pressed)
-	launch_box.add_child(_start_button)
+	detail_box.add_child(_start_button)
 
 
 func _build_mode_select_step(root: VBoxContainer, compact: bool) -> void:
 	var selected_mode := _selected_mode()
 	var mode_accent := _mode_accent(selected_mode)
 
-	var intro := _card(0, Color(mode_accent.r * 0.12 + 0.06, mode_accent.g * 0.10 + 0.07, mode_accent.b * 0.10 + 0.10, 0.98), Color(mode_accent.r, mode_accent.g, mode_accent.b, 0.82))
-	var intro_box := _card_box(intro, 16 if compact else 18)
-	intro_box.add_child(_label("第 3 步：选择模式并开始", 24 if compact else 30, Color(1.0, 0.95, 0.76)))
-	var intro_text := _label("最后在普通、困难、无尽三种模式中确认一项，然后直接开始。", 12 if compact else 15, Color(0.88, 0.94, 0.99))
-	intro_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	intro_box.add_child(intro_text)
-	root.add_child(intro)
-
 	var layout: BoxContainer = VBoxContainer.new() if compact else HBoxContainer.new()
-	layout.add_theme_constant_override("separation", 14)
+	layout.add_theme_constant_override("separation", 16 if not compact else 14)
 	root.add_child(layout)
 
-	var mode_section := _section_shell_v2("模式选择", "这里只保留模式卡和最终确认，不再重复地图列表。", mode_accent, 0)
+	var mode_section := _section_shell_v2("模式", "确认战斗节奏和倍率。", mode_accent, 0)
 	mode_section.get("panel").size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	layout.add_child(mode_section.get("panel"))
-	var mode_list: BoxContainer = VBoxContainer.new() if compact else HBoxContainer.new()
-	mode_list.add_theme_constant_override("separation", 12 if not compact else 10)
+	var mode_list := VBoxContainer.new()
+	mode_list.add_theme_constant_override("separation", 10 if compact else 12)
 	mode_section.get("content").add_child(mode_list)
 	for i in range(RUN_MODE_DEFINITIONS.size()):
-		var mode_entry := _mode_card_v2(i)
+		var mode_entry := _mode_card_v2(i, true)
 		_mode_cards.append(mode_entry)
 		mode_list.add_child(mode_entry.get("panel"))
 
@@ -504,15 +531,11 @@ func _build_mode_select_step(root: VBoxContainer, compact: bool) -> void:
 	_detail_hint = _label("", 11 if compact else 13, Color(0.80, 0.88, 0.95))
 	_detail_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail_box.add_child(_detail_body)
-	var launch_panel := _card(0, Color(0.11, 0.15, 0.20, 0.98), Color(0.30, 0.40, 0.50, 0.86))
-	detail_box.add_child(launch_panel)
-	var launch_box := _card_box(launch_panel, 14)
-	launch_box.add_child(_label("开始", 14 if compact else 16, Color(1.0, 0.90, 0.66)))
-	launch_box.add_child(_detail_hint)
+	detail_box.add_child(_detail_hint)
 	_start_button = _button("开始游戏", 18 if compact else 21)
 	_start_button.custom_minimum_size = Vector2(0, 56 if compact else 60)
 	_start_button.pressed.connect(_on_start_pressed)
-	launch_box.add_child(_start_button)
+	detail_box.add_child(_start_button)
 
 
 func _build_history(root: VBoxContainer) -> void:
@@ -555,35 +578,34 @@ func _character_card_v2(index: int) -> Dictionary:
 	var info: Dictionary = _character_definitions[index]
 	var accent: Color = info.get("accent", Color(0.56, 0.80, 1.0))
 	var compact := _mobile_layout and _portrait_layout
-	var panel := _card(188 if compact else 226, Color(accent.r * 0.18 + 0.06, accent.g * 0.14 + 0.07, accent.b * 0.14 + 0.09, 0.98), Color(accent.r, accent.g, accent.b, 0.58))
-	var box := _card_box(panel, 14)
+	var panel := _card(164 if compact else 188, Color(accent.r * 0.18 + 0.06, accent.g * 0.14 + 0.07, accent.b * 0.14 + 0.09, 0.98), Color(accent.r, accent.g, accent.b, 0.58))
+	panel.custom_minimum_size.x = 210 if compact else 0
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL if not compact else Control.SIZE_SHRINK_BEGIN
+	var box := _card_box(panel, 12)
 	var bar := ColorRect.new()
-	bar.custom_minimum_size = Vector2(0, 8)
+	bar.custom_minimum_size = Vector2(0, 6)
 	box.add_child(bar)
 	var header := HBoxContainer.new()
-	header.add_theme_constant_override("separation", 12)
+	header.add_theme_constant_override("separation", 10)
 	box.add_child(header)
 	var heading := VBoxContainer.new()
 	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	heading.add_theme_constant_override("separation", 4)
+	heading.add_theme_constant_override("separation", 2)
 	header.add_child(heading)
-	var title := _label(String(info.get("name", "角色")), 20 if compact else (24 if not _mobile_layout else 18), Color(0.98, 0.99, 1.0))
+	var title := _label(String(info.get("name", "角色")), 18 if compact else 22, Color(0.98, 0.99, 1.0))
 	var role := _label(String(info.get("title", "")), 11 if compact else (14 if not _mobile_layout else 11), Color(0.82, 0.92, 0.98))
 	heading.add_child(title)
 	heading.add_child(role)
-	var state_tag := _tag_v2("点击切换", Color(0.10, 0.16, 0.22, 0.96), Color(accent.r, accent.g, accent.b, 0.72), 11 if compact else (12 if not _mobile_layout else 11), Color(1.0, 0.93, 0.76))
+	var state_tag := _tag_v2("待选", Color(0.10, 0.16, 0.22, 0.96), Color(accent.r, accent.g, accent.b, 0.72), 11 if compact else 12, Color(1.0, 0.93, 0.76))
 	header.add_child(state_tag.get("panel"))
 	var preview := _preview()
-	preview.custom_minimum_size = Vector2(84, 84) if compact else Vector2(108, 108)
+	preview.custom_minimum_size = Vector2(76, 76) if compact else Vector2(92, 92)
 	preview.texture = SVG_MODEL_LIBRARY.get_character_texture(String(info.get("id", "caster")))
-	box.add_child(_preview_frame_v2(preview, Vector2(0, 96) if compact else Vector2(0, 118), Color(accent.r * 0.12 + 0.10, accent.g * 0.10 + 0.11, accent.b * 0.10 + 0.13, 0.98), Color(accent.r, accent.g, accent.b, 0.64), 16 if compact else 18))
-	var summary := _label(String(info.get("summary", "")), 12 if compact else (14 if not _mobile_layout else 11), Color(0.88, 0.94, 0.98))
+	box.add_child(_preview_frame_v2(preview, Vector2(0, 84) if compact else Vector2(0, 98), Color(accent.r * 0.12 + 0.10, accent.g * 0.10 + 0.11, accent.b * 0.10 + 0.13, 0.98), Color(accent.r, accent.g, accent.b, 0.64), 16 if compact else 18))
+	var summary := _label(String(info.get("summary", "")), 11 if compact else 12, Color(0.88, 0.94, 0.98))
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(summary)
-	if not compact:
-		var detail := _label(String(info.get("detail", "")), 13 if not _mobile_layout else 11, Color(0.80, 0.89, 0.96))
-		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		box.add_child(detail)
+	if compact:
+		box.add_child(summary)
 	_attach_card_button(panel, _on_character_button_pressed.bind(index))
 	return {
 		"panel": panel,
@@ -601,32 +623,27 @@ func _map_card_v2(index: int, wide: bool = false) -> Dictionary:
 	var accent := _map_accent(info)
 	var border := _map_border(info)
 	var compact := _mobile_layout and _portrait_layout
-	var panel := _card((220 if compact else 248) if wide else (196 if compact else 236), _map_fill(info), Color(border.r, border.g, border.b, 0.62))
-	var box := _card_box(panel, 14)
+	var panel := _card((190 if compact else 214) if wide else (176 if compact else 198), _map_fill(info), Color(border.r, border.g, border.b, 0.62))
+	panel.custom_minimum_size.x = (248 if compact else 0) if wide else (214 if compact else 0)
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL if not compact else Control.SIZE_SHRINK_BEGIN
+	var box := _card_box(panel, 12)
 	var bar := ColorRect.new()
-	bar.custom_minimum_size = Vector2(0, 8)
+	bar.custom_minimum_size = Vector2(0, 6)
 	box.add_child(bar)
-	var title := _label(String(info.get("name", "地图")), 19 if compact else (24 if wide else (22 if not _mobile_layout else 17)), Color(0.98, 0.99, 1.0))
+	var title := _label(String(info.get("name", "地图")), 18 if compact else 21, Color(0.98, 0.99, 1.0))
 	box.add_child(title)
 	var boss := _label("首领 %s" % String(info.get("boss_name", "未知首领")), 11 if compact else (13 if wide else (14 if not _mobile_layout else 11)), Color(1.0, 0.88, 0.64))
 	box.add_child(boss)
-	var preview := _preview()
-	preview.custom_minimum_size = Vector2(96, 96) if compact else (Vector2(120, 120) if wide else Vector2(100, 100))
-	preview.texture = SVG_MODEL_LIBRARY.get_enemy_texture(String(info.get("boss_archetype", "storm_archon")))
-	box.add_child(_preview_frame_v2(preview, Vector2(0, 110) if compact else (Vector2(0, 132) if wide else Vector2(0, 110)), Color(accent.r * 0.12 + 0.11, accent.g * 0.10 + 0.10, accent.b * 0.10 + 0.10, 0.98), Color(border.r, border.g, border.b, 0.72), 16 if compact else 18))
-	var tagline := _label(String(info.get("tagline", "")), 12 if compact else (15 if wide else (14 if not _mobile_layout else 11)), Color(0.84, 0.92, 0.98))
+	var tagline := _label(String(info.get("tagline", "")), 11 if compact else (13 if wide else 12), Color(0.84, 0.92, 0.98))
 	tagline.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var record := _label("", 11 if compact else (13 if not _mobile_layout else 11), Color(0.82, 0.90, 0.96))
 	box.add_child(tagline)
-	var terrain := _label("地形 %s" % String(info.get("terrain_hint", "")), 11 if compact else (13 if not _mobile_layout else 11), Color(0.80, 0.89, 0.96))
-	terrain.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(terrain)
 	var footer := HBoxContainer.new()
 	footer.add_theme_constant_override("separation", 8)
 	box.add_child(footer)
 	record.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	footer.add_child(record)
-	var state := _label("点击切换", 11 if compact else 12, Color(1.0, 0.90, 0.66))
+	var state := _label("选择", 11 if compact else 12, Color(1.0, 0.90, 0.66))
 	state.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	footer.add_child(state)
 	_attach_card_button(panel, _on_map_button_pressed.bind(index))
@@ -646,64 +663,182 @@ func _mode_card_v2(index: int, dense: bool = false) -> Dictionary:
 	var info: Dictionary = RUN_MODE_DEFINITIONS[index]
 	var accent: Color = info.get("accent", Color(0.46, 0.84, 1.0))
 	var compact := _mobile_layout and _portrait_layout
-	var panel := _card((112 if compact else 124) if dense else (150 if compact else 164), Color(accent.r * 0.18 + 0.06, accent.g * 0.14 + 0.07, accent.b * 0.12 + 0.08, 0.98), Color(accent.r, accent.g, accent.b, 0.60))
-	var box := _card_box(panel, 14)
+	var panel := _card((88 if compact else 96) if dense else (120 if compact else 134), Color(accent.r * 0.18 + 0.06, accent.g * 0.14 + 0.07, accent.b * 0.12 + 0.08, 0.98), Color(accent.r, accent.g, accent.b, 0.60))
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var box := _card_box(panel, 12)
 	var bar := ColorRect.new()
 	bar.custom_minimum_size = Vector2(0, 6 if dense else 8)
 	box.add_child(bar)
-	var title := _label(String(info.get("name", "模式")), 16 if dense else (18 if compact else 20), Color(0.98, 0.99, 1.0))
-	var summary := _label(String(info.get("summary", "")), 11 if dense else (12 if compact else 13), Color(0.88, 0.94, 0.98))
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 10)
+	box.add_child(header)
+	var title := _label(String(info.get("name", "模式")), 15 if dense else (18 if compact else 20), Color(0.98, 0.99, 1.0))
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(title)
+	var state_tag := _tag_v2("待选", Color(0.10, 0.16, 0.22, 0.96), Color(accent.r, accent.g, accent.b, 0.72), 11, Color(1.0, 0.93, 0.76))
+	header.add_child(state_tag.get("panel"))
+	var summary := _label(String(info.get("summary", "")), 10 if dense else (12 if compact else 13), Color(0.88, 0.94, 0.98))
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(title)
 	box.add_child(summary)
-	var state := _label("点击切换", 11, Color(1.0, 0.93, 0.76))
-	box.add_child(state)
-	if not compact and not dense:
-		var detail := _label(String(info.get("detail", "")), 12, Color(0.80, 0.89, 0.96))
-		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		box.add_child(detail)
 	_attach_card_button(panel, _on_mode_button_pressed.bind(index))
 	return {
 		"panel": panel,
 		"bar": bar,
 		"title": title,
 		"summary": summary,
-		"state": state,
+		"state": state_tag.get("label"),
 		"info": info,
 	}
 
 
 func _section_shell_v2(title: String, subtitle: String, accent: Color, min_h: float = 0.0) -> Dictionary:
 	var panel := _card(min_h, Color(accent.r * 0.12 + 0.05, accent.g * 0.10 + 0.06, accent.b * 0.10 + 0.08, 0.98), Color(accent.r, accent.g, accent.b, 0.76))
-	var box := _card_box(panel, 16)
+	var box := _card_box(panel, 14)
 	var bar := ColorRect.new()
-	bar.custom_minimum_size = Vector2(0, 8)
+	bar.custom_minimum_size = Vector2(0, 6)
 	bar.color = accent
 	box.add_child(bar)
-	box.add_child(_label(title, 22 if not _mobile_layout else 17, Color(1.0, 0.95, 0.76)))
-	var desc := _label(subtitle, 14 if not _mobile_layout else 11, Color(0.84, 0.92, 0.98))
+	box.add_child(_label(title, 16 if not _mobile_layout else 14, Color(1.0, 0.95, 0.76)))
+	var desc := _label(subtitle, 11 if not _mobile_layout else 10, Color(0.84, 0.92, 0.98))
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(desc)
 	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 12)
+	content.add_theme_constant_override("separation", 10)
 	box.add_child(content)
 	return {"panel": panel, "content": content}
 
 
+func _carousel_strip(strip_height: float, accent: Color) -> Dictionary:
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(0.0, strip_height)
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.add_theme_stylebox_override(
+		"panel",
+		_panel_style(
+			Color(accent.r * 0.10 + 0.04, accent.g * 0.08 + 0.05, accent.b * 0.08 + 0.07, 0.98),
+			Color(accent.r, accent.g, accent.b, 0.44),
+			20,
+			3
+		)
+	)
+	var scroll := ScrollContainer.new()
+	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
+	scroll.offset_left = 8
+	scroll.offset_top = 8
+	scroll.offset_right = -8
+	scroll.offset_bottom = -8
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.add_child(scroll)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(row)
+	return {"panel": panel, "scroll": scroll, "row": row}
+
+
+func _selection_grid_scroll(target_height: float) -> ScrollContainer:
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0.0, target_height)
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	return scroll
+
+
 func _tag_v2(text: String, fill: Color, border: Color, font_size: int = 12, font_color: Color = Color(0.96, 0.97, 1.0)) -> Dictionary:
 	var panel := Panel.new()
-	panel.custom_minimum_size = Vector2(maxf(132.0, float(text.length()) * float(font_size) * 0.72 + 24.0), 30.0)
+	panel.custom_minimum_size = Vector2(maxf(84.0, float(text.length()) * float(font_size) * 0.72 + 20.0), 28.0)
 	panel.add_theme_stylebox_override("panel", _panel_style(fill, border, 999, 2))
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.offset_left = 10
+	margin.offset_left = 9
 	margin.offset_top = 5
-	margin.offset_right = -10
+	margin.offset_right = -9
 	margin.offset_bottom = -5
 	panel.add_child(margin)
 	var label := _label(text, font_size, font_color)
 	margin.add_child(label)
 	return {"panel": panel, "label": label}
+
+
+func _build_select_overview(root: VBoxContainer, accent: Color, compact: bool) -> void:
+	var panel := _card(0, Color(accent.r * 0.10 + 0.05, accent.g * 0.08 + 0.06, accent.b * 0.08 + 0.08, 0.98), Color(accent.r, accent.g, accent.b, 0.76))
+	var box := _card_box(panel, 12 if compact else 14)
+	var row: BoxContainer = VBoxContainer.new() if compact else HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10 if compact else 12)
+	box.add_child(row)
+
+	var steps: BoxContainer = VBoxContainer.new() if compact else HBoxContainer.new()
+	steps.add_theme_constant_override("separation", 8)
+	steps.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(steps)
+	for step in [SelectFlowStep.CHARACTER, SelectFlowStep.MAP, SelectFlowStep.MODE]:
+		steps.add_child(_select_step_chip(step, accent, compact))
+
+	_select_summary_label = _label("", 12 if compact else 13, Color(0.90, 0.95, 0.99))
+	_select_summary_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(_select_summary_label)
+	root.add_child(panel)
+
+
+func _select_step_accent() -> Color:
+	match _select_step:
+		SelectFlowStep.CHARACTER:
+			return _selected_character().get("accent", Color(0.56, 0.80, 1.0))
+		SelectFlowStep.MAP:
+			return _map_accent(_selected_map())
+		_:
+			return _mode_accent(_selected_mode())
+
+
+func _select_step_chip(step: SelectFlowStep, accent: Color, compact: bool) -> Panel:
+	var active := step == _select_step
+	var completed := int(step) < int(_select_step)
+	var fill := Color(0.10, 0.14, 0.18, 0.98)
+	var border := Color(0.24, 0.34, 0.40, 0.82)
+	var text_color := Color(0.82, 0.90, 0.96)
+	if completed:
+		fill = Color(0.18, 0.22, 0.16, 0.98)
+		border = Color(0.78, 0.86, 0.52, 0.76)
+		text_color = Color(0.96, 0.98, 0.82)
+	if active:
+		fill = Color(accent.r * 0.20 + 0.08, accent.g * 0.18 + 0.08, accent.b * 0.18 + 0.10, 0.98)
+		border = Color(accent.r, accent.g, accent.b, 0.96)
+		text_color = Color(1.0, 0.98, 0.90)
+
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(92.0 if compact else 112.0, 36.0 if compact else 38.0)
+	panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	panel.add_theme_stylebox_override("panel", _panel_style(fill, border, 999, 3 if active else 2))
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.offset_left = 12
+	margin.offset_top = 7
+	margin.offset_right = -12
+	margin.offset_bottom = -7
+	panel.add_child(margin)
+	var label := _label("%d. %s" % [int(step) + 1, _select_step_short_name(step)], 11 if compact else 12, text_color)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	margin.add_child(label)
+	return panel
+
+
+func _select_step_short_name(step: SelectFlowStep) -> String:
+	match step:
+		SelectFlowStep.CHARACTER:
+			return "角色"
+		SelectFlowStep.MAP:
+			return "地图"
+		_:
+			return "模式"
+
+
+func _select_flow_label(step: SelectFlowStep) -> Label:
+	var label := _label(_select_step_short_name(step), 12 if not _mobile_layout else 11, Color(0.68, 0.78, 0.86))
+	if step == _select_step:
+		label.modulate = _select_step_accent().lightened(0.22)
+	elif int(step) < int(_select_step):
+		label.modulate = Color(0.82, 0.90, 0.62)
+	return label
 
 
 func _preview_frame_v2(texture: TextureRect, size: Vector2, fill: Color, border: Color, radius: int = 16) -> Panel:
@@ -725,6 +860,13 @@ func _refresh_dynamic_v2() -> void:
 	var selected_character := _selected_character()
 	var selected_mode := _selected_mode()
 
+	if _select_summary_label != null:
+		_select_summary_label.text = "当前配置：%s  /  %s  /  %s" % [
+			String(selected_character.get("name", "未选择角色")),
+			String(selected_map.get("name", "未选择地图")),
+			String(selected_mode.get("name", "普通模式")),
+		]
+
 	if _home_status != null:
 		_home_status.text = "角色：%s\n地图：%s\n模式：%s\n总战斗：%d  胜利：%d\n总击败：%d  音量：%d%%" % [
 			String(selected_character.get("name", "未选择")),
@@ -743,15 +885,15 @@ func _refresh_dynamic_v2() -> void:
 		if _select_step == SelectFlowStep.CHARACTER:
 			var accent: Color = selected_character.get("accent", Color(0.56, 0.80, 1.0))
 			_detail_title.text = String(selected_character.get("name", "未选择角色"))
-			_detail_meta.text = "定位：%s\n默认地图：%s" % [
+			_detail_meta.text = "定位：%s\n当前地图：%s" % [
 				String(selected_character.get("title", "")),
 				String(selected_map.get("name", "未选择地图"))
 			]
-			_detail_body.text = "%s\n\n%s" % [
+			_detail_body.text = "%s\n%s" % [
 				String(selected_character.get("summary", "")),
 				String(selected_character.get("detail", ""))
 			]
-			_detail_hint.text = "确认角色后进入地图选择。"
+			_detail_hint.text = "确认后进入地图选择。"
 			if _start_button != null:
 				_start_button.text = "下一步：选择地图"
 				_apply_primary_button_style(_start_button, accent, accent.lightened(0.20))
@@ -761,12 +903,11 @@ func _refresh_dynamic_v2() -> void:
 				String(selected_map.get("boss_name", "未知首领")),
 				_best_kill_text(String(selected_map.get("id", "")))
 			]
-			_detail_body.text = "%s\n\n%s\n地形提示：%s" % [
-				String(selected_map.get("tagline", "")),
+			_detail_body.text = "%s\n地形提示：%s" % [
 				String(selected_map.get("description", "")),
 				String(selected_map.get("terrain_hint", ""))
 			]
-			_detail_hint.text = "确认地图后进入模式选择。"
+			_detail_hint.text = "确认后进入模式选择。"
 			if _boss_preview != null:
 				_boss_preview.texture = SVG_MODEL_LIBRARY.get_enemy_texture(String(selected_map.get("boss_archetype", "storm_archon")))
 			if _start_button != null:
@@ -788,7 +929,7 @@ func _refresh_dynamic_v2() -> void:
 			var accent: Color = info.get("accent", Color(0.56, 0.80, 1.0))
 			(entry.get("panel") as Panel).add_theme_stylebox_override("panel", _panel_style(Color(accent.r * 0.22 + 0.06, accent.g * 0.18 + 0.06, accent.b * 0.18 + 0.08, 0.98), Color(accent.r, accent.g, accent.b, 0.96 if selected else 0.54), 20, 10 if selected else 6))
 			(entry.get("bar") as ColorRect).color = accent
-			(entry.get("state") as Label).text = "当前已选" if selected else "点击选择"
+			(entry.get("state") as Label).text = "已选" if selected else "待选"
 
 		for i in range(_map_cards.size()):
 			var entry: Dictionary = _map_cards[i]
@@ -797,6 +938,7 @@ func _refresh_dynamic_v2() -> void:
 			(entry.get("panel") as Panel).add_theme_stylebox_override("panel", _panel_style(_map_fill(info), Color(_map_border(info).r, _map_border(info).g, _map_border(info).b, 0.96 if selected else 0.58), 20, 10 if selected else 6))
 			(entry.get("bar") as ColorRect).color = _map_accent(info)
 			(entry.get("record") as Label).text = "历史最高击败：%s" % _best_kill_text(String(info.get("id", "")))
+			(entry.get("state") as Label).text = "已选" if selected else "选择"
 
 		for i in range(_mode_cards.size()):
 			var entry: Dictionary = _mode_cards[i]
@@ -805,11 +947,14 @@ func _refresh_dynamic_v2() -> void:
 			var accent: Color = _mode_accent(info)
 			(entry.get("panel") as Panel).add_theme_stylebox_override("panel", _panel_style(Color(accent.r * 0.22 + 0.06, accent.g * 0.18 + 0.06, accent.b * 0.16 + 0.08, 0.98), Color(accent.r, accent.g, accent.b, 0.96 if selected else 0.56), 20, 10 if selected else 6))
 			(entry.get("bar") as ColorRect).color = accent
-			(entry.get("state") as Label).text = "当前已选" if selected else "点击选择"
+			(entry.get("state") as Label).text = "已选" if selected else "选择"
 
 	if _volume_slider != null:
 		_volume_slider.value = round(_volume_ratio * 100.0)
 		_volume_value.text = "%d%%" % int(round(_volume_slider.value))
+
+	if _page == MenuPage.SELECT:
+		call_deferred("_ensure_selected_cards_visible")
 
 
 func _selected_map_index() -> int:
@@ -872,6 +1017,33 @@ func _select_character_index(index: int) -> void:
 func _select_mode_index(index: int) -> void:
 	_selected_mode_id = String(RUN_MODE_DEFINITIONS[index].get("id", "normal"))
 	_refresh_dynamic_v2()
+
+
+func _ensure_selected_cards_visible() -> void:
+	if _character_strip_scroll != null and _select_step == SelectFlowStep.CHARACTER:
+		var char_index := _selected_character_index()
+		if char_index >= 0 and char_index < _character_cards.size():
+			var char_panel := _character_cards[char_index].get("panel") as Control
+			if char_panel != null:
+				_character_strip_scroll.ensure_control_visible(char_panel)
+	if _character_grid_scroll != null and _select_step == SelectFlowStep.CHARACTER:
+		var selected_char_index := _selected_character_index()
+		if selected_char_index >= 0 and selected_char_index < _character_cards.size():
+			var selected_char_panel := _character_cards[selected_char_index].get("panel") as Control
+			if selected_char_panel != null:
+				_character_grid_scroll.ensure_control_visible(selected_char_panel)
+	if _map_strip_scroll != null and _select_step == SelectFlowStep.MAP:
+		var map_index := _selected_map_index()
+		if map_index >= 0 and map_index < _map_cards.size():
+			var map_panel := _map_cards[map_index].get("panel") as Control
+			if map_panel != null:
+				_map_strip_scroll.ensure_control_visible(map_panel)
+	if _map_grid_scroll != null and _select_step == SelectFlowStep.MAP:
+		var selected_map_index := _selected_map_index()
+		if selected_map_index >= 0 and selected_map_index < _map_cards.size():
+			var selected_map_panel := _map_cards[selected_map_index].get("panel") as Control
+			if selected_map_panel != null:
+				_map_grid_scroll.ensure_control_visible(selected_map_panel)
 
 
 func _emit_start() -> void: start_requested.emit(_selected_map_id, _selected_character_id, _selected_mode_id)

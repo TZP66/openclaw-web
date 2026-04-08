@@ -160,6 +160,12 @@ func _draw() -> void:
 		accent = Color(1.0, 0.58, 0.34, 0.26)
 	elif character_id == "thunder":
 		accent = Color(0.56, 0.84, 1.0, 0.30)
+	elif character_id == "alchemist":
+		accent = Color(0.72, 0.92, 0.46, 0.28)
+	elif character_id == "ranger":
+		accent = Color(0.96, 0.86, 0.42, 0.28)
+	elif character_id == "warden":
+		accent = Color(0.52, 0.96, 0.84, 0.30)
 	if _flash_timer > 0.0:
 		accent = Color(1.0, 0.92, 0.72, 0.36)
 

@@ -136,6 +136,30 @@ func _draw_icon(icon_id: String, rect: Rect2, color: Color) -> void:
 			_draw_mooncut_icon(rect, color)
 		"step_slash":
 			_draw_step_slash_icon(rect, color)
+		"flask":
+			_draw_flask_icon(rect, color)
+		"miasma":
+			_draw_miasma_icon(rect, color)
+		"shardburst":
+			_draw_shardburst_icon(rect, color)
+		"catalyst":
+			_draw_catalyst_icon(rect, color)
+		"needle":
+			_draw_needle_icon(rect, color)
+		"volley":
+			_draw_volley_icon(rect, color)
+		"glaive":
+			_draw_glaive_icon(rect, color)
+		"trail":
+			_draw_trail_icon(rect, color)
+		"pulse":
+			_draw_pulse_icon(rect, color)
+		"ward":
+			_draw_ward_icon(rect, color)
+		"beacon":
+			_draw_beacon_icon(rect, color)
+		"relay":
+			_draw_relay_icon(rect, color)
 		_:
 			_draw_bolt_icon(rect, color)
 
@@ -283,3 +307,118 @@ func _draw_step_slash_icon(rect: Rect2, color: Color) -> void:
 		rect.position + Vector2(rect.size.x * 0.70, rect.size.y * 0.54),
 	])
 	draw_colored_polygon(arrow, color)
+
+
+func _draw_flask_icon(rect: Rect2, color: Color) -> void:
+	var body := PackedVector2Array([
+		rect.position + Vector2(rect.size.x * 0.36, rect.size.y * 0.16),
+		rect.position + Vector2(rect.size.x * 0.64, rect.size.y * 0.16),
+		rect.position + Vector2(rect.size.x * 0.70, rect.size.y * 0.40),
+		rect.position + Vector2(rect.size.x * 0.82, rect.size.y * 0.78),
+		rect.position + Vector2(rect.size.x * 0.18, rect.size.y * 0.78),
+		rect.position + Vector2(rect.size.x * 0.30, rect.size.y * 0.40),
+	])
+	draw_colored_polygon(body, Color(color.r, color.g, color.b, 0.26))
+	draw_line(rect.position + Vector2(rect.size.x * 0.42, rect.size.y * 0.14), rect.position + Vector2(rect.size.x * 0.58, rect.size.y * 0.14), color, maxf(3.0, rect.size.x * 0.08))
+	draw_arc(rect.get_center() + Vector2(0.0, rect.size.y * 0.12), rect.size.x * 0.22, 0.2, PI - 0.2, 18, color, maxf(2.0, rect.size.x * 0.05))
+	draw_circle(rect.get_center() + Vector2(0.0, rect.size.y * 0.18), rect.size.x * 0.09, Color(0.98, 0.99, 1.0))
+
+
+func _draw_miasma_icon(rect: Rect2, color: Color) -> void:
+	var center := rect.get_center()
+	draw_circle(center + Vector2(-rect.size.x * 0.16, rect.size.y * 0.04), rect.size.x * 0.18, Color(color.r, color.g, color.b, 0.22))
+	draw_circle(center + Vector2(rect.size.x * 0.02, -rect.size.y * 0.04), rect.size.x * 0.20, Color(color.r, color.g, color.b, 0.30))
+	draw_circle(center + Vector2(rect.size.x * 0.18, rect.size.y * 0.08), rect.size.x * 0.16, Color(color.r, color.g, color.b, 0.24))
+	draw_arc(center, rect.size.x * 0.34, 0.0, TAU, 28, color, maxf(2.0, rect.size.x * 0.05))
+
+
+func _draw_shardburst_icon(rect: Rect2, color: Color) -> void:
+	var center := rect.get_center()
+	for index in range(5):
+		var angle := -0.8 + float(index) * 0.4
+		var direction := Vector2.RIGHT.rotated(angle)
+		var tangent := direction.orthogonal().normalized()
+		var base := center + direction * rect.size.x * 0.04
+		var tip := center + direction * rect.size.x * 0.36
+		draw_colored_polygon(PackedVector2Array([
+			base - tangent * rect.size.x * 0.04,
+			base + tangent * rect.size.x * 0.04,
+			tip,
+		]), Color(color.r, color.g, color.b, 0.84 if index != 2 else 1.0))
+
+
+func _draw_catalyst_icon(rect: Rect2, color: Color) -> void:
+	var center := rect.get_center()
+	draw_circle(center, rect.size.x * 0.16, Color(color.r, color.g, color.b, 0.24))
+	for index in range(6):
+		var angle := TAU * float(index) / 6.0
+		var direction := Vector2.RIGHT.rotated(angle)
+		draw_line(center + direction * rect.size.x * 0.08, center + direction * rect.size.x * 0.34, color, maxf(2.0, rect.size.x * 0.05))
+		draw_circle(center + direction * rect.size.x * 0.38, rect.size.x * 0.05, Color(0.98, 0.99, 1.0))
+
+
+func _draw_needle_icon(rect: Rect2, color: Color) -> void:
+	var start := rect.position + Vector2(rect.size.x * 0.14, rect.size.y * 0.72)
+	var end := rect.position + Vector2(rect.size.x * 0.86, rect.size.y * 0.28)
+	draw_line(start, end, color, maxf(3.0, rect.size.x * 0.07))
+	draw_line(start + Vector2(0.0, rect.size.y * 0.10), end + Vector2(0.0, rect.size.y * 0.10), Color(0.98, 0.99, 1.0), maxf(2.0, rect.size.x * 0.05))
+
+
+func _draw_volley_icon(rect: Rect2, color: Color) -> void:
+	for index in range(4):
+		var x := 0.18 + float(index) * 0.16
+		draw_line(
+			rect.position + Vector2(rect.size.x * x, rect.size.y * 0.76),
+			rect.position + Vector2(rect.size.x * (x + 0.18), rect.size.y * 0.22),
+			color if index % 2 == 0 else Color(0.98, 0.99, 1.0),
+			maxf(2.0, rect.size.x * 0.05)
+		)
+
+
+func _draw_glaive_icon(rect: Rect2, color: Color) -> void:
+	var center := rect.get_center()
+	draw_arc(center, rect.size.x * 0.28, -1.0, 1.2, 20, color, maxf(3.0, rect.size.x * 0.07))
+	draw_colored_polygon(PackedVector2Array([
+		rect.position + Vector2(rect.size.x * 0.58, rect.size.y * 0.16),
+		rect.position + Vector2(rect.size.x * 0.84, rect.size.y * 0.34),
+		rect.position + Vector2(rect.size.x * 0.66, rect.size.y * 0.52),
+	]), Color(0.98, 0.99, 1.0))
+
+
+func _draw_trail_icon(rect: Rect2, color: Color) -> void:
+	var line_width := maxf(4.0, rect.size.x * 0.10)
+	draw_line(rect.position + Vector2(rect.size.x * 0.14, rect.size.y * 0.74), rect.position + Vector2(rect.size.x * 0.86, rect.size.y * 0.26), color, line_width)
+	draw_line(rect.position + Vector2(rect.size.x * 0.14, rect.size.y * 0.54), rect.position + Vector2(rect.size.x * 0.70, rect.size.y * 0.18), Color(0.98, 0.99, 1.0, 0.84), maxf(2.0, rect.size.x * 0.05))
+
+
+func _draw_pulse_icon(rect: Rect2, color: Color) -> void:
+	var center := rect.get_center()
+	draw_circle(center, rect.size.x * 0.10, Color(0.98, 0.99, 1.0))
+	draw_arc(center, rect.size.x * 0.22, 0.0, TAU, 24, color, maxf(2.0, rect.size.x * 0.05))
+	draw_arc(center, rect.size.x * 0.34, 0.0, TAU, 28, Color(color.r, color.g, color.b, 0.58), maxf(2.0, rect.size.x * 0.04))
+
+
+func _draw_ward_icon(rect: Rect2, color: Color) -> void:
+	var center := rect.get_center()
+	draw_arc(center, rect.size.x * 0.28, 0.0, TAU, 32, color, maxf(2.0, rect.size.x * 0.05))
+	for index in range(3):
+		var angle := TAU * float(index) / 3.0 - PI * 0.5
+		draw_circle(center + Vector2.RIGHT.rotated(angle) * rect.size.x * 0.28, rect.size.x * 0.07, Color(0.98, 0.99, 1.0))
+
+
+func _draw_beacon_icon(rect: Rect2, color: Color) -> void:
+	var center := rect.get_center()
+	draw_line(center + Vector2(0.0, rect.size.y * 0.28), center + Vector2(0.0, -rect.size.y * 0.08), color, maxf(3.0, rect.size.x * 0.06))
+	draw_circle(center + Vector2(0.0, -rect.size.y * 0.12), rect.size.x * 0.10, Color(0.98, 0.99, 1.0))
+	draw_arc(center + Vector2(0.0, rect.size.y * 0.02), rect.size.x * 0.30, 0.0, TAU, 26, Color(color.r, color.g, color.b, 0.74), maxf(2.0, rect.size.x * 0.04))
+
+
+func _draw_relay_icon(rect: Rect2, color: Color) -> void:
+	var left := rect.position + Vector2(rect.size.x * 0.22, rect.size.y * 0.64)
+	var mid := rect.position + Vector2(rect.size.x * 0.50, rect.size.y * 0.32)
+	var right := rect.position + Vector2(rect.size.x * 0.80, rect.size.y * 0.58)
+	draw_line(left, mid, color, maxf(3.0, rect.size.x * 0.06))
+	draw_line(mid, right, Color(0.98, 0.99, 1.0), maxf(3.0, rect.size.x * 0.06))
+	draw_circle(left, rect.size.x * 0.06, color)
+	draw_circle(mid, rect.size.x * 0.06, Color(0.98, 0.99, 1.0))
+	draw_circle(right, rect.size.x * 0.06, color)

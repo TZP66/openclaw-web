@@ -48,6 +48,14 @@ func _draw() -> void:
 		)
 
 	match icon_style:
+		"core":
+			_draw_core_icon()
+		"spore":
+			_draw_spore_icon()
+		"prism":
+			_draw_prism_icon()
+		"gear":
+			_draw_gear_icon()
 		"pool":
 			_draw_pool_icon()
 		"mud":
@@ -75,6 +83,46 @@ func _draw_altar_icon() -> void:
 		draw_circle(point, radius * 0.08, Color(primary_color.r, primary_color.g, primary_color.b, 0.66))
 
 
+func _draw_core_icon() -> void:
+	var inner := radius * 0.26
+	var crystal := PackedVector2Array([
+		Vector2(0.0, -inner * 1.24),
+		Vector2(inner * 0.82, -inner * 0.18),
+		Vector2(inner * 0.56, inner * 0.94),
+		Vector2(0.0, inner * 1.36),
+		Vector2(-inner * 0.56, inner * 0.94),
+		Vector2(-inner * 0.82, -inner * 0.18),
+	])
+	draw_colored_polygon(crystal, Color(secondary_color.r, secondary_color.g, secondary_color.b, 0.92))
+	draw_arc(Vector2.ZERO, inner * 1.44, 0.0, TAU, 30, Color(primary_color.r, primary_color.g, primary_color.b, 0.82), maxf(2.0, radius * 0.04))
+	for index in range(3):
+		var angle := _time * 0.66 + TAU * float(index) / 3.0
+		var orbit_point := Vector2.RIGHT.rotated(angle) * radius * 0.44
+		draw_circle(orbit_point, radius * 0.07, Color(primary_color.r, primary_color.g, primary_color.b, 0.72))
+
+
+func _draw_spore_icon() -> void:
+	var centers: Array[Vector2] = [
+		Vector2.ZERO,
+		Vector2(-radius * 0.18, radius * 0.04),
+		Vector2(radius * 0.16, -radius * 0.06),
+		Vector2(radius * 0.04, radius * 0.20),
+	]
+	var radii: Array[float] = [0.18, 0.14, 0.12, 0.10]
+	for index in range(centers.size()):
+		var center: Vector2 = centers[index]
+		var local_radius: float = radius * radii[index]
+		draw_circle(center, local_radius, Color(primary_color.r, primary_color.g, primary_color.b, 0.34))
+		draw_arc(center, local_radius * 1.18, 0.0, TAU, 24, Color(secondary_color.r, secondary_color.g, secondary_color.b, 0.78), maxf(1.8, radius * 0.03))
+	var sprout := PackedVector2Array([
+		Vector2(-radius * 0.08, -radius * 0.06),
+		Vector2(0.0, -radius * 0.30),
+		Vector2(radius * 0.10, -radius * 0.06),
+		Vector2(0.0, radius * 0.08),
+	])
+	draw_colored_polygon(sprout, Color(secondary_color.r, secondary_color.g, secondary_color.b, 0.74))
+
+
 func _draw_pool_icon() -> void:
 	draw_circle(Vector2.ZERO, radius * 0.24, Color(secondary_color.r, secondary_color.g, secondary_color.b, 0.34))
 	draw_circle(Vector2(-radius * 0.20, radius * 0.04), radius * 0.18, Color(primary_color.r, primary_color.g, primary_color.b, 0.32))
@@ -88,6 +136,36 @@ func _draw_mud_icon() -> void:
 		var center := Vector2.RIGHT.rotated(angle) * radius * 0.18
 		draw_circle(center, radius * (0.16 + float(index) * 0.03), Color(primary_color.r, primary_color.g, primary_color.b, 0.30))
 	draw_arc(Vector2.ZERO, radius * 0.36, 0.2, PI - 0.2, 24, Color(secondary_color.r, secondary_color.g, secondary_color.b, 0.72), maxf(2.0, radius * 0.04))
+
+
+func _draw_prism_icon() -> void:
+	var inner := radius * 0.28
+	var prism := PackedVector2Array([
+		Vector2(0.0, -inner * 1.26),
+		Vector2(inner * 0.92, -inner * 0.10),
+		Vector2(inner * 0.48, inner * 1.10),
+		Vector2(-inner * 0.48, inner * 1.10),
+		Vector2(-inner * 0.92, -inner * 0.10),
+	])
+	draw_colored_polygon(prism, Color(secondary_color.r, secondary_color.g, secondary_color.b, 0.88))
+	draw_arc(Vector2.ZERO, inner * 1.48, 0.0, TAU, 30, Color(primary_color.r, primary_color.g, primary_color.b, 0.82), maxf(2.0, radius * 0.04))
+	for index in range(3):
+		var angle := -0.9 + float(index) * 0.9
+		var end := Vector2.RIGHT.rotated(angle) * radius * 0.52
+		draw_line(Vector2.ZERO, end, Color(primary_color.r, primary_color.g, primary_color.b, 0.64), maxf(1.8, radius * 0.03))
+
+
+func _draw_gear_icon() -> void:
+	var outer := radius * 0.34
+	var inner := outer * 0.62
+	var teeth := PackedVector2Array()
+	for index in range(16):
+		var angle := TAU * float(index) / 16.0 - PI * 0.5
+		var local_radius := outer * (1.18 if index % 2 == 0 else 0.92)
+		teeth.append(Vector2.RIGHT.rotated(angle) * local_radius)
+	draw_colored_polygon(teeth, Color(primary_color.r, primary_color.g, primary_color.b, 0.36))
+	draw_circle(Vector2.ZERO, inner, Color(secondary_color.r, secondary_color.g, secondary_color.b, 0.88))
+	draw_circle(Vector2.ZERO, inner * 0.38, Color(primary_color.r, primary_color.g, primary_color.b, 0.72))
 
 
 func _draw_label_block() -> void:
