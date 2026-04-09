@@ -309,6 +309,9 @@ func _format_upgrade_choice_text(index: int, choice: Dictionary) -> String:
 				tag_parts.append("[%s]" % String(tag_variant))
 			lines.append(" ".join(tag_parts))
 	var route := String(choice.get("route", ""))
+	var route_role := String(choice.get("route_role", ""))
+	if not route_role.is_empty():
+		lines.append("定位: %s" % route_role)
 	if not route.is_empty():
 		lines.append("路线: %s" % route)
 	var combo := String(choice.get("combo", ""))

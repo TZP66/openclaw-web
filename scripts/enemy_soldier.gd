@@ -51,6 +51,10 @@ var _sprite: Sprite2D
 var _model_offset: Vector2 = Vector2.ZERO
 var _model_scale: Vector2 = Vector2.ONE
 var _facing_direction: Vector2 = Vector2.RIGHT
+var _target_distance: float = INF
+var _signature_burst_name: String = ""
+var _signature_burst_timer: float = 0.0
+var _signature_burst_duration: float = 0.0
 
 
 func _ready() -> void:
@@ -78,6 +82,10 @@ func configure(type_name: String, wave_rank: int, is_elite: bool, player_target:
 	_summon_type = String(options.get("summon_type", "seer"))
 	_special_cycle = randi() % 3
 	_boss_phase_index = 0
+	_target_distance = INF
+	_signature_burst_name = ""
+	_signature_burst_timer = 0.0
+	_signature_burst_duration = 0.0
 	shield = 0
 	max_shield = 0
 
@@ -165,6 +173,7 @@ func _physics_process(delta: float) -> void:
 	_touch_cooldown = maxf(0.0, _touch_cooldown - delta)
 	_special_timer = maxf(0.0, _special_timer - delta)
 	_dash_time = maxf(0.0, _dash_time - delta)
+	_signature_burst_timer = maxf(0.0, _signature_burst_timer - delta)
 	if _flash_timer > 0.0:
 		_flash_timer = maxf(0.0, _flash_timer - delta)
 		if _flash_timer <= 0.0:
@@ -172,6 +181,7 @@ func _physics_process(delta: float) -> void:
 	_phase += delta * (1.2 if boss else 1.8)
 
 	if not active or target == null or not is_instance_valid(target) or not target.is_alive():
+		_target_distance = INF
 		velocity = _knockback
 		_knockback = _knockback.move_toward(Vector2.ZERO, 620.0 * delta)
 		move_and_slide()
@@ -179,6 +189,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	var to_player := target.global_position - global_position
+	_target_distance = to_player.length()
 	var direction := to_player.normalized()
 	if direction == Vector2.ZERO:
 		direction = Vector2.DOWN
@@ -291,10 +302,12 @@ func _process_special_behavior(to_player: Vector2, direction: Vector2) -> void:
 
 	match archetype:
 		"lancer":
+			_trigger_signature_burst("dash", 0.34)
 			_dash_velocity = direction * speed * 3.2
 			_dash_time = 0.34
 			_special_timer = randf_range(1.8, 2.6)
 		"embermage":
+			_trigger_signature_burst("cast", 0.28)
 			var radius := 72.0
 			special_attack.emit(global_position, radius, Color(1.0, 0.76, 0.34), Color(1.0, 0.38, 0.18))
 			if _player_in_radius(global_position, radius):
@@ -316,6 +329,7 @@ func _process_elite_affixes(delta: float, to_player: Vector2, direction: Vector2
 		var dash_timer := maxf(0.0, float(_elite_affix_timers.get("dash", 0.0)) - delta)
 		_elite_affix_timers["dash"] = dash_timer
 		if dash_timer <= 0.0 and _dash_time <= 0.0:
+			_trigger_signature_burst("dash", 0.32)
 			_dash_velocity = direction * speed * 3.8
 			_dash_time = 0.32
 			var rush_marker := global_position + direction * (_body_radius + 26.0)
@@ -339,6 +353,7 @@ func _process_elite_affixes(delta: float, to_player: Vector2, direction: Vector2
 
 
 func _use_storm_archon_skill(direction: Vector2) -> void:
+	_trigger_signature_burst("storm", 0.40)
 	var phase_bonus := float(_boss_phase_index)
 	var cycle := _special_cycle % 3
 	if cycle == 0:
@@ -399,6 +414,7 @@ func _use_storm_archon_skill(direction: Vector2) -> void:
 
 
 func _use_forge_tyrant_skill(direction: Vector2) -> void:
+	_trigger_signature_burst("forge", 0.44)
 	var phase_bonus := float(_boss_phase_index)
 	var cycle := _special_cycle % 3
 	if cycle == 0:
@@ -449,6 +465,7 @@ func _use_forge_tyrant_skill(direction: Vector2) -> void:
 
 
 func _use_void_matriarch_skill(_direction: Vector2) -> void:
+	_trigger_signature_burst("void", 0.42)
 	var phase_bonus := float(_boss_phase_index)
 	var cycle := _special_cycle % 3
 	if cycle == 0:
@@ -550,6 +567,7 @@ func _draw() -> void:
 			var angle := _phase * 0.6 + TAU * float(index) / 3.0
 			var orb_position := Vector2.RIGHT.rotated(angle) * (_body_radius + 10.0)
 			draw_circle(orb_position, 4.0, Color(accent_color.r, accent_color.g, accent_color.b, 0.82))
+		_draw_boss_phase_adornments(accent_color)
 		_draw_boss_phase_pips(accent_color)
 	elif elite:
 		draw_arc(Vector2.ZERO, _body_radius + 8.0, 0.0, TAU, 42, Color(accent_color.r, accent_color.g, accent_color.b, 0.46), 2.4)
@@ -584,6 +602,51 @@ func _draw_boss_phase_pips(fill_color: Color) -> void:
 		var active_pip := index < _boss_phase_index
 		var pip_color := fill_color if active_pip else Color(0.14, 0.16, 0.20, 0.88)
 		draw_circle(Vector2(start_x + float(index) * spacing, y), 3.4, pip_color)
+
+
+func _draw_boss_phase_adornments(fill_color: Color) -> void:
+	if _boss_phase_index <= 0:
+		return
+
+	match archetype:
+		"storm_archon":
+			for phase in range(_boss_phase_index):
+				var spread := _body_radius + 16.0 + float(phase) * 10.0
+				var tip_y := -10.0 - float(phase) * 8.0
+				var shard_color := Color(fill_color.r, fill_color.g, fill_color.b, 0.26 + float(phase) * 0.12)
+				var left_points := PackedVector2Array([
+					Vector2(-_body_radius * 0.35, -14.0),
+					Vector2(-spread, tip_y),
+					Vector2(-spread + 12.0, 10.0 + float(phase) * 4.0),
+				])
+				var right_points := PackedVector2Array([
+					Vector2(_body_radius * 0.35, -14.0),
+					Vector2(spread, tip_y),
+					Vector2(spread - 12.0, 10.0 + float(phase) * 4.0),
+				])
+				draw_colored_polygon(left_points, shard_color)
+				draw_colored_polygon(right_points, shard_color)
+		"forge_tyrant":
+			var vent_count := 2 + _boss_phase_index
+			var crack_color := Color(1.0, 0.72, 0.32, 0.44 + float(_boss_phase_index) * 0.12)
+			for index in range(vent_count):
+				var vent_x := -18.0 + float(index) * 16.0
+				var vent_height := 10.0 + float(index % 2) * 6.0 + float(_boss_phase_index) * 4.0
+				draw_line(Vector2(vent_x, -18.0), Vector2(vent_x, -18.0 - vent_height), crack_color, 4.6)
+			for phase in range(_boss_phase_index):
+				var crack_offset := float(phase) * 7.0
+				draw_line(Vector2(-10.0 + crack_offset, -2.0), Vector2(-2.0 + crack_offset, 18.0), crack_color, 3.2)
+				draw_line(Vector2(10.0 - crack_offset, -2.0), Vector2(2.0 - crack_offset, 18.0), crack_color, 3.2)
+		"void_matriarch":
+			var iris_radius := _body_radius * 0.44 + float(_boss_phase_index) * 4.0
+			draw_arc(Vector2.ZERO, iris_radius, 0.0, TAU, 48, Color(fill_color.r, fill_color.g, fill_color.b, 0.34), 2.6)
+			var tentacle_count := 2 + _boss_phase_index
+			for index in range(tentacle_count):
+				var side := -1.0 if index % 2 == 0 else 1.0
+				var step := float(index / 2)
+				var start := Vector2(side * (_body_radius * 0.48 + step * 6.0), 10.0 + step * 6.0)
+				var end := start + Vector2(side * (10.0 + step * 4.0), 18.0 + float(_boss_phase_index) * 6.0)
+				draw_line(start, end, Color(fill_color.r, fill_color.g, fill_color.b, 0.42), 3.2)
 
 
 func _draw_elite_affix_markers() -> void:
@@ -769,16 +832,102 @@ func _update_visual_state() -> void:
 	var bob := sin(_phase * (1.5 if hoverer else 1.1)) * (4.0 if hoverer else 1.4)
 	if not hoverer:
 		bob += minf(2.0, velocity.length() * 0.01)
-
-	_sprite.position = _model_offset + Vector2(0.0, bob)
-	_sprite.rotation = clampf(velocity.x / maxf(speed * 2.0, 1.0), -1.0, 1.0) * (0.12 if boss else 0.08)
-	_sprite.scale = Vector2(_model_scale.x * (1.0 - pulse * 0.03), _model_scale.y * (1.0 + pulse * 0.04))
+	var signature_pose := _get_signature_pose()
+	_sprite.position = _model_offset + Vector2(0.0, bob) + signature_pose.get("offset", Vector2.ZERO)
+	_sprite.rotation = clampf(velocity.x / maxf(speed * 2.0, 1.0), -1.0, 1.0) * (0.12 if boss else 0.08) + float(signature_pose.get("rotation", 0.0))
+	var scale_multiplier: Vector2 = signature_pose.get("scale", Vector2.ONE)
+	_sprite.scale = Vector2(_model_scale.x * (1.0 - pulse * 0.03) * scale_multiplier.x, _model_scale.y * (1.0 + pulse * 0.04) * scale_multiplier.y)
 	if _flash_timer > 0.0:
 		_sprite.self_modulate = Color(1.0, 0.92, 0.82)
 	elif elite and not boss:
 		_sprite.self_modulate = Color(1.0, 0.98, 0.92)
 	else:
 		_sprite.self_modulate = Color.WHITE
+
+
+func _trigger_signature_burst(signature_name: String, duration: float) -> void:
+	if signature_name.is_empty():
+		return
+	_signature_burst_name = signature_name
+	_signature_burst_duration = maxf(duration, 0.01)
+	_signature_burst_timer = _signature_burst_duration
+
+
+func _get_signature_pose() -> Dictionary:
+	var forward := _facing_direction if _facing_direction != Vector2.ZERO else Vector2.RIGHT
+	forward = forward.normalized()
+	var lean_x := clampf(forward.x, -1.0, 1.0)
+	var offset := Vector2.ZERO
+	var rotation := 0.0
+	var scale := Vector2.ONE
+	var burst_peak := 0.0
+	if _signature_burst_timer > 0.0 and _signature_burst_duration > 0.0:
+		var burst_progress := 1.0 - _signature_burst_timer / _signature_burst_duration
+		burst_peak = sin(burst_progress * PI)
+
+	match archetype:
+		"lancer":
+			var charge := clampf(1.0 - _special_timer / 0.34, 0.0, 1.0) if _dash_time <= 0.0 else 0.0
+			if _dash_time > 0.0:
+				offset += forward * (12.0 + 4.0 * burst_peak)
+				rotation += lean_x * 0.20
+				scale = Vector2(1.14, 0.88)
+			elif charge > 0.0:
+				offset -= forward * 8.0 * charge
+				offset += Vector2(0.0, 4.0 * charge)
+				rotation -= lean_x * 0.10 * charge
+				scale = Vector2(0.92 - 0.04 * charge, 1.10 + 0.04 * charge)
+		"brute":
+			var crush := clampf(1.0 - _target_distance / 180.0, 0.0, 1.0)
+			var stomp := (0.45 + 0.55 * absf(sin(_phase * 0.70))) * crush
+			offset += Vector2(0.0, 6.0 * stomp)
+			rotation += sin(_phase * 0.90) * 0.05 * crush
+			scale = Vector2(1.10 + 0.04 * stomp, 0.88 - 0.06 * stomp)
+		"embermage":
+			var ember_charge := clampf(1.0 - _special_timer / 0.32, 0.0, 1.0) if _dash_time <= 0.0 else 0.0
+			var ember_peak := maxf(ember_charge, burst_peak)
+			offset += forward * (-4.0 * ember_charge + 2.0 * burst_peak)
+			offset += Vector2(0.0, -6.0 * ember_peak)
+			rotation += lean_x * (0.03 * ember_charge + 0.09 * burst_peak)
+			scale = Vector2(0.94 - 0.02 * ember_peak, 1.10 + 0.08 * ember_peak)
+		"seer":
+			var focus := clampf(1.0 - _target_distance / 250.0, 0.0, 1.0) * (0.55 + 0.45 * absf(sin(_phase * 0.80)))
+			offset += Vector2(0.0, -8.0 * focus)
+			offset -= forward * 2.0 * focus
+			rotation += sin(_phase * 1.10) * 0.03 * focus
+			scale = Vector2(0.90 - 0.02 * focus, 1.12 + 0.10 * focus)
+		"mireling":
+			var pounce := clampf(1.0 - _target_distance / 150.0, 0.0, 1.0)
+			var surge := maxf(pounce, burst_peak)
+			offset += forward * 6.0 * surge
+			offset += Vector2(0.0, 4.0 * pounce)
+			rotation += lean_x * 0.10 * pounce
+			scale = Vector2(1.12 + 0.06 * surge, 0.86 - 0.08 * surge)
+		"storm_archon":
+			var storm_charge := clampf(1.0 - _special_timer / 0.50, 0.0, 1.0)
+			var storm_peak := maxf(storm_charge, burst_peak)
+			offset += Vector2(0.0, -10.0 * storm_peak)
+			rotation += lean_x * 0.06 * storm_peak
+			scale = Vector2(1.04 + 0.04 * storm_peak, 1.02 + 0.08 * storm_peak)
+		"forge_tyrant":
+			var forge_charge := clampf(1.0 - _special_timer / 0.60, 0.0, 1.0)
+			var forge_peak := maxf(forge_charge, burst_peak)
+			offset += Vector2(0.0, 8.0 * forge_charge - 4.0 * burst_peak)
+			rotation += lean_x * 0.05 * burst_peak
+			scale = Vector2(1.08 + 0.04 * forge_peak, 0.90 - 0.05 * forge_charge)
+		"void_matriarch":
+			var void_charge := clampf(1.0 - _special_timer / 0.60, 0.0, 1.0)
+			var void_peak := maxf(void_charge, burst_peak)
+			offset += Vector2(0.0, -9.0 * void_peak)
+			offset -= forward * 3.0 * void_charge
+			rotation += sin(_phase * 1.30) * 0.04 * void_peak
+			scale = Vector2(0.92 - 0.02 * void_peak, 1.10 + 0.08 * void_peak)
+
+	return {
+		"offset": offset,
+		"rotation": rotation,
+		"scale": scale,
+	}
 
 
 func _get_highlight_color() -> Color:

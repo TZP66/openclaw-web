@@ -2655,6 +2655,8 @@ func _fire_bolts() -> void:
 
 	var count := _get_bolt_count()
 	var targets := _get_nearest_enemies(_player.global_position, count, 900.0)
+	var signature_direction := _get_player_target_direction(900.0)
+	_trigger_player_action_signature("cast_arc", 0.18, 0.86, signature_direction)
 	for index in range(count):
 		var direction := Vector2.RIGHT.rotated(_run_time * 0.7 + TAU * float(index) / float(max(count, 1)))
 		var target: EnemySoldier = null
@@ -2686,6 +2688,8 @@ func _fire_bolts() -> void:
 func _cast_nova() -> void:
 	if _player == null or not is_instance_valid(_player):
 		return
+
+	_trigger_player_action_signature("nova_cast", 0.22, 0.98, _player.get_facing_direction())
 
 	var count := _get_nova_projectile_count()
 	for index in range(count):
@@ -2725,6 +2729,8 @@ func _cast_storm() -> void:
 	var targets := _get_nearest_enemies(_player.global_position, _get_storm_target_count(), 920.0)
 	if targets.is_empty():
 		return
+	var signature_direction := (targets[0].global_position - _player.global_position).normalized()
+	_trigger_player_action_signature("storm_cast", 0.24, 1.10, signature_direction)
 
 	var storm_damage := _get_storm_damage()
 	var has_tempest_network := _has_endgame_evolution("evo_caster_tempest_network")
@@ -2824,6 +2830,8 @@ func _cast_chain_lightning_attack() -> bool:
 	)
 	if hit_enemies.is_empty():
 		return false
+	var signature_direction := facing if facing != Vector2.ZERO else _get_player_target_direction(_get_chain_initial_range())
+	_trigger_player_action_signature("chain_cast", 0.18, 0.96, signature_direction)
 
 	var first_target := hit_enemies[0]
 	if first_target != null and is_instance_valid(first_target):
@@ -2956,6 +2964,7 @@ func _cast_storm_orb() -> bool:
 		throw_direction = _player.get_facing_direction()
 	if throw_direction == Vector2.ZERO:
 		throw_direction = Vector2.RIGHT
+	_trigger_player_action_signature("orb_throw", 0.22, 1.04, throw_direction)
 	_player.set_facing_direction(throw_direction)
 	_spawn_lightning_link_effect(_player.global_position + throw_direction * 18.0, target_position, 6.2)
 	_spawn_effect(target_position, field.radius * 0.26, Color(0.86, 0.98, 1.0), Color(0.32, 0.62, 1.0), 0.18)
@@ -3097,6 +3106,12 @@ func _get_player_target_position(search_range: float, fallback_distance: float =
 	return _player.global_position + _get_player_target_direction(search_range) * fallback_distance
 
 
+func _trigger_player_action_signature(signature_name: String, duration: float, strength: float = 1.0, direction: Vector2 = Vector2.ZERO) -> void:
+	if _player == null or not is_instance_valid(_player):
+		return
+	_player.trigger_action_signature(signature_name, duration, strength, direction)
+
+
 func _update_alchemist_attacks(delta: float) -> void:
 	_flask_timer -= delta
 	if _flask_timer <= 0.0:
@@ -3140,6 +3155,7 @@ func _throw_alchemist_flasks() -> bool:
 	var targets := _get_nearest_enemies(_player.global_position, count, 820.0)
 	var base_direction := _get_player_target_direction(820.0)
 	_player.set_facing_direction(base_direction)
+	_trigger_player_action_signature("throw_flask", 0.24, 1.08, base_direction)
 	for index in range(count):
 		var target_position := _get_player_target_position(820.0, 180.0)
 		if index < targets.size():
@@ -3183,6 +3199,8 @@ func _cast_alchemist_miasma() -> bool:
 		return false
 
 	_prune_alchemist_clouds()
+	var signature_direction := _get_player_target_direction(_get_miasma_cast_range())
+	_trigger_player_action_signature("throw_flask", 0.22, 0.92, signature_direction)
 	var cloud: PoisonCloudHazard = POISON_CLOUD_SCRIPT.new()
 	var target_position := _get_player_target_position(_get_miasma_cast_range(), 210.0)
 	cloud.global_position = target_position
@@ -3217,6 +3235,7 @@ func _cast_alchemist_shardburst() -> bool:
 		return false
 	var direction := _get_player_target_direction(860.0)
 	_player.set_facing_direction(direction)
+	_trigger_player_action_signature("throw_flask", 0.18, 0.84, direction)
 	var count := _get_shardburst_count()
 	var span := 0.34
 	for index in range(count):
@@ -3252,6 +3271,7 @@ func _trigger_alchemist_catalyst() -> bool:
 	if _player == null or not is_instance_valid(_player):
 		return false
 	_prune_alchemist_clouds()
+	_trigger_player_action_signature("catalyst_burst", 0.22, 1.02, _get_player_target_direction(640.0))
 	var burst_positions: Array[Vector2] = []
 	while burst_positions.size() < _get_catalyst_burst_count() and not _alchemist_clouds.is_empty():
 		var cloud := _alchemist_clouds[0]
@@ -3345,6 +3365,7 @@ func _fire_ranger_needles() -> bool:
 	var targets := _get_nearest_enemies(_player.global_position, count, 960.0)
 	var base_direction := _get_player_target_direction(960.0)
 	_player.set_facing_direction(base_direction)
+	_trigger_player_action_signature("draw_shot", 0.20, 0.94, base_direction)
 	for index in range(count):
 		var direction := base_direction
 		if index < targets.size():
@@ -3371,6 +3392,7 @@ func _cast_ranger_volley() -> bool:
 		return false
 	var direction := _get_player_target_direction(900.0)
 	_player.set_facing_direction(direction)
+	_trigger_player_action_signature("draw_shot", 0.24, 1.08, direction)
 	var count := _get_volley_count()
 	var span := 0.58
 	for index in range(count):
@@ -3399,6 +3421,7 @@ func _cast_ranger_glaive() -> bool:
 	var targets := _get_nearest_enemies(_player.global_position, count, 860.0)
 	var base_direction := _get_player_target_direction(860.0)
 	_player.set_facing_direction(base_direction)
+	_trigger_player_action_signature("glaive_throw", 0.22, 1.02, base_direction)
 	for index in range(count):
 		var target: EnemySoldier = null
 		var direction := base_direction
@@ -3433,6 +3456,7 @@ func _cast_ranger_trail() -> bool:
 	if direction == Vector2.ZERO:
 		direction = _get_player_target_direction(860.0)
 	_player.set_facing_direction(direction)
+	_trigger_player_action_signature("trail_dash", 0.18, 0.96, direction)
 	var length := _get_trail_length()
 	var width := _get_trail_width()
 	var line_count := 1 + int(_trail_level >= 3)
@@ -3478,6 +3502,7 @@ func _update_warden_attacks(delta: float) -> void:
 func _cast_warden_pulse() -> bool:
 	if _player == null or not is_instance_valid(_player):
 		return false
+	_trigger_player_action_signature("brace_pulse", 0.22, 1.04, _player.get_facing_direction())
 	var radius := _get_pulse_radius()
 	var hit_total := _damage_enemies_in_radius(_player.global_position, radius, _get_pulse_damage(), 220.0, _get_pulse_hit_count())
 	_spawn_effect(_player.global_position, radius * 0.92, Color(0.86, 0.98, 0.90), Color(0.28, 0.82, 0.64), 0.20)
@@ -3508,6 +3533,7 @@ func _cast_warden_beacon() -> bool:
 	var direction := (field.global_position - _player.global_position).normalized()
 	if direction != Vector2.ZERO:
 		_player.set_facing_direction(direction)
+	_trigger_player_action_signature("brace_cast", 0.24, 0.96, direction)
 	_spawn_effect(field.global_position, field.radius * 0.22, Color(0.88, 0.98, 0.92), Color(0.28, 0.82, 0.66), 0.18)
 	_audio.play_player_shot("power")
 	return true
@@ -3545,6 +3571,8 @@ func _cast_warden_relay() -> bool:
 		})
 	if segments.is_empty():
 		return false
+	var signature_direction := _get_player_target_direction(760.0)
+	_trigger_player_action_signature("brace_cast", 0.20, 0.90, signature_direction)
 
 	var total_hits := 0
 	for segment_variant in segments:
@@ -3604,6 +3632,7 @@ func _perform_steel_slash() -> bool:
 	if direction == Vector2.ZERO:
 		direction = Vector2.RIGHT
 	_player.set_facing_direction(direction)
+	_trigger_player_action_signature("slash", 0.20, 1.12, direction)
 
 	var slash_center := _player.global_position
 	var hit_count := _damage_enemies_in_arc(
@@ -3680,6 +3709,7 @@ func _cast_mooncut() -> bool:
 	if primary_direction == Vector2.ZERO:
 		primary_direction = Vector2.RIGHT
 	_player.set_facing_direction(primary_direction)
+	_trigger_player_action_signature("mooncut", 0.22, 1.04, primary_direction)
 
 	var count := _get_mooncut_projectile_count()
 	var fan_offsets: Array[float] = []
@@ -3785,6 +3815,7 @@ func _perform_step_slash() -> bool:
 	if direction == Vector2.ZERO:
 		direction = Vector2.RIGHT
 	_player.set_facing_direction(direction)
+	_trigger_player_action_signature("dash_cut", 0.18, 1.18, direction)
 
 	var radius := _get_step_slash_radius()
 	var slash_center := start_position
@@ -4851,6 +4882,262 @@ func _get_build_focus_snapshot() -> Dictionary:
 	}
 
 
+func _is_build_focus_locked(snapshot: Dictionary) -> bool:
+	var primary: Dictionary = snapshot.get("primary", {})
+	if primary.is_empty():
+		return false
+	var primary_score := int(primary.get("score", 0))
+	if primary_score <= 0:
+		return false
+	var secondary: Dictionary = snapshot.get("secondary", {})
+	if secondary.is_empty():
+		return primary_score >= 3
+	return primary_score >= 3 and primary_score - int(secondary.get("score", 0)) >= 2
+
+
+func _get_ranked_build_paths(snapshot: Dictionary) -> Array[Dictionary]:
+	var ranked: Array[Dictionary] = []
+	var seen_ids: Array[String] = []
+	for route_variant in [snapshot.get("primary", {}), snapshot.get("secondary", {})]:
+		var route: Dictionary = route_variant
+		var route_id := String(route.get("id", ""))
+		if route_id.is_empty() or seen_ids.has(route_id):
+			continue
+		ranked.append(route)
+		seen_ids.append(route_id)
+	for path in _get_build_path_definitions():
+		var route_id := String(path.get("id", ""))
+		if seen_ids.has(route_id):
+			continue
+		ranked.append(path)
+		seen_ids.append(route_id)
+	return ranked
+
+
+func _get_upgrade_route_ids(key: String) -> Array[String]:
+	var route_ids: Array[String] = []
+	var evolution_route_id := _get_endgame_route_id_for_key(key)
+	if not evolution_route_id.is_empty():
+		route_ids.append(evolution_route_id)
+		return route_ids
+	for path in _get_build_path_definitions():
+		var weights: Dictionary = path.get("weights", {})
+		if weights.has(key):
+			route_ids.append(String(path.get("id", "")))
+	return route_ids
+
+
+func _get_candidate_route_ids(candidate: Dictionary) -> Array[String]:
+	return _get_upgrade_route_ids(String(candidate.get("key", "")))
+
+
+func _get_candidate_route_priority(candidate: Dictionary, route_id: String) -> int:
+	if route_id.is_empty():
+		return 0
+	var key := String(candidate.get("key", ""))
+	var bucket := String(candidate.get("bucket", "skill"))
+	if bucket == "endgame":
+		return 160 if _get_endgame_route_id_for_key(key) == route_id else 0
+
+	var path := _get_build_path_definition_by_id(route_id)
+	if path.is_empty():
+		return 0
+	var weights: Dictionary = path.get("weights", {})
+	if not weights.has(key):
+		return 0
+
+	var current_level := _get_upgrade_progress_value(key)
+	var target_level := _get_upgrade_target_level(key)
+	var missing := maxi(target_level - current_level, 0)
+	var bucket_bonus := 10
+	match bucket:
+		"mutation":
+			bucket_bonus = 28
+		"skill":
+			bucket_bonus = 16
+		"support":
+			bucket_bonus = 8
+	return int(weights.get(key, 0)) * 20 + missing * 6 + bucket_bonus + (6 if current_level == 0 else 0) - current_level * 2
+
+
+func _get_general_candidate_priority(candidate: Dictionary, primary_id: String, secondary_id: String) -> int:
+	var bucket := String(candidate.get("bucket", "skill"))
+	var bucket_bonus := 48
+	match bucket:
+		"endgame":
+			bucket_bonus = 120
+		"mutation":
+			bucket_bonus = 82
+		"skill":
+			bucket_bonus = 60
+		"support":
+			bucket_bonus = 42
+	var route_ids := _get_candidate_route_ids(candidate)
+	var shared_bonus := 0
+	if not primary_id.is_empty() and not secondary_id.is_empty() and route_ids.has(primary_id) and route_ids.has(secondary_id):
+		shared_bonus = 14
+	elif route_ids.is_empty():
+		shared_bonus = 4
+	return bucket_bonus + _get_candidate_route_priority(candidate, primary_id) + int(_get_candidate_route_priority(candidate, secondary_id) / 2) + shared_bonus
+
+
+func _pop_best_route_candidate(
+	pool: Array[Dictionary],
+	route_id: String,
+	exclusive_only: bool = false,
+	allow_shared: bool = true,
+	allowed_buckets: Array[String] = []
+) -> Dictionary:
+	if route_id.is_empty():
+		return {}
+	var best_index := -1
+	var best_score := -1
+	for index in range(pool.size()):
+		var candidate: Dictionary = pool[index]
+		var bucket := String(candidate.get("bucket", "skill"))
+		if not allowed_buckets.is_empty() and not allowed_buckets.has(bucket):
+			continue
+		var route_ids := _get_candidate_route_ids(candidate)
+		if not route_ids.has(route_id):
+			continue
+		if exclusive_only and route_ids.size() != 1:
+			continue
+		if not allow_shared and route_ids.size() > 1:
+			continue
+		var score := _get_candidate_route_priority(candidate, route_id)
+		score += 10 if route_ids.size() == 1 else 4
+		if exclusive_only:
+			score += 12
+		if score > best_score:
+			best_score = score
+			best_index = index
+	if best_index < 0:
+		return {}
+	var choice := pool[best_index]
+	pool.remove_at(best_index)
+	return choice
+
+
+func _pop_best_shared_route_candidate(
+	pool: Array[Dictionary],
+	primary_id: String,
+	secondary_id: String,
+	allowed_buckets: Array[String] = []
+) -> Dictionary:
+	if primary_id.is_empty() or secondary_id.is_empty():
+		return {}
+	var best_index := -1
+	var best_score := -1
+	for index in range(pool.size()):
+		var candidate: Dictionary = pool[index]
+		var bucket := String(candidate.get("bucket", "skill"))
+		if not allowed_buckets.is_empty() and not allowed_buckets.has(bucket):
+			continue
+		var route_ids := _get_candidate_route_ids(candidate)
+		if not route_ids.has(primary_id) or not route_ids.has(secondary_id):
+			continue
+		var score := _get_candidate_route_priority(candidate, primary_id) + _get_candidate_route_priority(candidate, secondary_id) + 16
+		if score > best_score:
+			best_score = score
+			best_index = index
+	if best_index < 0:
+		return {}
+	var choice := pool[best_index]
+	pool.remove_at(best_index)
+	return choice
+
+
+func _pop_best_support_candidate(pool: Array[Dictionary], primary_id: String, secondary_id: String) -> Dictionary:
+	var best_index := -1
+	var best_score := -1
+	for index in range(pool.size()):
+		var candidate: Dictionary = pool[index]
+		if String(candidate.get("bucket", "skill")) != "support":
+			continue
+		var route_ids := _get_candidate_route_ids(candidate)
+		var score := 42
+		score += _get_candidate_route_priority(candidate, primary_id)
+		score += int(_get_candidate_route_priority(candidate, secondary_id) / 2)
+		if not route_ids.is_empty():
+			score += 10 if route_ids.has(primary_id) else 0
+			score += 6 if route_ids.has(secondary_id) else 0
+		else:
+			score += 4
+		if score > best_score:
+			best_score = score
+			best_index = index
+	if best_index < 0:
+		return {}
+	var choice := pool[best_index]
+	pool.remove_at(best_index)
+	return choice
+
+
+func _pop_best_bucket_candidate(pool: Array[Dictionary], bucket_name: String, primary_id: String, secondary_id: String) -> Dictionary:
+	var best_index := -1
+	var best_score := -1
+	for index in range(pool.size()):
+		var candidate: Dictionary = pool[index]
+		if String(candidate.get("bucket", "skill")) != bucket_name:
+			continue
+		var score := _get_general_candidate_priority(candidate, primary_id, secondary_id)
+		if score > best_score:
+			best_score = score
+			best_index = index
+	if best_index < 0:
+		return {}
+	var choice := pool[best_index]
+	pool.remove_at(best_index)
+	return choice
+
+
+func _pop_best_general_candidate(pool: Array[Dictionary], primary_id: String, secondary_id: String) -> Dictionary:
+	var best_index := -1
+	var best_score := -1
+	for index in range(pool.size()):
+		var candidate: Dictionary = pool[index]
+		var score := _get_general_candidate_priority(candidate, primary_id, secondary_id)
+		if score > best_score:
+			best_score = score
+			best_index = index
+	if best_index < 0:
+		return {}
+	var choice := pool[best_index]
+	pool.remove_at(best_index)
+	return choice
+
+
+func _annotate_combo_choice_build_role(choice: Dictionary, snapshot: Dictionary) -> Dictionary:
+	var annotated := choice.duplicate(true)
+	var primary: Dictionary = snapshot.get("primary", {})
+	var secondary: Dictionary = snapshot.get("secondary", {})
+	var primary_id := String(primary.get("id", ""))
+	var secondary_id := String(secondary.get("id", ""))
+	var route_ids := _get_candidate_route_ids(annotated)
+	var bucket := String(annotated.get("bucket", "skill"))
+	var role := ""
+	if bucket == "endgame":
+		role = "终局分叉"
+	elif route_ids.is_empty():
+		role = "通用补强"
+	elif not _is_build_focus_locked(snapshot):
+		role = "开局通用件" if route_ids.size() > 1 else "开局定流派"
+	else:
+		var on_primary := route_ids.has(primary_id)
+		var on_secondary := route_ids.has(secondary_id)
+		if on_primary and on_secondary:
+			role = "双路线通用"
+		elif on_primary:
+			role = "主路线推进"
+		elif on_secondary:
+			role = "副路线转向"
+		else:
+			role = "通用补强"
+	if not role.is_empty():
+		annotated["route_role"] = role
+	return annotated
+
+
 func _get_build_path_recommendations(path: Dictionary, count: int = 2) -> Array[String]:
 	var weights: Dictionary = path.get("weights", {})
 	var pending: Array[Dictionary] = []
@@ -4916,55 +5203,111 @@ func _get_upgrade_route_info(key: String) -> Dictionary:
 
 
 func _pick_combo_upgrade_choices(candidates: Array[Dictionary]) -> Array[Dictionary]:
-	var endgame_pool: Array[Dictionary] = []
-	var mutation_pool: Array[Dictionary] = []
-	var skill_pool: Array[Dictionary] = []
-	var support_pool: Array[Dictionary] = []
+	var snapshot := _get_build_focus_snapshot()
+	var primary: Dictionary = snapshot.get("primary", {})
+	var secondary: Dictionary = snapshot.get("secondary", {})
+	var primary_id := String(primary.get("id", ""))
+	var secondary_id := String(secondary.get("id", ""))
+	var focus_locked := _is_build_focus_locked(snapshot)
+	var working: Array[Dictionary] = []
 	for candidate_variant in candidates:
-		var candidate: Dictionary = candidate_variant
-		match String(candidate.get("bucket", "skill")):
-			"endgame":
-				endgame_pool.append(candidate)
-			"mutation":
-				mutation_pool.append(candidate)
-			"support":
-				support_pool.append(candidate)
-			_:
-				skill_pool.append(candidate)
+		var candidate: Dictionary = candidate_variant.duplicate(true)
+		working.append(candidate)
 
 	var result: Array[Dictionary] = []
-	if endgame_pool.size() >= 2:
-		result.append(endgame_pool[0])
-		result.append(endgame_pool[1])
-	elif not endgame_pool.is_empty():
-		result.append(_pop_random_combo_upgrade(endgame_pool))
+	var has_endgame := false
+	for candidate in working:
+		if String(candidate.get("bucket", "skill")) == "endgame":
+			has_endgame = true
+			break
 
-	if not endgame_pool.is_empty():
-		if not skill_pool.is_empty() and result.size() < 3:
-			result.append(_pop_random_combo_upgrade(skill_pool))
-		elif not support_pool.is_empty() and result.size() < 3:
-			result.append(_pop_random_combo_upgrade(support_pool))
-		while result.size() < 3 and not mutation_pool.is_empty():
-			result.append(_pop_random_combo_upgrade(mutation_pool))
-		return result
+	if has_endgame:
+		var first_endgame := _pop_best_route_candidate(working, primary_id, false, true, ["endgame"])
+		if first_endgame.is_empty():
+			first_endgame = _pop_best_bucket_candidate(working, "endgame", primary_id, secondary_id)
+		if not first_endgame.is_empty():
+			result.append(first_endgame)
 
-	if not mutation_pool.is_empty():
-		result.append(_pop_random_combo_upgrade(mutation_pool))
-	if not skill_pool.is_empty():
-		result.append(_pop_random_combo_upgrade(skill_pool))
-	elif not mutation_pool.is_empty() and result.size() < 2:
-		result.append(_pop_random_combo_upgrade(mutation_pool))
-	if not support_pool.is_empty() and result.size() < 3:
-		result.append(_pop_random_combo_upgrade(support_pool))
+		var second_endgame := _pop_best_bucket_candidate(working, "endgame", primary_id, secondary_id)
+		if not second_endgame.is_empty():
+			result.append(second_endgame)
 
-	var remaining: Array[Dictionary] = []
-	remaining.append_array(endgame_pool)
-	remaining.append_array(mutation_pool)
-	remaining.append_array(skill_pool)
-	remaining.append_array(support_pool)
-	while result.size() < 3 and not remaining.is_empty():
-		result.append(_pop_random_combo_upgrade(remaining))
-	return result
+		var followup := _pop_best_route_candidate(working, primary_id, false, true, ["mutation", "skill", "support"])
+		if followup.is_empty() and not secondary_id.is_empty():
+			followup = _pop_best_route_candidate(working, secondary_id, false, true, ["mutation", "skill", "support"])
+		if followup.is_empty():
+			followup = _pop_best_support_candidate(working, primary_id, secondary_id)
+		if followup.is_empty():
+			followup = _pop_best_general_candidate(working, primary_id, secondary_id)
+		if not followup.is_empty():
+			result.append(followup)
+	elif not focus_locked:
+		var ranked_paths := _get_ranked_build_paths(snapshot)
+		if ranked_paths.size() >= 1:
+			var first_route_id := String(ranked_paths[0].get("id", ""))
+			var first_route_pick := _pop_best_route_candidate(working, first_route_id, true, false, ["mutation", "skill"])
+			if first_route_pick.is_empty():
+				first_route_pick = _pop_best_route_candidate(working, first_route_id, false, true, ["mutation", "skill", "support"])
+			if not first_route_pick.is_empty():
+				result.append(first_route_pick)
+
+		if ranked_paths.size() >= 2:
+			var second_route_id := String(ranked_paths[1].get("id", ""))
+			var second_route_pick := _pop_best_route_candidate(working, second_route_id, true, false, ["mutation", "skill"])
+			if second_route_pick.is_empty():
+				second_route_pick = _pop_best_route_candidate(working, second_route_id, false, true, ["mutation", "skill", "support"])
+			if not second_route_pick.is_empty():
+				result.append(second_route_pick)
+
+			var bridge_pick := _pop_best_shared_route_candidate(working, String(ranked_paths[0].get("id", "")), second_route_id, ["skill", "support", "mutation"])
+			if bridge_pick.is_empty():
+				bridge_pick = _pop_best_support_candidate(working, String(ranked_paths[0].get("id", "")), second_route_id)
+			if bridge_pick.is_empty():
+				bridge_pick = _pop_best_general_candidate(working, String(ranked_paths[0].get("id", "")), second_route_id)
+			if not bridge_pick.is_empty():
+				result.append(bridge_pick)
+	else:
+		var primary_pick := _pop_best_route_candidate(working, primary_id, false, true, ["mutation", "skill", "support"])
+		if primary_pick.is_empty():
+			primary_pick = _pop_best_shared_route_candidate(working, primary_id, secondary_id, ["mutation", "skill", "support"])
+		if primary_pick.is_empty():
+			primary_pick = _pop_best_general_candidate(working, primary_id, secondary_id)
+		if not primary_pick.is_empty():
+			result.append(primary_pick)
+
+		var pivot_pick: Dictionary = {}
+		if not secondary_id.is_empty():
+			pivot_pick = _pop_best_route_candidate(working, secondary_id, true, true, ["mutation", "skill", "support"])
+			if pivot_pick.is_empty():
+				pivot_pick = _pop_best_shared_route_candidate(working, primary_id, secondary_id, ["mutation", "skill", "support"])
+		if pivot_pick.is_empty():
+			pivot_pick = _pop_best_route_candidate(working, primary_id, false, true, ["mutation", "skill"])
+		if pivot_pick.is_empty():
+			pivot_pick = _pop_best_general_candidate(working, primary_id, secondary_id)
+		if not pivot_pick.is_empty():
+			result.append(pivot_pick)
+
+		var support_pick := _pop_best_support_candidate(working, primary_id, secondary_id)
+		if support_pick.is_empty() and not secondary_id.is_empty():
+			support_pick = _pop_best_route_candidate(working, secondary_id, false, true, ["mutation", "skill", "support"])
+		if support_pick.is_empty():
+			support_pick = _pop_best_general_candidate(working, primary_id, secondary_id)
+		if not support_pick.is_empty():
+			result.append(support_pick)
+
+	while result.size() < 3 and not working.is_empty():
+		var fallback_choice := _pop_best_general_candidate(working, primary_id, secondary_id)
+		if fallback_choice.is_empty():
+			break
+		result.append(fallback_choice)
+
+	var finalized: Array[Dictionary] = []
+	for choice_variant in result:
+		var choice: Dictionary = choice_variant
+		if choice.is_empty():
+			continue
+		finalized.append(_annotate_combo_choice_build_role(choice, snapshot))
+	return finalized
 
 
 func _pop_random_combo_upgrade(pool: Array[Dictionary]) -> Dictionary:
@@ -5637,27 +5980,53 @@ func _get_build_info_lines() -> Array[String]:
 	var lines: Array[String] = []
 	var snapshot := _get_build_focus_snapshot()
 	var primary: Dictionary = snapshot.get("primary", {})
+	var secondary: Dictionary = snapshot.get("secondary", {})
 	var primary_score := int(primary.get("score", 0))
 	if primary.is_empty() or primary_score <= 0:
 		var paths := _get_build_path_definitions()
 		if paths.size() >= 2:
-			lines.append("构筑路线: %s / %s" % [String(paths[0].get("name", "路线A")), String(paths[1].get("name", "路线B"))])
-			lines.append("开局建议: %s" % String(paths[0].get("focus", "先拿核心主动和第一段联动。")))
+			lines.append("待定流派: %s / %s" % [String(paths[0].get("name", "路线A")), String(paths[1].get("name", "路线B"))])
+			lines.append("开局建议: 先拿路线专属核心，再补共享组件。")
 		else:
 			lines.append("构筑路线: 未定型")
 		return lines
 
-	var focus_line := "当前构筑: %s" % String(primary.get("name", "当前路线"))
+	if not _is_build_focus_locked(snapshot):
+		var leaning_line := "构筑倾向: %s" % String(primary.get("name", "当前路线"))
+		if not secondary.is_empty():
+			leaning_line += "   可转: %s" % String(secondary.get("name", "备选路线"))
+		lines.append(leaning_line)
+		var primary_recommendations := _get_build_path_recommendations(primary, 2)
+		if not secondary.is_empty():
+			var secondary_recommendations := _get_build_path_recommendations(secondary, 2)
+			lines.append(
+				"定型建议: %s -> %s   或   %s -> %s"
+				% [
+					String(primary.get("name", "当前路线")),
+					" / ".join(primary_recommendations) if not primary_recommendations.is_empty() else String(primary.get("focus", "补足核心件")),
+					String(secondary.get("name", "备选路线")),
+					" / ".join(secondary_recommendations) if not secondary_recommendations.is_empty() else String(secondary.get("focus", "补足核心件")),
+				]
+			)
+		else:
+			lines.append("定型建议: %s" % (" / ".join(primary_recommendations) if not primary_recommendations.is_empty() else String(primary.get("focus", "补足核心件"))))
+		return lines
+
+	var focus_line := "主路线: %s" % String(primary.get("name", "当前路线"))
+	if not secondary.is_empty():
+		focus_line += "   副路线: %s" % String(secondary.get("name", "副路线"))
 	var endgame_summary := _get_endgame_evolution_summary()
 	if not endgame_summary.is_empty():
 		focus_line += "   终局: %s" % endgame_summary
 	lines.append(focus_line)
 
-	var recommendations := _get_build_path_recommendations(primary, 2)
-	if recommendations.is_empty():
-		lines.append("下一步: 继续补满核心等级，准备进入终局分叉。")
-	else:
-		lines.append("下一步: %s" % " / ".join(recommendations))
+	var primary_recommendations := _get_build_path_recommendations(primary, 2)
+	var next_line := "下一步: %s" % (" / ".join(primary_recommendations) if not primary_recommendations.is_empty() else "继续补满核心等级，准备进入终局分叉。")
+	if not secondary.is_empty():
+		var secondary_recommendations := _get_build_path_recommendations(secondary, 2)
+		if not secondary_recommendations.is_empty():
+			next_line += "   转向口: %s" % " / ".join(secondary_recommendations)
+	lines.append(next_line)
 	return lines
 
 
