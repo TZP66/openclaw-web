@@ -205,6 +205,12 @@ func _draw() -> void:
 		accent = Color(0.96, 0.86, 0.42, 0.28)
 	elif character_id == "warden":
 		accent = Color(0.52, 0.96, 0.84, 0.30)
+	elif character_id == "blood_hunter":
+		accent = Color(0.92, 0.42, 0.48, 0.30)
+	elif character_id == "grave_caller":
+		accent = Color(0.62, 0.84, 0.74, 0.30)
+	elif character_id == "illusionist":
+		accent = Color(0.62, 0.68, 1.0, 0.30)
 	if _flash_timer > 0.0:
 		accent = Color(1.0, 0.92, 0.72, 0.36)
 
@@ -551,6 +557,35 @@ func _get_signature_pose() -> Dictionary:
 			offset += Vector2(0.0, 5.0 * windup * strength)
 			rotation += lean_x * 0.04 * release * strength
 			scale = Vector2(1.08 + 0.04 * windup * strength, 0.90 - 0.05 * windup * strength)
+		"blood_hunter":
+			if signature_id == "blood_dash":
+				release = maxf(release, peak)
+				offset += forward * (8.0 * release) * strength
+			elif signature_id == "blood_draw":
+				offset += side * 2.4 * sin(progress * PI) * strength
+			offset += forward * (6.0 * peak * strength)
+			offset += Vector2(0.0, -3.0 * peak * strength)
+			rotation += lean_x * 0.16 * peak * strength
+			scale = Vector2(1.10 + 0.06 * peak * strength, 0.92 - 0.05 * peak * strength)
+		"grave_caller":
+			if signature_id == "grave_toll":
+				release *= 1.12
+				offset += side * 2.0 * sin(progress * TAU) * strength
+			elif signature_id == "dirge_cast":
+				offset += Vector2(0.0, -3.0 * windup * strength)
+			offset += forward * (-4.0 * windup + 4.0 * release) * strength
+			rotation += lean_x * (0.05 * windup + 0.08 * release) * strength
+			scale = Vector2(0.98 - 0.03 * peak * strength, 1.06 + 0.08 * peak * strength)
+		"illusionist":
+			if signature_id == "swap_step":
+				release = maxf(release, peak)
+				offset += side * 4.0 * signf(sin(progress * TAU)) * strength
+			elif signature_id == "mirror_cast":
+				offset += side * 2.2 * sin(progress * TAU) * strength
+			offset += forward * (-5.0 * windup + 6.0 * release) * strength
+			offset += Vector2(0.0, -4.0 * peak * strength)
+			rotation += lean_x * (-0.08 * windup + 0.10 * release) * strength
+			scale = Vector2(1.04 + 0.05 * windup * strength, 0.96 - 0.02 * windup * strength + 0.05 * release * strength)
 		_:
 			offset += Vector2(0.0, -3.0 * peak * strength)
 			rotation += lean_x * 0.06 * peak * strength

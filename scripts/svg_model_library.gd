@@ -146,6 +146,75 @@ const CHARACTER_MODELS := {
 <circle cx='86' cy='38' r='2.6' fill='#140f14'/>
 </svg>""",
 	},
+	"blood_hunter": {
+		"id": "blood_hunter",
+		"game_height": 102.0,
+		"game_offset": Vector2(0.0, -10.0),
+		"svg": """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'>
+<circle cx='80' cy='84' r='46' fill='#d94d58' opacity='0.14'/>
+<circle cx='80' cy='82' r='36' fill='none' stroke='#ffd6d8' stroke-width='4' opacity='0.28'/>
+<path d='M80 24L104 42L114 72L110 124Q80 150 46 124L46 72L56 44Z' fill='#5a1e26' stroke='#230c11' stroke-width='6' stroke-linejoin='round'/>
+<path d='M80 44L100 58L102 112Q80 130 58 114L60 58Z' fill='#2a0f14'/>
+<circle cx='80' cy='38' r='13' fill='#f1c4a3' stroke='#261218' stroke-width='4'/>
+<path d='M66 28Q80 14 94 28' fill='none' stroke='#ffd6d8' stroke-width='6' stroke-linecap='round'/>
+<path d='M54 72L44 110' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<path d='M106 70L118 104' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<path d='M102 26L122 14L148 70L126 82Z' fill='#f0f3f7' stroke='#5d626b' stroke-width='4' stroke-linejoin='round'/>
+<path d='M106 34L122 26' stroke='#ffffff' stroke-width='4' stroke-linecap='round' opacity='0.55'/>
+<path d='M44 52L68 44L74 64L48 72Z' fill='#8c3942' stroke='#2a0f14' stroke-width='4' stroke-linejoin='round'/>
+<path d='M62 92L98 92' stroke='#f16f7d' stroke-width='6' stroke-linecap='round'/>
+<path d='M58 118L50 138L72 132' fill='none' stroke='#b74a55' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<path d='M98 118L106 138L86 132' fill='none' stroke='#b74a55' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<circle cx='74' cy='38' r='2.6' fill='#140f14'/>
+<circle cx='86' cy='38' r='2.6' fill='#140f14'/>
+</svg>""",
+	},
+	"grave_caller": {
+		"id": "grave_caller",
+		"game_height": 104.0,
+		"game_offset": Vector2(0.0, -12.0),
+		"svg": """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'>
+<circle cx='80' cy='84' r='46' fill='#8ec3ad' opacity='0.12'/>
+<circle cx='80' cy='82' r='34' fill='none' stroke='#dcfff1' stroke-width='4' opacity='0.26'/>
+<path d='M80 20L104 40L114 70L112 126Q80 152 44 124L46 70L56 40Z' fill='#2f3f3a' stroke='#121b18' stroke-width='6' stroke-linejoin='round'/>
+<path d='M80 42L98 56L102 110Q80 130 58 114L58 56Z' fill='#16211e'/>
+<circle cx='80' cy='38' r='12' fill='#ebc3a0' stroke='#271419' stroke-width='4'/>
+<path d='M66 28Q80 14 94 28' fill='none' stroke='#dff9ec' stroke-width='6' stroke-linecap='round'/>
+<path d='M56 74L46 112' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<path d='M104 70L116 104' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<path d='M110 24L132 30L126 62L104 56Z' fill='#9ad9c2' stroke='#2a4a3f' stroke-width='4' stroke-linejoin='round'/>
+<circle cx='122' cy='30' r='12' fill='none' stroke='#dcfff1' stroke-width='4' opacity='0.68'/>
+<path d='M40 120Q80 96 120 120' fill='none' stroke='#8ec3ad' stroke-width='5' stroke-linecap='round'/>
+<path d='M62 94L98 94' stroke='#9ad9c2' stroke-width='6' stroke-linecap='round'/>
+<path d='M56 118L48 140L70 134' fill='none' stroke='#5b7d72' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<path d='M100 118L108 140L88 134' fill='none' stroke='#5b7d72' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<circle cx='74' cy='38' r='2.6' fill='#140f14'/>
+<circle cx='86' cy='38' r='2.6' fill='#140f14'/>
+</svg>""",
+	},
+	"illusionist": {
+		"id": "illusionist",
+		"game_height": 100.0,
+		"game_offset": Vector2(0.0, -10.0),
+		"svg": """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'>
+<circle cx='80' cy='84' r='46' fill='#6a7cff' opacity='0.12'/>
+<circle cx='80' cy='82' r='34' fill='none' stroke='#d9ddff' stroke-width='4' opacity='0.28'/>
+<path d='M80 24L104 42L112 70L110 124Q80 148 46 124L48 70L58 42Z' fill='#2f3369' stroke='#141735' stroke-width='6' stroke-linejoin='round'/>
+<path d='M80 42L98 58L100 112Q80 130 58 114L60 58Z' fill='#151a3d'/>
+<circle cx='80' cy='38' r='13' fill='#efc4a1' stroke='#24141b' stroke-width='4'/>
+<path d='M66 28Q80 14 94 28' fill='none' stroke='#e6e9ff' stroke-width='6' stroke-linecap='round'/>
+<path d='M54 72L44 110' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<path d='M106 70L118 104' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<path d='M108 22L130 30L126 60L104 56Z' fill='#aeb8ff' stroke='#364091' stroke-width='4' stroke-linejoin='round'/>
+<circle cx='122' cy='30' r='12' fill='none' stroke='#d9ddff' stroke-width='4' opacity='0.66'/>
+<path d='M44 58Q80 44 116 58' fill='none' stroke='#9ea8ff' stroke-width='4' stroke-linecap='round' opacity='0.62'/>
+<path d='M62 94L98 94' stroke='#9ea8ff' stroke-width='6' stroke-linecap='round'/>
+<path d='M58 118L48 138L70 132' fill='none' stroke='#626fce' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<path d='M98 118L108 138L88 132' fill='none' stroke='#626fce' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<circle cx='74' cy='38' r='2.6' fill='#140f14'/>
+<circle cx='86' cy='38' r='2.6' fill='#140f14'/>
+</svg>""",
+	},
 }
 
 const CHARACTER_SPLIT_MODELS := {
@@ -464,6 +533,36 @@ static func get_character_animation_frame_count(character_id: String, animation_
 					return 3
 				"idle":
 					return 1
+		"blood_hunter":
+			match animation_id:
+				"move":
+					return 2
+				"blood_draw":
+					return 3
+				"blood_dash":
+					return 3
+				"idle":
+					return 1
+		"grave_caller":
+			match animation_id:
+				"move":
+					return 2
+				"dirge_cast":
+					return 3
+				"grave_toll":
+					return 3
+				"idle":
+					return 1
+		"illusionist":
+			match animation_id:
+				"move":
+					return 2
+				"mirror_cast":
+					return 3
+				"swap_step":
+					return 3
+				"idle":
+					return 1
 	return 0
 
 
@@ -571,6 +670,12 @@ static func _build_character_animation_svg(character_id: String, animation_id: S
 			return _build_ranger_animation_svg(animation_id, frame_index)
 		"warden":
 			return _build_warden_animation_svg(animation_id, frame_index)
+		"blood_hunter":
+			return _build_blood_hunter_animation_svg(animation_id, frame_index)
+		"grave_caller":
+			return _build_grave_caller_animation_svg(animation_id, frame_index)
+		"illusionist":
+			return _build_illusionist_animation_svg(animation_id, frame_index)
 	return ""
 
 
@@ -1380,6 +1485,351 @@ static func _build_alchemist_pose_svg(pose_id: String) -> String:
 %s
 %s
 </svg>""" % [left_arm_svg, body_svg, right_arm_svg, device_svg, extra_svg]
+
+
+static func _build_blood_hunter_animation_svg(animation_id: String, frame_index: int) -> String:
+	var pose_id := "idle"
+	match animation_id:
+		"move":
+			pose_id = "move_%d" % clampi(frame_index, 0, 1)
+		"blood_draw":
+			pose_id = "draw_%d" % clampi(frame_index, 0, 2)
+		"blood_dash":
+			pose_id = "dash_%d" % clampi(frame_index, 0, 2)
+	return _build_blood_hunter_pose_svg(pose_id)
+
+
+static func _build_blood_hunter_pose_svg(pose_id: String) -> String:
+	var body_transform := "translate(0 0)"
+	var back_arm_svg := ""
+	var front_arm_svg := ""
+	var weapon_svg := ""
+	var extra_svg := ""
+
+	match pose_id:
+		"idle":
+			back_arm_svg = """<path d='M54 72L44 110' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='44' cy='110' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			front_arm_svg = """<path d='M106 70L118 104' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='118' cy='104' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			weapon_svg = """<path d='M104 26L124 14L150 72L128 84Z' fill='#f0f3f7' stroke='#5d626b' stroke-width='4' stroke-linejoin='round'/>
+<path d='M108 34L124 26' stroke='#ffffff' stroke-width='4' stroke-linecap='round' opacity='0.55'/>"""
+		"move_0":
+			body_transform = "translate(-3 1) rotate(-5 76 88)"
+			back_arm_svg = """<path d='M52 74L40 106' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='40' cy='106' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			front_arm_svg = """<path d='M106 68L122 96' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='122' cy='96' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			weapon_svg = """<path d='M108 20L130 12L154 66L132 80Z' fill='#f0f3f7' stroke='#5d626b' stroke-width='4' stroke-linejoin='round'/>"""
+		"move_1":
+			body_transform = "translate(2 1) rotate(5 82 88)"
+			back_arm_svg = """<path d='M56 72L48 112' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='48' cy='112' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			front_arm_svg = """<path d='M104 72L114 108' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='114' cy='108' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			weapon_svg = """<path d='M100 26L122 16L144 74L124 86Z' fill='#f0f3f7' stroke='#5d626b' stroke-width='4' stroke-linejoin='round'/>"""
+		"draw_0":
+			body_transform = "translate(-5 0) rotate(-10 76 84)"
+			back_arm_svg = """<path d='M54 72Q46 60 44 48' fill='none' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='44' cy='48' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			front_arm_svg = """<path d='M106 70Q122 58 136 52' fill='none' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='136' cy='52' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			weapon_svg = """<path d='M102 16L126 8L154 70L130 80Z' fill='#f0f3f7' stroke='#5d626b' stroke-width='4' stroke-linejoin='round'/>"""
+			extra_svg = """<path d='M114 54Q132 46 152 52' fill='none' stroke='#f16f7d' stroke-width='5' stroke-linecap='round' opacity='0.72'/>"""
+		"draw_1":
+			body_transform = "translate(0 -1) rotate(3 80 84)"
+			back_arm_svg = """<path d='M54 72Q70 70 86 64' fill='none' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='86' cy='64' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			front_arm_svg = """<path d='M106 70Q128 70 148 74' fill='none' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='148' cy='74' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			weapon_svg = """<path d='M118 24L142 20L160 78L136 88Z' fill='#f0f3f7' stroke='#5d626b' stroke-width='4' stroke-linejoin='round'/>"""
+			extra_svg = """<path d='M124 74Q144 84 160 96' fill='none' stroke='#f16f7d' stroke-width='5' stroke-linecap='round' opacity='0.72'/>"""
+		"draw_2":
+			body_transform = "translate(2 1) rotate(6 82 86)"
+			back_arm_svg = """<path d='M54 72L46 108' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='46' cy='108' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			front_arm_svg = """<path d='M106 70L118 102' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='118' cy='102' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			weapon_svg = """<path d='M108 24L130 16L154 74L132 86Z' fill='#f0f3f7' stroke='#5d626b' stroke-width='4' stroke-linejoin='round'/>"""
+		"dash_0":
+			body_transform = "translate(-10 4) rotate(-18 70 88)"
+			back_arm_svg = """<path d='M56 74L34 100' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='34' cy='100' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			front_arm_svg = """<path d='M106 70L132 82' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='132' cy='82' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			weapon_svg = """<path d='M120 22L148 20L160 58L136 80Z' fill='#f0f3f7' stroke='#5d626b' stroke-width='4' stroke-linejoin='round'/>"""
+			extra_svg = """<path d='M26 106L60 84L94 80' fill='none' stroke='#f16f7d' stroke-width='6' stroke-linecap='round' opacity='0.72'/>"""
+		"dash_1":
+			body_transform = "translate(4 6) rotate(12 86 92)"
+			back_arm_svg = """<path d='M56 74L30 86' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='30' cy='86' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			front_arm_svg = """<path d='M106 70Q128 86 152 96' fill='none' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='152' cy='96' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			weapon_svg = """<path d='M124 40L154 52L160 88L136 96Z' fill='#f0f3f7' stroke='#5d626b' stroke-width='4' stroke-linejoin='round'/>"""
+			extra_svg = """<path d='M44 84L94 94L142 110' fill='none' stroke='#f16f7d' stroke-width='6' stroke-linecap='round' opacity='0.72'/>"""
+		"dash_2":
+			body_transform = "translate(1 2) rotate(2 80 88)"
+			back_arm_svg = """<path d='M54 72L44 110' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='44' cy='110' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			front_arm_svg = """<path d='M106 70L118 104' stroke='#221116' stroke-width='8' stroke-linecap='round'/>
+<circle cx='118' cy='104' r='4.4' fill='#f1c4a3' stroke='#261218' stroke-width='2.4'/>"""
+			weapon_svg = """<path d='M104 26L124 14L150 72L128 84Z' fill='#f0f3f7' stroke='#5d626b' stroke-width='4' stroke-linejoin='round'/>"""
+		_:
+			return _build_blood_hunter_pose_svg("idle")
+
+	var body_svg := """<g transform='%s'>
+<circle cx='80' cy='84' r='46' fill='#d94d58' opacity='0.14'/>
+<circle cx='80' cy='82' r='36' fill='none' stroke='#ffd6d8' stroke-width='4' opacity='0.24'/>
+<path d='M80 24L104 42L114 72L110 124Q80 150 46 124L46 72L56 44Z' fill='#5a1e26' stroke='#230c11' stroke-width='6' stroke-linejoin='round'/>
+<path d='M80 44L100 58L102 112Q80 130 58 114L60 58Z' fill='#2a0f14'/>
+<circle cx='80' cy='38' r='13' fill='#f1c4a3' stroke='#261218' stroke-width='4'/>
+<path d='M66 28Q80 14 94 28' fill='none' stroke='#ffd6d8' stroke-width='6' stroke-linecap='round'/>
+<path d='M44 52L68 44L74 64L48 72Z' fill='#8c3942' stroke='#2a0f14' stroke-width='4' stroke-linejoin='round'/>
+<path d='M62 92L98 92' stroke='#f16f7d' stroke-width='6' stroke-linecap='round'/>
+<path d='M58 118L50 138L72 132' fill='none' stroke='#b74a55' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<path d='M98 118L106 138L88 132' fill='none' stroke='#b74a55' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<circle cx='74' cy='38' r='2.6' fill='#140f14'/>
+<circle cx='86' cy='38' r='2.6' fill='#140f14'/>
+</g>""" % body_transform
+
+	return """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'>
+%s
+%s
+%s
+%s
+%s
+</svg>""" % [back_arm_svg, body_svg, front_arm_svg, weapon_svg, extra_svg]
+
+
+static func _build_grave_caller_animation_svg(animation_id: String, frame_index: int) -> String:
+	var pose_id := "idle"
+	match animation_id:
+		"move":
+			pose_id = "move_%d" % clampi(frame_index, 0, 1)
+		"dirge_cast":
+			pose_id = "dirge_%d" % clampi(frame_index, 0, 2)
+		"grave_toll":
+			pose_id = "toll_%d" % clampi(frame_index, 0, 2)
+	return _build_grave_caller_pose_svg(pose_id)
+
+
+static func _build_grave_caller_pose_svg(pose_id: String) -> String:
+	var body_transform := "translate(0 0)"
+	var left_arm_svg := ""
+	var right_arm_svg := ""
+	var relic_svg := ""
+	var extra_svg := ""
+
+	match pose_id:
+		"idle":
+			left_arm_svg = """<path d='M56 74L46 112' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='46' cy='112' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M104 70L116 104' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='116' cy='104' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			relic_svg = """<path d='M108 24L132 30L126 62L104 56Z' fill='#9ad9c2' stroke='#2a4a3f' stroke-width='4' stroke-linejoin='round'/>
+<circle cx='122' cy='30' r='12' fill='none' stroke='#dcfff1' stroke-width='4' opacity='0.68'/>"""
+		"move_0":
+			body_transform = "translate(-3 1) rotate(-4 77 88)"
+			left_arm_svg = """<path d='M54 76L42 106' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='42' cy='106' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M106 68L120 96' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='120' cy='96' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			relic_svg = """<path d='M110 26L132 32L126 62L106 56Z' fill='#9ad9c2' stroke='#2a4a3f' stroke-width='4' stroke-linejoin='round'/>"""
+		"move_1":
+			body_transform = "translate(2 1) rotate(4 82 88)"
+			left_arm_svg = """<path d='M58 74L50 110' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='50' cy='110' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M102 72L114 106' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='114' cy='106' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			relic_svg = """<path d='M106 22L128 30L124 60L102 54Z' fill='#9ad9c2' stroke='#2a4a3f' stroke-width='4' stroke-linejoin='round'/>"""
+		"dirge_0":
+			body_transform = "translate(-2 0) rotate(-6 78 84)"
+			left_arm_svg = """<path d='M56 74Q48 62 44 48' fill='none' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='44' cy='48' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M104 70Q116 58 128 50' fill='none' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='128' cy='50' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			relic_svg = """<path d='M106 18L134 24L128 62L102 56Z' fill='#9ad9c2' stroke='#2a4a3f' stroke-width='4' stroke-linejoin='round'/>"""
+			extra_svg = """<path d='M42 46Q58 36 74 42' fill='none' stroke='#dcfff1' stroke-width='4' stroke-linecap='round' opacity='0.72'/>"""
+		"dirge_1":
+			body_transform = "translate(0 -1)"
+			left_arm_svg = """<path d='M56 74Q38 82 20 84' fill='none' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='20' cy='84' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M104 70Q124 82 146 84' fill='none' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='146' cy='84' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			relic_svg = """<path d='M108 20L136 26L130 64L104 58Z' fill='#9ad9c2' stroke='#2a4a3f' stroke-width='4' stroke-linejoin='round'/>"""
+			extra_svg = """<circle cx='80' cy='86' r='28' fill='none' stroke='#dcfff1' stroke-width='5' opacity='0.58'/>
+<path d='M56 86L104 86' stroke='#9ad9c2' stroke-width='5' stroke-linecap='round' opacity='0.68'/>"""
+		"dirge_2":
+			body_transform = "translate(2 1) rotate(3 82 86)"
+			left_arm_svg = """<path d='M56 74L46 110' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='46' cy='110' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M104 70L118 102' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='118' cy='102' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			relic_svg = """<path d='M108 24L132 30L126 62L104 56Z' fill='#9ad9c2' stroke='#2a4a3f' stroke-width='4' stroke-linejoin='round'/>"""
+		"toll_0":
+			body_transform = "translate(-4 2) rotate(-8 76 88)"
+			left_arm_svg = """<path d='M56 74Q42 78 30 82' fill='none' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='30' cy='82' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M104 70Q122 70 138 72' fill='none' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='138' cy='72' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			relic_svg = """<path d='M110 20L138 26L132 64L106 58Z' fill='#9ad9c2' stroke='#2a4a3f' stroke-width='4' stroke-linejoin='round'/>
+<circle cx='124' cy='74' r='14' fill='none' stroke='#dcfff1' stroke-width='4' opacity='0.58'/>"""
+		"toll_1":
+			body_transform = "translate(0 2)"
+			left_arm_svg = """<path d='M56 74Q36 88 20 98' fill='none' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='20' cy='98' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M104 70Q126 88 150 100' fill='none' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='150' cy='100' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			relic_svg = """<path d='M110 24L136 30L130 64L106 58Z' fill='#9ad9c2' stroke='#2a4a3f' stroke-width='4' stroke-linejoin='round'/>"""
+			extra_svg = """<circle cx='80' cy='90' r='34' fill='none' stroke='#dcfff1' stroke-width='5' opacity='0.52'/>
+<circle cx='80' cy='90' r='16' fill='#8ec3ad' opacity='0.18'/>"""
+		"toll_2":
+			body_transform = "translate(2 2) rotate(2 82 88)"
+			left_arm_svg = """<path d='M56 74L46 112' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='46' cy='112' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M104 70L116 104' stroke='#15201d' stroke-width='8' stroke-linecap='round'/>
+<circle cx='116' cy='104' r='4.4' fill='#ebc3a0' stroke='#271419' stroke-width='2.4'/>"""
+			relic_svg = """<path d='M108 24L132 30L126 62L104 56Z' fill='#9ad9c2' stroke='#2a4a3f' stroke-width='4' stroke-linejoin='round'/>"""
+		_:
+			return _build_grave_caller_pose_svg("idle")
+
+	var body_svg := """<g transform='%s'>
+<circle cx='80' cy='84' r='46' fill='#8ec3ad' opacity='0.12'/>
+<circle cx='80' cy='82' r='34' fill='none' stroke='#dcfff1' stroke-width='4' opacity='0.24'/>
+<path d='M80 20L104 40L114 70L112 126Q80 152 44 124L46 70L56 40Z' fill='#2f3f3a' stroke='#121b18' stroke-width='6' stroke-linejoin='round'/>
+<path d='M80 42L98 56L102 110Q80 130 58 114L58 56Z' fill='#16211e'/>
+<circle cx='80' cy='38' r='12' fill='#ebc3a0' stroke='#271419' stroke-width='4'/>
+<path d='M66 28Q80 14 94 28' fill='none' stroke='#dff9ec' stroke-width='6' stroke-linecap='round'/>
+<path d='M40 120Q80 96 120 120' fill='none' stroke='#8ec3ad' stroke-width='5' stroke-linecap='round'/>
+<path d='M62 94L98 94' stroke='#9ad9c2' stroke-width='6' stroke-linecap='round'/>
+<path d='M56 118L48 140L70 134' fill='none' stroke='#5b7d72' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<path d='M100 118L108 140L88 134' fill='none' stroke='#5b7d72' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<circle cx='74' cy='38' r='2.6' fill='#140f14'/>
+<circle cx='86' cy='38' r='2.6' fill='#140f14'/>
+</g>""" % body_transform
+
+	return """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'>
+%s
+%s
+%s
+%s
+%s
+</svg>""" % [left_arm_svg, body_svg, right_arm_svg, relic_svg, extra_svg]
+
+
+static func _build_illusionist_animation_svg(animation_id: String, frame_index: int) -> String:
+	var pose_id := "idle"
+	match animation_id:
+		"move":
+			pose_id = "move_%d" % clampi(frame_index, 0, 1)
+		"mirror_cast":
+			pose_id = "mirror_%d" % clampi(frame_index, 0, 2)
+		"swap_step":
+			pose_id = "swap_%d" % clampi(frame_index, 0, 2)
+	return _build_illusionist_pose_svg(pose_id)
+
+
+static func _build_illusionist_pose_svg(pose_id: String) -> String:
+	var body_transform := "translate(0 0)"
+	var left_arm_svg := ""
+	var right_arm_svg := ""
+	var mirror_svg := ""
+	var extra_svg := ""
+
+	match pose_id:
+		"idle":
+			left_arm_svg = """<path d='M54 72L44 110' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='44' cy='110' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M106 70L118 104' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='118' cy='104' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			mirror_svg = """<path d='M108 22L130 30L126 60L104 56Z' fill='#aeb8ff' stroke='#364091' stroke-width='4' stroke-linejoin='round'/>
+<circle cx='122' cy='30' r='12' fill='none' stroke='#d9ddff' stroke-width='4' opacity='0.66'/>"""
+		"move_0":
+			body_transform = "translate(-3 1) rotate(-5 77 88)"
+			left_arm_svg = """<path d='M52 74L40 106' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='40' cy='106' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M106 68L122 96' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='122' cy='96' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			mirror_svg = """<path d='M110 24L130 30L126 60L106 56Z' fill='#aeb8ff' stroke='#364091' stroke-width='4' stroke-linejoin='round'/>"""
+		"move_1":
+			body_transform = "translate(2 1) rotate(5 82 88)"
+			left_arm_svg = """<path d='M56 72L48 112' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='48' cy='112' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M104 72L114 108' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='114' cy='108' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			mirror_svg = """<path d='M106 20L128 28L124 58L102 54Z' fill='#aeb8ff' stroke='#364091' stroke-width='4' stroke-linejoin='round'/>"""
+		"mirror_0":
+			body_transform = "translate(-2 0) rotate(-6 78 84)"
+			left_arm_svg = """<path d='M56 74Q48 62 42 50' fill='none' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='42' cy='50' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M106 70Q118 58 130 50' fill='none' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='130' cy='50' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			mirror_svg = """<path d='M108 18L136 26L130 64L104 58Z' fill='#aeb8ff' stroke='#364091' stroke-width='4' stroke-linejoin='round'/>"""
+			extra_svg = """<path d='M44 52Q60 38 76 42' fill='none' stroke='#d9ddff' stroke-width='4' stroke-linecap='round' opacity='0.72'/>"""
+		"mirror_1":
+			body_transform = "translate(0 -1)"
+			left_arm_svg = """<path d='M56 74Q34 80 18 82' fill='none' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='18' cy='82' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M106 70Q128 80 150 82' fill='none' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='150' cy='82' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			mirror_svg = """<path d='M110 20L138 28L132 66L106 60Z' fill='#aeb8ff' stroke='#364091' stroke-width='4' stroke-linejoin='round'/>"""
+			extra_svg = """<circle cx='80' cy='86' r='30' fill='none' stroke='#d9ddff' stroke-width='5' opacity='0.58'/>
+<path d='M48 86L112 86' stroke='#9ea8ff' stroke-width='5' stroke-linecap='round' opacity='0.68'/>"""
+		"mirror_2":
+			body_transform = "translate(2 1) rotate(3 82 86)"
+			left_arm_svg = """<path d='M56 72L46 110' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='46' cy='110' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M106 70L118 102' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='118' cy='102' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			mirror_svg = """<path d='M108 22L130 30L126 60L104 56Z' fill='#aeb8ff' stroke='#364091' stroke-width='4' stroke-linejoin='round'/>"""
+		"swap_0":
+			body_transform = "translate(-8 3) rotate(-14 72 88)"
+			left_arm_svg = """<path d='M56 74L30 96' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='30' cy='96' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M106 70L132 82' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='132' cy='82' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			mirror_svg = """<path d='M114 26L138 34L132 62L108 58Z' fill='#aeb8ff' stroke='#364091' stroke-width='4' stroke-linejoin='round'/>"""
+			extra_svg = """<path d='M22 102L54 84L88 82' fill='none' stroke='#9ea8ff' stroke-width='6' stroke-linecap='round' opacity='0.74'/>"""
+		"swap_1":
+			body_transform = "translate(6 5) rotate(12 88 92)"
+			left_arm_svg = """<path d='M56 74L28 86' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='28' cy='86' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M106 70Q128 86 154 98' fill='none' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='154' cy='98' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			mirror_svg = """<path d='M116 30L142 40L136 66L110 60Z' fill='#aeb8ff' stroke='#364091' stroke-width='4' stroke-linejoin='round'/>"""
+			extra_svg = """<path d='M42 84L96 96L146 110' fill='none' stroke='#9ea8ff' stroke-width='6' stroke-linecap='round' opacity='0.74'/>"""
+		"swap_2":
+			body_transform = "translate(1 2) rotate(2 80 88)"
+			left_arm_svg = """<path d='M54 72L44 110' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='44' cy='110' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			right_arm_svg = """<path d='M106 70L118 104' stroke='#151a32' stroke-width='8' stroke-linecap='round'/>
+<circle cx='118' cy='104' r='4.4' fill='#efc4a1' stroke='#24141b' stroke-width='2.4'/>"""
+			mirror_svg = """<path d='M108 22L130 30L126 60L104 56Z' fill='#aeb8ff' stroke='#364091' stroke-width='4' stroke-linejoin='round'/>"""
+		_:
+			return _build_illusionist_pose_svg("idle")
+
+	var body_svg := """<g transform='%s'>
+<circle cx='80' cy='84' r='46' fill='#6a7cff' opacity='0.12'/>
+<circle cx='80' cy='82' r='34' fill='none' stroke='#d9ddff' stroke-width='4' opacity='0.24'/>
+<path d='M80 24L104 42L112 70L110 124Q80 148 46 124L48 70L58 42Z' fill='#2f3369' stroke='#141735' stroke-width='6' stroke-linejoin='round'/>
+<path d='M80 42L98 58L100 112Q80 130 58 114L60 58Z' fill='#151a3d'/>
+<circle cx='80' cy='38' r='13' fill='#efc4a1' stroke='#24141b' stroke-width='4'/>
+<path d='M66 28Q80 14 94 28' fill='none' stroke='#e6e9ff' stroke-width='6' stroke-linecap='round'/>
+<path d='M44 58Q80 44 116 58' fill='none' stroke='#9ea8ff' stroke-width='4' stroke-linecap='round' opacity='0.62'/>
+<path d='M62 94L98 94' stroke='#9ea8ff' stroke-width='6' stroke-linecap='round'/>
+<path d='M58 118L48 138L70 132' fill='none' stroke='#626fce' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<path d='M98 118L108 138L88 132' fill='none' stroke='#626fce' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+<circle cx='74' cy='38' r='2.6' fill='#140f14'/>
+<circle cx='86' cy='38' r='2.6' fill='#140f14'/>
+</g>""" % body_transform
+
+	return """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'>
+%s
+%s
+%s
+%s
+%s
+</svg>""" % [left_arm_svg, body_svg, right_arm_svg, mirror_svg, extra_svg]
 
 
 static func _build_warden_animation_svg(animation_id: String, frame_index: int) -> String:

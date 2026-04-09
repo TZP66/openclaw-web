@@ -95,6 +95,30 @@ const CHARACTER_DEFINITIONS := [
 		"detail": "初始技能为谐振脉冲，血量更高，后续可建立守卫环和中继信标。",
 		"accent": Color(0.52, 0.96, 0.84),
 	},
+	{
+		"id": "blood_hunter",
+		"name": "血誓猎手",
+		"title": "裂心追猎",
+		"summary": "把残血与收割绑定在一起，靠烙印、血沼和穿心追猎不断滚节奏。",
+		"detail": "初始技能为血誓箭，伤害会随缺失生命抬升；后续可补猎誓烙印、血潮沼与誓刃穿心。",
+		"accent": Color(0.96, 0.28, 0.34),
+	},
+	{
+		"id": "grave_caller",
+		"name": "墓潮号手",
+		"title": "尸钟调度者",
+		"summary": "击杀会留下可调度的尸核，靠起灵、丧钟和合唱把残局变成下一轮火力。",
+		"detail": "初始技能为挽歌，后续可起灵尸核、敲出丧钟脉冲，并把整片尸场拉成合唱线。",
+		"accent": Color(0.62, 0.88, 0.78),
+	},
+	{
+		"id": "illusionist",
+		"name": "幻戏师",
+		"title": "换幕操演者",
+		"summary": "靠假身、镜射和换幕位移打乱怪潮路线，擅长用错位制造安全窗。",
+		"detail": "初始技能为镜折弹，后续可留下残像、瞬换站位，并让多处假身同时开火。",
+		"accent": Color(0.86, 0.72, 1.0),
+	},
 ]
 
 const PLAYER_START := Vector2.ZERO
@@ -128,6 +152,18 @@ const UPGRADE_LIMITS := {
 	"ward": 4,
 	"beacon": 4,
 	"relay": 4,
+	"oathshot": 7,
+	"brand": 4,
+	"bloodtrail": 4,
+	"verdict": 4,
+	"dirge": 7,
+	"wake": 4,
+	"toll": 4,
+	"choir": 4,
+	"mirrorbolt": 7,
+	"afterimage": 4,
+	"switchstep": 4,
+	"prismdance": 4,
 	"stride": 4,
 	"vitality": 4,
 	"focus": 4,
@@ -275,6 +311,90 @@ const CHARACTER_BUILD_PATHS := {
 			},
 		},
 	],
+	"blood_hunter": [
+		{
+			"id": "hunter_execution",
+			"name": "裂心追猎",
+			"summary": "先用烙印锁定关键目标，再靠穿心斩线把整列敌人直接处决。",
+			"focus": "优先补猎誓烙印、誓刃穿心和聚焦镜片。",
+			"weights": {
+				"brand": 3,
+				"verdict": 3,
+				"oathshot": 2,
+				"focus": 1,
+				"stride": 1,
+			},
+		},
+		{
+			"id": "hunter_tide",
+			"name": "血潮回收",
+			"summary": "用血誓箭和血沼把战场磨成回收区，越低血越像在压榨整张地图。",
+			"focus": "优先补血誓箭、血潮沼、猎誓烙印和战斗精要。",
+			"weights": {
+				"oathshot": 3,
+				"bloodtrail": 3,
+				"brand": 2,
+				"mastery": 1,
+				"vitality": 1,
+			},
+		},
+	],
+	"grave_caller": [
+		{
+			"id": "grave_harvest",
+			"name": "葬潮回收",
+			"summary": "把击杀留下的尸核重新调度成下一波爆发，越打残局越厚。",
+			"focus": "优先补起灵、丧钟、挽歌和战斗精要。",
+			"weights": {
+				"wake": 3,
+				"toll": 3,
+				"dirge": 2,
+				"mastery": 1,
+				"vitality": 1,
+			},
+		},
+		{
+			"id": "grave_choir",
+			"name": "尸钟合唱",
+			"summary": "让尸核同时起唱，远近火力会从多个落点同时压进来。",
+			"focus": "优先补挽歌、合唱、起灵和聚焦镜片。",
+			"weights": {
+				"dirge": 3,
+				"choir": 3,
+				"wake": 2,
+				"focus": 1,
+				"magnet": 1,
+			},
+		},
+	],
+	"illusionist": [
+		{
+			"id": "illusion_mirror",
+			"name": "镜廊齐射",
+			"summary": "把残像变成多点火力源，让同一轮镜弹从多个位置同时开火。",
+			"focus": "优先补镜折弹、残像、棱镜舞台和战斗精要。",
+			"weights": {
+				"mirrorbolt": 3,
+				"afterimage": 3,
+				"prismdance": 2,
+				"mastery": 1,
+				"focus": 1,
+			},
+		},
+		{
+			"id": "illusion_stage",
+			"name": "换幕戏法",
+			"summary": "不断换位和借假身转幕，把追兵和火线都导向错误方向。",
+			"focus": "优先补残像、换幕步、棱镜舞台和步幅矩阵。",
+			"weights": {
+				"afterimage": 2,
+				"switchstep": 3,
+				"prismdance": 3,
+				"stride": 1,
+				"focus": 1,
+			},
+		},
+	],
 	"caster": [
 		{
 			"id": "caster_orbit",
@@ -328,6 +448,18 @@ const BUILD_ROUTE_TARGETS := {
 	"ward": 3,
 	"beacon": 3,
 	"relay": 3,
+	"oathshot": 4,
+	"brand": 3,
+	"bloodtrail": 3,
+	"verdict": 3,
+	"dirge": 4,
+	"wake": 3,
+	"toll": 3,
+	"choir": 3,
+	"mirrorbolt": 4,
+	"afterimage": 3,
+	"switchstep": 3,
+	"prismdance": 3,
 	"stride": 2,
 	"vitality": 2,
 	"focus": 2,
@@ -670,6 +802,102 @@ const MAP_DEFINITIONS := [
 			{"until": 999.0, "weights": {"brute": 0.24, "lancer": 0.30, "embermage": 0.46}},
 		],
 	},
+	{
+		"id": "bridge_train",
+		"name": "断桥列车",
+		"tagline": "崩塌桥段和车顶框架把战场切成会移动的连续短节，你得边打边跨车。",
+		"description": "列车正在断桥上硬冲，怪潮会从裂口和车侧同时登上来；你要顺着高亮车节连续跨过去，稳住整列车的步频。",
+		"intro": "铁轨在断桥边缘剧烈震颤，整列战车正被迫以危险速度冲关。",
+		"terrain_hint": "长轨和窄桥让战场更线性，适合前后拉扯，但一旦卡在断节口就会被双侧包夹。",
+		"boss_name": "断轨督军",
+		"boss_archetype": "forge_tyrant",
+		"boss_summon_type": "lancer",
+		"enemy_labels": ["攀桥枪骑", "断节重卫"],
+		"boss_time": 600.0,
+		"spawn_rate_bonus": 0.16,
+		"enemy_cap_bonus": 4,
+		"hazard_type": "",
+		"palette": {
+			"style_id": "bridge_train",
+			"ground_dark": Color(0.05, 0.06, 0.08),
+			"ground_mid": Color(0.10, 0.12, 0.16),
+			"line_color": Color(0.30, 0.34, 0.42, 0.56),
+			"rune_color": Color(0.78, 0.88, 1.0, 0.14),
+			"ember_color": Color(1.0, 0.78, 0.44, 0.14),
+			"accent_color": Color(0.92, 0.96, 1.0, 0.18),
+		},
+		"waves": [
+			{"until": 120.0, "weights": {"lancer": 0.72, "wisp": 0.28}},
+			{"until": 260.0, "weights": {"lancer": 0.50, "wisp": 0.24, "brute": 0.26}},
+			{"until": 420.0, "weights": {"lancer": 0.42, "brute": 0.34, "embermage": 0.24}},
+			{"until": 560.0, "weights": {"lancer": 0.30, "brute": 0.38, "embermage": 0.32}},
+			{"until": 999.0, "weights": {"lancer": 0.24, "brute": 0.42, "embermage": 0.34}},
+		],
+	},
+	{
+		"id": "black_fog_hunt",
+		"name": "黑雾狩场",
+		"tagline": "视野被雾带切碎，只有被重新点亮的猎灯能给你一点短暂主动权。",
+		"description": "夜猎者会借雾贴近，你得尽快点亮猎灯；一旦失去光域，整片战场会立刻反向偏向怪群。",
+		"intro": "黑雾已经吞掉远处边界，只剩零散灯火还在风里晃动。",
+		"terrain_hint": "狩径很窄，雾带和灯架会不断打断视线，逼你在短距离里快速换位。",
+		"boss_name": "雾棺牧主",
+		"boss_archetype": "void_matriarch",
+		"boss_summon_type": "seer",
+		"enemy_labels": ["夜猎者", "雾灯侍"],
+		"boss_time": 600.0,
+		"spawn_rate_bonus": 0.10,
+		"enemy_cap_bonus": 1,
+		"hazard_type": "",
+		"palette": {
+			"style_id": "black_fog_hunt",
+			"ground_dark": Color(0.03, 0.04, 0.05),
+			"ground_mid": Color(0.08, 0.10, 0.12),
+			"line_color": Color(0.18, 0.24, 0.26, 0.42),
+			"rune_color": Color(0.82, 0.66, 0.42, 0.12),
+			"ember_color": Color(1.0, 0.80, 0.54, 0.12),
+			"accent_color": Color(0.94, 0.84, 0.58, 0.18),
+		},
+		"waves": [
+			{"until": 120.0, "weights": {"wisp": 0.76, "seer": 0.24}},
+			{"until": 260.0, "weights": {"wisp": 0.48, "seer": 0.30, "lancer": 0.22}},
+			{"until": 420.0, "weights": {"seer": 0.40, "wisp": 0.24, "lancer": 0.36}},
+			{"until": 560.0, "weights": {"seer": 0.34, "lancer": 0.34, "mireling": 0.32}},
+			{"until": 999.0, "weights": {"seer": 0.28, "mireling": 0.40, "lancer": 0.32}},
+		],
+	},
+	{
+		"id": "airship_breach",
+		"name": "空艇裂甲",
+		"tagline": "甲板被炮火撕成多块斜切板，风压和破口会持续把你的站位往外推。",
+		"description": "裂风兵会顺着甲板长线压上来，而你要顶着风压封住破口，不让整层甲板继续失压。",
+		"intro": "舰体外板被轰开后，整片甲板开始向外漏风。",
+		"terrain_hint": "长甲板和裂口会制造大量斜角通道，直线火力很舒服，但横向回转会更难受。",
+		"boss_name": "裂甲提督",
+		"boss_archetype": "storm_archon",
+		"boss_summon_type": "embermage",
+		"enemy_labels": ["裂风枪骑", "甲板咒手"],
+		"boss_time": 600.0,
+		"spawn_rate_bonus": 0.14,
+		"enemy_cap_bonus": 3,
+		"hazard_type": "",
+		"palette": {
+			"style_id": "airship_breach",
+			"ground_dark": Color(0.05, 0.07, 0.10),
+			"ground_mid": Color(0.10, 0.14, 0.18),
+			"line_color": Color(0.28, 0.36, 0.44, 0.52),
+			"rune_color": Color(0.56, 0.78, 1.0, 0.14),
+			"ember_color": Color(0.84, 0.90, 1.0, 0.12),
+			"accent_color": Color(0.80, 0.92, 1.0, 0.18),
+		},
+		"waves": [
+			{"until": 120.0, "weights": {"lancer": 0.58, "embermage": 0.42}},
+			{"until": 260.0, "weights": {"lancer": 0.40, "embermage": 0.34, "wisp": 0.26}},
+			{"until": 420.0, "weights": {"lancer": 0.32, "embermage": 0.40, "seer": 0.28}},
+			{"until": 560.0, "weights": {"lancer": 0.24, "embermage": 0.42, "seer": 0.34}},
+			{"until": 999.0, "weights": {"embermage": 0.44, "seer": 0.30, "lancer": 0.26}},
+		],
+	},
 ]
 
 var _state: GameState = GameState.MENU
@@ -747,6 +975,23 @@ var _clock_node_zone: MapRuleZone = null
 var _clock_node_progress: float = 0.0
 var _clock_node_respawn_timer: float = 0.0
 var _clock_overdrive_timer: float = 0.0
+var _train_car_zones: Array[MapRuleZone] = []
+var _train_car_progress: float = 0.0
+var _train_car_respawn_timer: float = 0.0
+var _train_car_active_index: int = 0
+var _train_rush_timer: float = 0.0
+var _train_car_move_direction: Vector2 = Vector2.RIGHT
+var _fog_brazier_zone: MapRuleZone = null
+var _fog_brazier_progress: float = 0.0
+var _fog_brazier_respawn_timer: float = 0.0
+var _fog_light_timer: float = 0.0
+var _fog_pulse_timer: float = 0.0
+var _airship_breach_zone: MapRuleZone = null
+var _airship_breach_progress: float = 0.0
+var _airship_breach_respawn_timer: float = 0.0
+var _airship_tailwind_timer: float = 0.0
+var _airship_gust_timer: float = 0.0
+var _airship_gust_direction: Vector2 = Vector2.RIGHT
 var _boss_prelude_stage: int = 0
 var _score: int = 0
 var _score_bonus_multiplier: float = 0.0
@@ -810,6 +1055,18 @@ var _pulse_level: int = 1
 var _ward_level: int = 0
 var _beacon_level: int = 0
 var _relay_level: int = 0
+var _oathshot_level: int = 1
+var _brand_level: int = 0
+var _bloodtrail_level: int = 0
+var _verdict_level: int = 0
+var _dirge_level: int = 1
+var _wake_level: int = 0
+var _toll_level: int = 0
+var _choir_level: int = 0
+var _mirrorbolt_level: int = 1
+var _afterimage_level: int = 0
+var _switchstep_level: int = 0
+var _prismdance_level: int = 0
 
 var _bolt_timer: float = 0.0
 var _nova_timer: float = 1.4
@@ -830,6 +1087,18 @@ var _trail_timer: float = 2.6
 var _pulse_timer: float = 0.2
 var _beacon_timer: float = 1.4
 var _relay_timer: float = 2.0
+var _oathshot_timer: float = 0.0
+var _brand_timer: float = 1.2
+var _bloodtrail_timer: float = 1.8
+var _verdict_timer: float = 2.2
+var _dirge_timer: float = 0.0
+var _wake_timer: float = 1.4
+var _toll_timer: float = 2.2
+var _choir_timer: float = 2.6
+var _mirrorbolt_timer: float = 0.0
+var _afterimage_timer: float = 1.4
+var _switchstep_timer: float = 2.4
+var _prismdance_timer: float = 3.0
 var _selected_endgame_branches: Dictionary = {}
 var _touch_move_vector: Vector2 = Vector2.ZERO
 var _touch_pointer_id: int = -1
@@ -840,6 +1109,10 @@ var _dot_damage_buffers: Dictionary = {}
 var _thunder_orb_field: Node2D = null
 var _alchemist_clouds: Array[PoisonCloudHazard] = []
 var _warden_beacon_field: LightningOrbField = null
+var _blood_marks: Dictionary = {}
+var _blood_trails: Array[Dictionary] = []
+var _grave_tokens: Array[Dictionary] = []
+var _illusion_decoys: Array[Dictionary] = []
 
 var _rng := RandomNumberGenerator.new()
 
@@ -979,6 +1252,7 @@ func _process(delta: float) -> void:
 	_hud_refresh_timer += delta
 
 	_update_run_pacing(delta)
+	_update_special_character_state(delta)
 	_update_spell_attacks(delta)
 	_update_environment_hazards(delta)
 	_update_boss_warning_and_prelude()
@@ -1163,6 +1437,10 @@ func _reset_runtime_collections() -> void:
 	_thunder_orb_field = null
 	_alchemist_clouds.clear()
 	_warden_beacon_field = null
+	_blood_marks.clear()
+	_blood_trails.clear()
+	_grave_tokens.clear()
+	_illusion_decoys.clear()
 	_ruins_altar_zone = null
 	_ruins_altar_destination_zone = null
 	_forge_core_zone = null
@@ -1172,6 +1450,9 @@ func _reset_runtime_collections() -> void:
 	_prism_focus_zone = null
 	_prism_link_target_zone = null
 	_clock_node_zone = null
+	_train_car_zones.clear()
+	_fog_brazier_zone = null
+	_airship_breach_zone = null
 	if _player != null and is_instance_valid(_player):
 		_player.set_move_speed_multiplier(1.0)
 
@@ -1219,6 +1500,21 @@ func _reset_progression_state() -> void:
 	_clock_node_progress = 0.0
 	_clock_node_respawn_timer = 12.0
 	_clock_overdrive_timer = 0.0
+	_train_car_progress = 0.0
+	_train_car_respawn_timer = 10.0
+	_train_car_active_index = 0
+	_train_rush_timer = 0.0
+	_train_car_zones.clear()
+	_train_car_move_direction = Vector2.RIGHT
+	_fog_brazier_progress = 0.0
+	_fog_brazier_respawn_timer = 10.0
+	_fog_light_timer = 0.0
+	_fog_pulse_timer = 1.6
+	_airship_breach_progress = 0.0
+	_airship_breach_respawn_timer = 12.0
+	_airship_tailwind_timer = 0.0
+	_airship_gust_timer = 2.2
+	_airship_gust_direction = Vector2.RIGHT
 	_player_previous_position = PLAYER_START
 	_world_mutation_index = 0
 	_next_world_mutation_time = 180.0
@@ -1267,6 +1563,22 @@ func _reset_progression_state() -> void:
 	_ward_level = 0
 	_beacon_level = 0
 	_relay_level = 0
+	_oathshot_level = 1
+	_brand_level = 0
+	_bloodtrail_level = 0
+	_verdict_level = 0
+	_dirge_level = 1
+	_wake_level = 0
+	_toll_level = 0
+	_choir_level = 0
+	_mirrorbolt_level = 1
+	_afterimage_level = 0
+	_switchstep_level = 0
+	_prismdance_level = 0
+	_blood_marks.clear()
+	_blood_trails.clear()
+	_grave_tokens.clear()
+	_illusion_decoys.clear()
 
 	_bolt_timer = 0.0
 	_nova_timer = 1.4
@@ -1287,6 +1599,18 @@ func _reset_progression_state() -> void:
 	_pulse_timer = 0.2
 	_beacon_timer = 1.4
 	_relay_timer = 2.0
+	_oathshot_timer = 0.0
+	_brand_timer = 1.2
+	_bloodtrail_timer = 1.8
+	_verdict_timer = 2.2
+	_dirge_timer = 0.0
+	_wake_timer = 1.4
+	_toll_timer = 2.2
+	_choir_timer = 2.6
+	_mirrorbolt_timer = 0.0
+	_afterimage_timer = 1.4
+	_switchstep_timer = 2.4
+	_prismdance_timer = 3.0
 	_selected_endgame_branches.clear()
 	_alchemist_clouds.clear()
 	_warden_beacon_field = null
@@ -1479,6 +1803,12 @@ func _trigger_boss_prelude(stage: int) -> void:
 			_trigger_prism_archive_boss_prelude(stage)
 		"clockwork_garden":
 			_trigger_clockwork_garden_boss_prelude(stage)
+		"bridge_train":
+			_trigger_bridge_train_boss_prelude(stage)
+		"black_fog_hunt":
+			_trigger_black_fog_boss_prelude(stage)
+		"airship_breach":
+			_trigger_airship_breach_boss_prelude(stage)
 		_:
 			_trigger_sky_ruins_boss_prelude(stage)
 
@@ -1497,6 +1827,12 @@ func _spawn_boss_prelude_reinforcements(stage: int) -> void:
 			roles = ["ranged", "control", "ranged", "elite"]
 		"clockwork_garden":
 			roles = ["fodder", "ranged", "elite", "fodder"]
+		"bridge_train":
+			roles = ["diver", "fodder", "ranged", "elite"]
+		"black_fog_hunt":
+			roles = ["control", "diver", "ranged", "elite"]
+		"airship_breach":
+			roles = ["ranged", "diver", "ranged", "elite"]
 		_:
 			roles = ["diver", "ranged", "control", "diver"]
 
@@ -1606,6 +1942,35 @@ func _trigger_clockwork_garden_boss_prelude(stage: int) -> void:
 		Color(1.0, 0.90, 0.66),
 		2.6
 	)
+
+
+func _trigger_bridge_train_boss_prelude(stage: int) -> void:
+	if _train_car_zones.is_empty():
+		_spawn_train_cars()
+	var center := _player.global_position
+	var spacing := 108.0 + float(stage) * 20.0
+	for lane in range(3 + stage):
+		var offset := (float(lane) - float(2 + stage) * 0.5) * spacing
+		_spawn_prelude_blast_marker(center + Vector2(offset, 0.0), 54.0, 0.10 + float(stage) * 0.02, 180.0, 0.72, Color(0.88, 0.94, 1.0), Color(1.0, 0.76, 0.42))
+	_show_message("列车前奏：断桥正在继续崩落，%s 已经逼近车头。", Color(0.92, 0.96, 1.0), 2.6)
+
+
+func _trigger_black_fog_boss_prelude(stage: int) -> void:
+	if _fog_brazier_zone == null or not is_instance_valid(_fog_brazier_zone):
+		_spawn_black_fog_brazier()
+	for index in range(3 + stage):
+		var angle := TAU * float(index) / float(3 + stage)
+		_spawn_prelude_blast_marker(_player.global_position + Vector2.RIGHT.rotated(angle) * (120.0 + float(stage) * 18.0), 52.0, 0.08 + float(stage) * 0.02, 170.0, 0.70, Color(0.40, 0.44, 0.52), Color(0.96, 0.82, 0.58))
+	_show_message("黑雾前奏：灯火开始被压灭，%s 正从雾里逼近。", Color(0.92, 0.88, 0.74), 2.8)
+
+
+func _trigger_airship_breach_boss_prelude(stage: int) -> void:
+	if _airship_breach_zone == null or not is_instance_valid(_airship_breach_zone):
+		_spawn_airship_breach()
+	_trigger_airship_gust(_player.global_position, 180.0 + float(stage) * 32.0)
+	if stage > 0:
+		_trigger_airship_gust(_player.global_position + Vector2.RIGHT.rotated(PI * 0.5) * 90.0, 180.0 + float(stage) * 24.0)
+	_show_message("空艇前奏：甲板再次失压，%s 正沿着裂线逼近。", Color(0.86, 0.94, 1.0), 2.6)
 
 
 func _spawn_prelude_blast_marker(
@@ -1771,6 +2136,12 @@ func _update_map_rule_state(delta: float) -> void:
 			_update_prism_archive_rule(delta)
 		"clockwork_garden":
 			_update_clockwork_garden_rule(delta)
+		"bridge_train":
+			_update_bridge_train_rule(delta)
+		"black_fog_hunt":
+			_update_black_fog_rule(delta)
+		"airship_breach":
+			_update_airship_breach_rule(delta)
 
 
 func _tick_map_reward_timers(delta: float) -> void:
@@ -1779,6 +2150,9 @@ func _tick_map_reward_timers(delta: float) -> void:
 	_void_spore_blessing_timer = maxf(0.0, _void_spore_blessing_timer - delta)
 	_prism_overcharge_timer = maxf(0.0, _prism_overcharge_timer - delta)
 	_clock_overdrive_timer = maxf(0.0, _clock_overdrive_timer - delta)
+	_train_rush_timer = maxf(0.0, _train_rush_timer - delta)
+	_fog_light_timer = maxf(0.0, _fog_light_timer - delta)
+	_airship_tailwind_timer = maxf(0.0, _airship_tailwind_timer - delta)
 
 
 func _update_endless_mutations() -> void:
@@ -1786,6 +2160,91 @@ func _update_endless_mutations() -> void:
 		return
 	_apply_next_world_mutation()
 	_next_world_mutation_time += 180.0
+
+
+func _update_special_character_state(delta: float) -> void:
+	_update_blood_marks(delta)
+	_update_blood_trails(delta)
+	_update_grave_tokens(delta)
+	_update_illusion_decoys(delta)
+
+
+func _update_blood_marks(delta: float) -> void:
+	var expired: Array = []
+	for enemy_id_variant in _blood_marks.keys():
+		var enemy_id := int(enemy_id_variant)
+		var entry: Dictionary = _blood_marks.get(enemy_id_variant, {})
+		var enemy := entry.get("enemy", null) as EnemySoldier
+		if enemy == null or not is_instance_valid(enemy):
+			expired.append(enemy_id_variant)
+			continue
+		entry["timer"] = float(entry.get("timer", 0.0)) - delta
+		if float(entry.get("timer", 0.0)) <= 0.0:
+			expired.append(enemy_id_variant)
+			continue
+		_blood_marks[enemy_id_variant] = entry
+	for enemy_id_variant in expired:
+		_blood_marks.erase(enemy_id_variant)
+
+
+func _update_blood_trails(delta: float) -> void:
+	for index in range(_blood_trails.size() - 1, -1, -1):
+		var trail: Dictionary = _blood_trails[index]
+		var node := trail.get("node", null) as MapRuleZone
+		if node == null or not is_instance_valid(node):
+			_blood_trails.remove_at(index)
+			continue
+		trail["lifetime"] = float(trail.get("lifetime", 0.0)) - delta
+		trail["pulse_timer"] = float(trail.get("pulse_timer", 0.0)) - delta
+		if float(trail.get("lifetime", 0.0)) <= 0.0:
+			node.queue_free()
+			_blood_trails.remove_at(index)
+			continue
+		var radius := float(trail.get("radius", node.radius))
+		var pressure := _count_enemies_in_radius(node.global_position, radius + 12.0)
+		node.active = pressure > 0
+		node.sublabel = "收割区 x%d" % maxi(pressure, 1)
+		if float(trail.get("pulse_timer", 0.0)) <= 0.0:
+			var damage := int(trail.get("damage", 1))
+			_damage_enemies_in_radius(node.global_position, radius, damage, 130.0, 5 + _bloodtrail_level)
+			_burst_marked_enemies_in_radius(node.global_position, radius * 1.06, max(1, int(round(float(damage) * 0.55))), 120.0)
+			trail["pulse_timer"] = float(trail.get("pulse_interval", 0.52))
+			_spawn_effect(node.global_position, radius * 0.68, Color(0.94, 0.26, 0.34), Color(1.0, 0.80, 0.78), 0.16)
+		_blood_trails[index] = trail
+
+
+func _update_grave_tokens(delta: float) -> void:
+	for index in range(_grave_tokens.size() - 1, -1, -1):
+		var token: Dictionary = _grave_tokens[index]
+		var node := token.get("node", null) as MapRuleZone
+		if node == null or not is_instance_valid(node):
+			_grave_tokens.remove_at(index)
+			continue
+		token["lifetime"] = float(token.get("lifetime", 0.0)) - delta
+		if float(token.get("lifetime", 0.0)) <= 0.0:
+			node.queue_free()
+			_grave_tokens.remove_at(index)
+			continue
+		node.active = _player != null and is_instance_valid(_player) and node.global_position.distance_to(_player.global_position) <= node.radius + 56.0
+		node.sublabel = "尸核 %d" % (index + 1)
+		_grave_tokens[index] = token
+
+
+func _update_illusion_decoys(delta: float) -> void:
+	for index in range(_illusion_decoys.size() - 1, -1, -1):
+		var decoy: Dictionary = _illusion_decoys[index]
+		var node := decoy.get("node", null) as MapRuleZone
+		if node == null or not is_instance_valid(node):
+			_illusion_decoys.remove_at(index)
+			continue
+		decoy["lifetime"] = float(decoy.get("lifetime", 0.0)) - delta
+		if float(decoy.get("lifetime", 0.0)) <= 0.0:
+			node.queue_free()
+			_illusion_decoys.remove_at(index)
+			continue
+		node.active = true
+		node.sublabel = "残像火点"
+		_illusion_decoys[index] = decoy
 
 
 func _update_spell_attacks(delta: float) -> void:
@@ -1803,6 +2262,15 @@ func _update_spell_attacks(delta: float) -> void:
 		return
 	elif _is_thunder_character():
 		_update_thunder_attacks(delta)
+		return
+	elif _is_blood_hunter_character():
+		_update_blood_hunter_attacks(delta)
+		return
+	elif _is_grave_caller_character():
+		_update_grave_caller_attacks(delta)
+		return
+	elif _is_illusionist_character():
+		_update_illusionist_attacks(delta)
 		return
 
 	_bolt_timer -= delta
@@ -2563,6 +3031,239 @@ func _trigger_gear_sweep_damage(center: Vector2, spoke_count: int, radius: float
 	_audio.play_enemy_shot(true)
 
 
+func _update_bridge_train_rule(delta: float) -> void:
+	if _player != null and is_instance_valid(_player):
+		_player.set_move_speed_multiplier(1.12 if _train_rush_timer > 0.0 else 1.0)
+	if _train_car_zones.is_empty():
+		_train_car_respawn_timer = maxf(0.0, _train_car_respawn_timer - delta)
+		if _train_car_respawn_timer <= 0.0:
+			_spawn_train_cars()
+		return
+
+	var move_speed := 94.0
+	var first_position := Vector2.ZERO
+	var last_position := Vector2.ZERO
+	for index in range(_train_car_zones.size()):
+		var zone := _train_car_zones[index]
+		if zone == null or not is_instance_valid(zone):
+			_clear_train_car_zones()
+			_train_car_respawn_timer = 10.0
+			return
+		zone.global_position += _train_car_move_direction * move_speed * delta
+		zone.active = index == _train_car_active_index
+		zone.progress = _train_car_progress
+		zone.label = "车节 %d" % (index + 1)
+		zone.sublabel = "跳上这节" if index == _train_car_active_index else ("已稳住" if index < _train_car_active_index else "继续前跨")
+		if index == 0:
+			first_position = zone.global_position
+		last_position = zone.global_position
+
+	if _train_car_active_index >= _train_car_zones.size():
+		_spawn_rule_link_effect(first_position, last_position, 7.2, Color(0.92, 0.96, 1.0), Color(1.0, 0.80, 0.46), 0.20)
+		_apply_line_damage(first_position, last_position, 82.0, max(12, int(round(float(_get_wave_rank()) * 2.1))), 240.0, 8)
+		_award_score(110 + _get_wave_rank() * 18)
+		_train_rush_timer = 22.0
+		_show_message("跨车成功：整列车暂时稳住，22 秒内移速、冷却和得分一起抬升。", Color(0.94, 0.96, 1.0), 2.8)
+		_clear_train_car_zones()
+		_train_car_respawn_timer = 32.0
+		_train_car_progress = 0.0
+		return
+
+	var current_zone := _train_car_zones[_train_car_active_index]
+	if current_zone != null and is_instance_valid(current_zone) and _is_player_in_rule_zone(current_zone, 12.0):
+		_spawn_effect(current_zone.global_position, current_zone.radius * 0.88, Color(0.90, 0.96, 1.0), Color(1.0, 0.78, 0.42), 0.14)
+		_train_car_active_index += 1
+		_train_car_progress = clampf(float(_train_car_active_index) / float(max(_train_car_zones.size(), 1)), 0.0, 1.0)
+		if _train_car_active_index < _train_car_zones.size():
+			_show_message("跨车成功：继续追前方车节。", Color(0.92, 0.96, 1.0), 1.2)
+		return
+
+	if _player != null and is_instance_valid(_player):
+		var center := current_zone.global_position if current_zone != null and is_instance_valid(current_zone) else last_position
+		if _player.global_position.distance_to(center) > 680.0:
+			_clear_train_car_zones()
+			_train_car_respawn_timer = 8.0
+			_train_car_progress = 0.0
+			_train_car_active_index = 0
+
+
+func _spawn_train_cars() -> void:
+	if _hazard_root == null or not is_instance_valid(_hazard_root):
+		return
+	_clear_train_car_zones()
+	_train_car_move_direction = Vector2.RIGHT.rotated(_rng.randf_range(-0.55, 0.55)).normalized()
+	var side := _train_car_move_direction.orthogonal()
+	var anchor := _pick_hazard_focus_position(180.0, 260.0) - _train_car_move_direction * 180.0
+	for index in range(3):
+		var zone := MAP_RULE_ZONE_SCRIPT.new()
+		zone.global_position = anchor + _train_car_move_direction * float(index) * 170.0 + side * (16.0 if index % 2 == 0 else -16.0)
+		zone.radius = 62.0
+		zone.primary_color = Color(0.88, 0.94, 1.0, 0.92)
+		zone.secondary_color = Color(1.0, 0.80, 0.46, 0.86)
+		zone.icon_style = "gear"
+		zone.progress = 0.0
+		zone.label = "车节 %d" % (index + 1)
+		zone.sublabel = "连续跨车"
+		_hazard_root.add_child(zone)
+		_train_car_zones.append(zone)
+	_train_car_active_index = 0
+	_train_car_progress = 0.0
+	_show_message("列车规则启动：顺着亮起的车节连续跨过去，别让整列车失步。", Color(0.92, 0.96, 1.0), 2.8)
+
+
+func _clear_train_car_zones() -> void:
+	for zone in _train_car_zones:
+		if zone != null and is_instance_valid(zone):
+			zone.queue_free()
+	_train_car_zones.clear()
+
+
+func _update_black_fog_rule(delta: float) -> void:
+	if _fog_light_timer <= 0.0:
+		_fog_pulse_timer = maxf(0.0, _fog_pulse_timer - delta)
+		if _fog_pulse_timer <= 0.0:
+			_trigger_black_fog_pulse()
+			_fog_pulse_timer = 3.2
+	else:
+		_fog_pulse_timer = 1.6
+
+	if _fog_brazier_zone == null or not is_instance_valid(_fog_brazier_zone):
+		_fog_brazier_respawn_timer = maxf(0.0, _fog_brazier_respawn_timer - delta)
+		if _fog_brazier_respawn_timer <= 0.0:
+			_spawn_black_fog_brazier()
+	else:
+		var inside := _is_player_in_rule_zone(_fog_brazier_zone, 10.0)
+		_fog_brazier_zone.active = inside
+		if inside:
+			_fog_brazier_progress = minf(1.0, _fog_brazier_progress + delta * 0.40)
+		else:
+			_fog_brazier_progress = maxf(0.0, _fog_brazier_progress - delta * 0.08)
+		_fog_brazier_zone.progress = _fog_brazier_progress
+		_fog_brazier_zone.sublabel = "点亮 %.0f%%" % (_fog_brazier_progress * 100.0)
+		if _fog_brazier_progress >= 1.0:
+			var center := _fog_brazier_zone.global_position
+			_spawn_effect(center, _fog_brazier_zone.radius * 1.12, Color(1.0, 0.86, 0.56), Color(1.0, 0.96, 0.86), 0.26)
+			_damage_enemies_in_radius(center, _fog_brazier_zone.radius * 1.12, max(10, int(round(float(_get_wave_rank()) * 1.8))), 180.0, 6)
+			_award_score(102 + _get_wave_rank() * 16)
+			_fog_brazier_zone.queue_free()
+			_fog_brazier_zone = null
+			_fog_brazier_progress = 0.0
+			_fog_brazier_respawn_timer = 28.0
+			_fog_light_timer = 24.0
+			_show_message("猎灯点亮：24 秒内黑雾后退，经验、得分和移速同步回暖。", Color(1.0, 0.90, 0.62), 2.8)
+
+	if _player != null and is_instance_valid(_player):
+		if _fog_light_timer > 0.0:
+			_player.set_move_speed_multiplier(1.08)
+		else:
+			_player.set_move_speed_multiplier(0.84)
+
+
+func _spawn_black_fog_brazier() -> void:
+	if _hazard_root == null or not is_instance_valid(_hazard_root):
+		return
+	_fog_brazier_zone = MAP_RULE_ZONE_SCRIPT.new()
+	_fog_brazier_zone.global_position = _pick_hazard_focus_position(150.0, 280.0)
+	_fog_brazier_zone.radius = 78.0
+	_fog_brazier_zone.primary_color = Color(1.0, 0.82, 0.50, 0.92)
+	_fog_brazier_zone.secondary_color = Color(1.0, 0.96, 0.86, 0.84)
+	_fog_brazier_zone.label = "猎灯"
+	_fog_brazier_zone.sublabel = "站入点亮"
+	_fog_brazier_zone.icon_style = "altar"
+	_fog_brazier_zone.progress = 0.0
+	_hazard_root.add_child(_fog_brazier_zone)
+	_show_message("黑雾翻涌：尽快点亮猎灯，不然整张图会继续偏向怪群。", Color(1.0, 0.90, 0.62), 2.6)
+
+
+func _trigger_black_fog_pulse() -> void:
+	if _player == null or not is_instance_valid(_player):
+		return
+	var center := _player.global_position + Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU)) * _rng.randf_range(70.0, 150.0)
+	_spawn_prelude_blast_marker(center, 54.0, 0.10, 180.0, 0.70, Color(0.44, 0.48, 0.56), Color(0.96, 0.82, 0.56))
+	if _message_timer <= 0.1:
+		_show_message("失光：黑雾正在贴近，先找下一盏猎灯。", Color(0.92, 0.88, 0.74), 1.6)
+
+
+func _update_airship_breach_rule(delta: float) -> void:
+	if _airship_breach_zone == null or not is_instance_valid(_airship_breach_zone):
+		_airship_breach_respawn_timer = maxf(0.0, _airship_breach_respawn_timer - delta)
+		if _airship_breach_respawn_timer <= 0.0:
+			_spawn_airship_breach()
+		return
+
+	_airship_gust_timer = maxf(0.0, _airship_gust_timer - delta)
+	if _airship_gust_timer <= 0.0:
+		_trigger_airship_gust(_airship_breach_zone.global_position, _airship_breach_zone.radius + 168.0)
+		_airship_gust_timer = maxf(2.1, 3.5 - float(_threat_phase) * 0.18)
+
+	var inside := _is_player_in_rule_zone(_airship_breach_zone, 14.0)
+	_airship_breach_zone.active = inside
+	var nearby_pressure := _count_enemies_in_radius(_airship_breach_zone.global_position, _airship_breach_zone.radius * 1.22)
+	if inside:
+		var gain := 0.26 + minf(0.20, float(nearby_pressure) * 0.02)
+		_airship_breach_progress = minf(1.0, _airship_breach_progress + delta * gain)
+	else:
+		_airship_breach_progress = maxf(0.0, _airship_breach_progress - delta * 0.10)
+	_airship_breach_zone.progress = _airship_breach_progress
+	_airship_breach_zone.sublabel = "封舱 %.0f%%" % (_airship_breach_progress * 100.0)
+
+	if _airship_breach_progress < 1.0:
+		return
+
+	var center := _airship_breach_zone.global_position
+	_spawn_effect(center, _airship_breach_zone.radius * 1.18, Color(0.82, 0.94, 1.0), Color(1.0, 0.94, 0.80), 0.28)
+	_fire_airship_broadside(center)
+	_award_score(108 + _get_wave_rank() * 18)
+	_airship_tailwind_timer = 20.0
+	_airship_breach_zone.queue_free()
+	_airship_breach_zone = null
+	_airship_breach_progress = 0.0
+	_airship_breach_respawn_timer = 30.0
+	_airship_gust_timer = 2.4
+	_show_message("封舱成功：甲板暂时稳住，20 秒内法术威力、冷却和得分同步抬升。", Color(0.88, 0.96, 1.0), 2.8)
+
+
+func _spawn_airship_breach() -> void:
+	if _hazard_root == null or not is_instance_valid(_hazard_root):
+		return
+	_airship_breach_zone = MAP_RULE_ZONE_SCRIPT.new()
+	_airship_breach_zone.global_position = _pick_hazard_focus_position(160.0, 280.0)
+	_airship_breach_zone.radius = 82.0
+	_airship_breach_zone.primary_color = Color(0.74, 0.90, 1.0, 0.92)
+	_airship_breach_zone.secondary_color = Color(0.98, 0.96, 0.88, 0.84)
+	_airship_breach_zone.label = "裂甲破口"
+	_airship_breach_zone.sublabel = "顶住风压封舱"
+	_airship_breach_zone.icon_style = "core"
+	_airship_breach_zone.progress = 0.0
+	_hazard_root.add_child(_airship_breach_zone)
+	_airship_gust_direction = Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU)).normalized()
+	_show_message("空艇裂甲出现：顶住风压，把这道破口强行封住。", Color(0.86, 0.94, 1.0), 2.6)
+
+
+func _trigger_airship_gust(center: Vector2, radius: float) -> void:
+	_airship_gust_direction = _airship_gust_direction.rotated(_rng.randf_range(-0.55, 0.55)).normalized()
+	if _airship_gust_direction == Vector2.ZERO:
+		_airship_gust_direction = Vector2.RIGHT
+	var start_position := center - _airship_gust_direction.orthogonal() * radius
+	var end_position := center + _airship_gust_direction.orthogonal() * radius
+	_spawn_rule_link_effect(start_position, end_position, 6.0, Color(0.76, 0.90, 1.0), Color(0.98, 0.96, 0.88), 0.18)
+	_apply_line_current_health_damage(start_position, end_position, 44.0, 0.10, 240.0)
+	for index in range(5):
+		var t := float(index) / 4.0
+		_spawn_effect(start_position.lerp(end_position, t), 34.0, Color(0.78, 0.92, 1.0), Color(0.98, 0.96, 0.88), 0.12)
+
+
+func _fire_airship_broadside(center: Vector2) -> void:
+	var direction := _airship_gust_direction if _airship_gust_direction != Vector2.ZERO else Vector2.RIGHT
+	var side := direction.orthogonal()
+	for lane in range(3):
+		var offset := (float(lane) - 1.0) * 96.0
+		var start_position := center - direction * 340.0 + side * offset
+		var end_position := center + direction * 340.0 + side * offset
+		_spawn_rule_link_effect(start_position, end_position, 5.4, Color(0.86, 0.96, 1.0), Color(0.96, 0.86, 0.60), 0.18)
+		_apply_line_damage(start_position, end_position, 32.0, max(12, int(round(float(_get_wave_rank()) * 2.0))), 240.0, 5)
+
+
 func _count_void_pools_in_radius(center: Vector2, radius: float) -> int:
 	var count := 0
 	for pool_variant in _void_pools:
@@ -2647,6 +3348,809 @@ func _get_latest_world_mutation_name() -> String:
 	if _active_world_mutations.is_empty():
 		return "无"
 	return _active_world_mutations[_active_world_mutations.size() - 1]
+
+
+func _update_blood_hunter_attacks(delta: float) -> void:
+	_oathshot_timer -= delta
+	if _oathshot_timer <= 0.0:
+		if _fire_oathshots():
+			_oathshot_timer = _get_oathshot_cooldown()
+		else:
+			_oathshot_timer = 0.10
+
+	if _brand_level > 0:
+		_brand_timer -= delta
+		if _brand_timer <= 0.0:
+			if _cast_blood_brand():
+				_brand_timer = _get_brand_cooldown()
+			else:
+				_brand_timer = 0.24
+
+	if _bloodtrail_level > 0:
+		_bloodtrail_timer -= delta
+		if _bloodtrail_timer <= 0.0:
+			if _cast_bloodtrail():
+				_bloodtrail_timer = _get_bloodtrail_cooldown()
+			else:
+				_bloodtrail_timer = 0.24
+
+	if _verdict_level > 0:
+		_verdict_timer -= delta
+		if _verdict_timer <= 0.0:
+			if _cast_verdict():
+				_verdict_timer = _get_verdict_cooldown()
+			else:
+				_verdict_timer = 0.20
+
+
+func _fire_oathshots() -> bool:
+	if _player == null or not is_instance_valid(_player):
+		return false
+	var targets := _get_nearest_enemies(_player.global_position, _get_oathshot_count(), 900.0)
+	if targets.is_empty():
+		return false
+	var signature_direction := (targets[0].global_position - _player.global_position).normalized()
+	_trigger_player_action_signature("blood_draw", 0.18, 0.94, signature_direction)
+	for index in range(_get_oathshot_count()):
+		var target: EnemySoldier = targets[min(index, targets.size() - 1)]
+		if target == null or not is_instance_valid(target):
+			continue
+		var direction := (target.global_position - _player.global_position).normalized()
+		if direction == Vector2.ZERO:
+			direction = Vector2.RIGHT.rotated(_rng.randf_range(-0.18, 0.18))
+		var projectile: SpellProjectile = PROJECTILE_SCRIPT.new()
+		projectile.global_position = _player.global_position + direction * 24.0
+		projectile.direction = direction
+		projectile.damage = _get_oathshot_damage()
+		projectile.speed = 860.0
+		projectile.radius = 6.4
+		projectile.pierce = _get_oathshot_pierce()
+		projectile.max_distance = 860.0
+		projectile.knockback = 170.0
+		projectile.tint = Color(0.96, 0.28, 0.34)
+		projectile.secondary_tint = Color(1.0, 0.82, 0.80, 0.42)
+		projectile.homing_target = target
+		projectile.homing_strength = 6.2
+		_register_projectile(projectile)
+	if signature_direction != Vector2.ZERO:
+		_player.set_facing_direction(signature_direction)
+	_audio.play_player_shot("rapid")
+	return true
+
+
+func _cast_blood_brand() -> bool:
+	if _player == null or not is_instance_valid(_player):
+		return false
+	var targets := _get_nearest_enemies(_player.global_position, _get_brand_target_count(), 760.0)
+	if targets.is_empty():
+		return false
+	var signature_direction := (targets[0].global_position - _player.global_position).normalized()
+	_trigger_player_action_signature("blood_draw", 0.20, 0.86, signature_direction)
+	for target_variant in targets:
+		var target: EnemySoldier = target_variant
+		if target == null or not is_instance_valid(target):
+			continue
+		_apply_blood_mark(target, 5.2 + float(_brand_level) * 1.1)
+		target.take_damage(_get_brand_damage(), signature_direction * 90.0)
+		_spawn_rule_link_effect(_player.global_position, target.global_position, 5.0, Color(0.92, 0.24, 0.32), Color(1.0, 0.82, 0.78), 0.18)
+		_spawn_effect(target.global_position, 22.0, Color(0.96, 0.30, 0.36), Color(1.0, 0.82, 0.78), 0.12)
+	_audio.play_player_shot("power")
+	return true
+
+
+func _cast_bloodtrail() -> bool:
+	if _player == null or not is_instance_valid(_player) or _hazard_root == null or not is_instance_valid(_hazard_root):
+		return false
+	var forward := _player.get_facing_direction()
+	if forward == Vector2.ZERO:
+		forward = _get_player_target_direction(680.0)
+	if forward == Vector2.ZERO:
+		forward = Vector2.RIGHT
+	var drop_position := _player_previous_position
+	if drop_position.distance_to(_player.global_position) < 28.0:
+		drop_position = _player.global_position + forward * 48.0
+	_spawn_bloodtrail_zone(drop_position)
+	_trigger_player_action_signature("blood_draw", 0.18, 0.72, forward)
+	_audio.play_player_shot("spread")
+	return true
+
+
+func _cast_verdict() -> bool:
+	if _player == null or not is_instance_valid(_player):
+		return false
+	var targets := _get_nearest_enemies(_player.global_position, 1, _get_verdict_range() + 80.0)
+	if targets.is_empty():
+		return false
+	var primary_target := targets[0]
+	if primary_target == null or not is_instance_valid(primary_target):
+		return false
+	var direction := (primary_target.global_position - _player.global_position).normalized()
+	if direction == Vector2.ZERO:
+		direction = _player.get_facing_direction()
+	if direction == Vector2.ZERO:
+		direction = Vector2.RIGHT
+	var start_position := _player.global_position
+	var end_position := start_position + direction * _get_verdict_range()
+	_trigger_player_action_signature("blood_dash", 0.24, 1.06, direction)
+	_player.set_facing_direction(direction)
+	_spawn_rule_link_effect(start_position, end_position, _get_verdict_width() * 0.42, Color(0.98, 0.30, 0.34), Color(1.0, 0.92, 0.88), 0.18)
+	_spawn_slash_effect(start_position + direction * (_get_verdict_range() * 0.34), direction, _get_verdict_width() * 1.6, 0.50)
+	_apply_line_damage(start_position, end_position, _get_verdict_width(), _get_verdict_damage(), 260.0, 8)
+	_burst_marked_enemies_in_radius(end_position, 92.0, max(1, int(round(float(_get_verdict_damage()) * 0.48))), 220.0)
+	_audio.play_player_shot("power")
+	return true
+
+
+func _spawn_bloodtrail_zone(position: Vector2) -> void:
+	if _hazard_root == null or not is_instance_valid(_hazard_root):
+		return
+	while _blood_trails.size() >= _get_bloodtrail_limit():
+		var oldest: Dictionary = _blood_trails.pop_front()
+		var oldest_node := oldest.get("node", null) as MapRuleZone
+		if oldest_node != null and is_instance_valid(oldest_node):
+			oldest_node.queue_free()
+	var zone := MAP_RULE_ZONE_SCRIPT.new()
+	zone.global_position = position
+	zone.radius = _get_bloodtrail_radius()
+	zone.primary_color = Color(0.94, 0.24, 0.32, 0.92)
+	zone.secondary_color = Color(1.0, 0.86, 0.82, 0.82)
+	zone.label = "血潮沼"
+	zone.sublabel = "收割区"
+	zone.icon_style = "pool"
+	zone.progress = -1.0
+	_hazard_root.add_child(zone)
+	_blood_trails.append({
+		"node": zone,
+		"radius": zone.radius,
+		"damage": _get_bloodtrail_damage(),
+		"lifetime": _get_bloodtrail_duration(),
+		"pulse_interval": 0.48,
+		"pulse_timer": 0.24,
+	})
+
+
+func _apply_blood_mark(enemy: EnemySoldier, duration: float) -> void:
+	if enemy == null or not is_instance_valid(enemy):
+		return
+	_blood_marks[enemy.get_instance_id()] = {
+		"enemy": enemy,
+		"timer": duration,
+	}
+
+
+func _is_enemy_blood_marked(enemy: EnemySoldier) -> bool:
+	if enemy == null or not is_instance_valid(enemy):
+		return false
+	return _blood_marks.has(enemy.get_instance_id())
+
+
+func _burst_marked_enemies_in_radius(center: Vector2, radius: float, damage: int, knockback: float) -> int:
+	if damage <= 0:
+		return 0
+	var hits := 0
+	for enemy_id_variant in _blood_marks.keys():
+		var entry: Dictionary = _blood_marks.get(enemy_id_variant, {})
+		var enemy := entry.get("enemy", null) as EnemySoldier
+		if enemy == null or not is_instance_valid(enemy):
+			continue
+		if center.distance_to(enemy.global_position) > radius + enemy.get_body_radius():
+			continue
+		var impulse := (enemy.global_position - center).normalized()
+		if impulse == Vector2.ZERO:
+			impulse = Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU))
+		enemy.take_damage(damage, impulse * knockback)
+		_spawn_effect(enemy.global_position, 26.0, Color(0.98, 0.34, 0.36), Color(1.0, 0.86, 0.82), 0.12)
+		hits += 1
+	return hits
+
+
+func _consume_blood_mark(enemy: EnemySoldier) -> void:
+	if enemy == null:
+		return
+	_blood_marks.erase(enemy.get_instance_id())
+
+
+func _get_missing_health_ratio() -> float:
+	if _player == null or not is_instance_valid(_player) or _player.max_health <= 0:
+		return 0.0
+	return clampf(1.0 - float(_player.health) / float(_player.max_health), 0.0, 1.0)
+
+
+func _get_blood_bonus_multiplier() -> float:
+	return 1.0 + _get_missing_health_ratio() * 0.55
+
+
+func _get_brand_heal() -> int:
+	return 1 + int(_brand_level >= 2) + int(_brand_level >= 4)
+
+
+func _get_brand_burst_damage() -> int:
+	return max(1, int(round((12.0 + float(_brand_level) * 4.0) * _get_spell_power_multiplier() * (1.0 + _get_missing_health_ratio() * 0.25))))
+
+
+func _get_brand_burst_radius() -> float:
+	return 68.0 + float(_brand_level) * 14.0
+
+
+func _get_oathshot_count() -> int:
+	return 1 + int(_oathshot_level >= 3) + int(_oathshot_level >= 6)
+
+
+func _get_oathshot_damage() -> int:
+	return max(1, int(round((16.0 + float(_oathshot_level) * 4.0) * _get_spell_power_multiplier() * _get_blood_bonus_multiplier())))
+
+
+func _get_oathshot_cooldown() -> float:
+	return maxf(0.30, (0.84 - float(_oathshot_level) * 0.06) * _get_cooldown_multiplier())
+
+
+func _get_oathshot_pierce() -> int:
+	return 1 + int(_oathshot_level >= 4) + int(_oathshot_level >= 7)
+
+
+func _get_brand_target_count() -> int:
+	return 1 + _brand_level
+
+
+func _get_brand_damage() -> int:
+	return max(1, int(round((8.0 + float(_brand_level) * 3.0) * _get_spell_power_multiplier() * (1.0 + _get_missing_health_ratio() * 0.25))))
+
+
+func _get_brand_cooldown() -> float:
+	return maxf(1.0, (4.8 - float(_brand_level) * 0.40) * _get_cooldown_multiplier())
+
+
+func _get_bloodtrail_radius() -> float:
+	return 74.0 + float(_bloodtrail_level) * 18.0
+
+
+func _get_bloodtrail_damage() -> int:
+	return max(1, int(round((10.0 + float(_bloodtrail_level) * 4.0) * _get_spell_power_multiplier() * (1.0 + _get_missing_health_ratio() * 0.20))))
+
+
+func _get_bloodtrail_cooldown() -> float:
+	return maxf(1.3, (4.6 - float(_bloodtrail_level) * 0.36) * _get_cooldown_multiplier())
+
+
+func _get_bloodtrail_duration() -> float:
+	return 5.2 + float(_bloodtrail_level) * 0.7
+
+
+func _get_bloodtrail_limit() -> int:
+	return 1 + int(_bloodtrail_level >= 2) + int(_bloodtrail_level >= 4)
+
+
+func _get_verdict_damage() -> int:
+	return max(1, int(round((24.0 + float(_verdict_level) * 8.0) * _get_spell_power_multiplier() * (1.0 + _get_missing_health_ratio() * 0.70))))
+
+
+func _get_verdict_cooldown() -> float:
+	return maxf(1.5, (5.2 - float(_verdict_level) * 0.44) * _get_cooldown_multiplier())
+
+
+func _get_verdict_range() -> float:
+	return 240.0 + float(_verdict_level) * 44.0
+
+
+func _get_verdict_width() -> float:
+	return 34.0 + float(_verdict_level) * 4.0
+
+
+func _update_grave_caller_attacks(delta: float) -> void:
+	_dirge_timer -= delta
+	if _dirge_timer <= 0.0:
+		if _cast_dirge():
+			_dirge_timer = _get_dirge_cooldown()
+		else:
+			_dirge_timer = 0.10
+
+	if _wake_level > 0:
+		_wake_timer -= delta
+		if _wake_timer <= 0.0:
+			if _cast_wake():
+				_wake_timer = _get_wake_cooldown()
+			else:
+				_wake_timer = 0.22
+
+	if _toll_level > 0:
+		_toll_timer -= delta
+		if _toll_timer <= 0.0:
+			if _cast_toll():
+				_toll_timer = _get_toll_cooldown()
+			else:
+				_toll_timer = 0.24
+
+	if _choir_level > 0:
+		_choir_timer -= delta
+		if _choir_timer <= 0.0:
+			if _cast_choir():
+				_choir_timer = _get_choir_cooldown()
+			else:
+				_choir_timer = 0.24
+
+
+func _cast_dirge() -> bool:
+	if _player == null or not is_instance_valid(_player):
+		return false
+	var origins: Array[Vector2] = [_player.global_position]
+	var token_origins := _get_grave_token_positions(mini(_get_dirge_count() - 1, 2), 640.0)
+	origins.append_array(token_origins)
+	var targets := _get_nearest_enemies(_player.global_position, maxi(origins.size(), _get_dirge_count()), 880.0)
+	if targets.is_empty():
+		return false
+	var signature_direction := (targets[0].global_position - _player.global_position).normalized()
+	_trigger_player_action_signature("dirge_cast", 0.20, 0.92, signature_direction)
+	for index in range(origins.size()):
+		var origin := origins[index]
+		var target := targets[min(index, targets.size() - 1)]
+		if target == null or not is_instance_valid(target):
+			continue
+		var direction := (target.global_position - origin).normalized()
+		if direction == Vector2.ZERO:
+			direction = Vector2.RIGHT.rotated(_rng.randf_range(-0.16, 0.16))
+		_spawn_dirge_projectile(origin, direction, target, _get_dirge_damage())
+	_audio.play_player_shot("rapid")
+	return true
+
+
+func _cast_wake() -> bool:
+	if _grave_tokens.is_empty():
+		return false
+	var consumed := _consume_grave_tokens(_get_wake_consume_count())
+	if consumed.is_empty():
+		return false
+	var signature_direction := _get_player_target_direction(840.0)
+	_trigger_player_action_signature("grave_toll", 0.22, 0.90, signature_direction)
+	for token in consumed:
+		var position: Vector2 = token.get("position", Vector2.ZERO)
+		var target_list := _get_nearest_enemies(position, 1, 680.0)
+		_spawn_effect(position, 52.0, Color(0.62, 0.88, 0.78), Color(0.90, 1.0, 0.94), 0.18)
+		_damage_enemies_in_radius(position, 68.0, _get_wake_damage(), 170.0, 4)
+		if not target_list.is_empty():
+			var target := target_list[0]
+			if target != null and is_instance_valid(target):
+				var direction := (target.global_position - position).normalized()
+				_spawn_dirge_projectile(position, direction, target, max(1, int(round(float(_get_wake_damage()) * 0.82))), 0.90)
+	_audio.play_player_shot("spread")
+	return true
+
+
+func _cast_toll() -> bool:
+	if _grave_tokens.is_empty():
+		return false
+	var pulse_count := mini(_grave_tokens.size(), _get_toll_pulse_count())
+	if pulse_count <= 0:
+		return false
+	_trigger_player_action_signature("grave_toll", 0.20, 0.84, _get_player_target_direction(760.0))
+	for index in range(pulse_count):
+		var token: Dictionary = _grave_tokens[index]
+		var node := token.get("node", null) as MapRuleZone
+		if node == null or not is_instance_valid(node):
+			continue
+		_spawn_effect(node.global_position, _get_toll_radius() * 0.72, Color(0.60, 0.90, 0.82), Color(0.94, 1.0, 0.96), 0.14)
+		_damage_enemies_in_radius(node.global_position, _get_toll_radius(), _get_toll_damage(), 150.0, 5)
+		node.active = true
+	_audio.play_player_shot("power")
+	return true
+
+
+func _cast_choir() -> bool:
+	if _player == null or not is_instance_valid(_player):
+		return false
+	var consumed := _consume_grave_tokens(_get_choir_consume_count())
+	if consumed.is_empty():
+		return false
+	var signature_direction := _get_player_target_direction(920.0)
+	_trigger_player_action_signature("grave_toll", 0.24, 1.02, signature_direction)
+	var targets := _get_nearest_enemies(_player.global_position, maxi(consumed.size(), 1), 920.0)
+	for index in range(consumed.size()):
+		var token: Dictionary = consumed[index]
+		var origin: Vector2 = token.get("position", _player.global_position)
+		var target := targets[min(index, max(targets.size() - 1, 0))] if not targets.is_empty() else null
+		var base_direction := signature_direction
+		if target != null and is_instance_valid(target):
+			base_direction = (target.global_position - origin).normalized()
+		for bolt_index in range(_get_choir_projectile_count()):
+			var angle_offset := (float(bolt_index) - float(_get_choir_projectile_count() - 1) * 0.5) * 0.16
+			var direction := base_direction.rotated(angle_offset)
+			_spawn_dirge_projectile(origin, direction, target, _get_choir_damage(), 1.08)
+		_spawn_rule_link_effect(origin, _player.global_position, 4.0, Color(0.62, 0.88, 0.80), Color(0.92, 0.98, 0.94), 0.16)
+	_audio.play_player_shot("power")
+	return true
+
+
+func _spawn_grave_token(position: Vector2) -> void:
+	if _hazard_root == null or not is_instance_valid(_hazard_root):
+		return
+	while _grave_tokens.size() >= _get_grave_token_limit():
+		var oldest: Dictionary = _grave_tokens.pop_front()
+		var oldest_node := oldest.get("node", null) as MapRuleZone
+		if oldest_node != null and is_instance_valid(oldest_node):
+			oldest_node.queue_free()
+	var zone := MAP_RULE_ZONE_SCRIPT.new()
+	zone.global_position = position
+	zone.radius = 42.0
+	zone.primary_color = Color(0.58, 0.88, 0.76, 0.90)
+	zone.secondary_color = Color(0.92, 1.0, 0.96, 0.82)
+	zone.label = "尸核"
+	zone.sublabel = "待起灵"
+	zone.icon_style = "spore"
+	zone.progress = -1.0
+	_hazard_root.add_child(zone)
+	_grave_tokens.append({
+		"node": zone,
+		"position": position,
+		"lifetime": 12.0 + float(_wake_level) * 2.0,
+	})
+
+
+func _get_grave_token_positions(count: int, max_distance: float) -> Array[Vector2]:
+	var positions: Array[Vector2] = []
+	if _player == null or not is_instance_valid(_player) or count <= 0:
+		return positions
+	var ranked: Array[Dictionary] = []
+	for token in _grave_tokens:
+		var node := token.get("node", null) as MapRuleZone
+		if node == null or not is_instance_valid(node):
+			continue
+		var distance := node.global_position.distance_to(_player.global_position)
+		if distance > max_distance:
+			continue
+		ranked.append({
+			"position": node.global_position,
+			"distance": distance,
+		})
+	ranked.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("distance", 0.0)) < float(b.get("distance", 0.0))
+	)
+	for index in range(mini(count, ranked.size())):
+		positions.append(ranked[index].get("position", Vector2.ZERO))
+	return positions
+
+
+func _consume_grave_tokens(count: int) -> Array[Dictionary]:
+	var consumed: Array[Dictionary] = []
+	if count <= 0 or _player == null or not is_instance_valid(_player):
+		return consumed
+	var ranked: Array[Dictionary] = []
+	for index in range(_grave_tokens.size()):
+		var token: Dictionary = _grave_tokens[index]
+		var node := token.get("node", null) as MapRuleZone
+		if node == null or not is_instance_valid(node):
+			continue
+		ranked.append({
+			"index": index,
+			"distance": node.global_position.distance_to(_player.global_position),
+		})
+	ranked.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("distance", 0.0)) < float(b.get("distance", 0.0))
+	)
+	var taken_indices: Array[int] = []
+	for rank in range(mini(count, ranked.size())):
+		taken_indices.append(int(ranked[rank].get("index", -1)))
+	taken_indices.sort()
+	for offset in range(taken_indices.size() - 1, -1, -1):
+		var source_index := taken_indices[offset]
+		if source_index < 0 or source_index >= _grave_tokens.size():
+			continue
+		var token := _grave_tokens[source_index]
+		var node := token.get("node", null) as MapRuleZone
+		if node != null and is_instance_valid(node):
+			token["position"] = node.global_position
+			node.queue_free()
+		consumed.append(token)
+		_grave_tokens.remove_at(source_index)
+	return consumed
+
+
+func _spawn_dirge_projectile(origin: Vector2, direction: Vector2, target: EnemySoldier, damage: int, speed_scale: float = 1.0) -> void:
+	var projectile: SpellProjectile = PROJECTILE_SCRIPT.new()
+	projectile.global_position = origin
+	projectile.direction = direction if direction != Vector2.ZERO else Vector2.RIGHT
+	projectile.damage = damage
+	projectile.speed = 620.0 * speed_scale
+	projectile.radius = 7.6
+	projectile.pierce = 1 + int(_dirge_level >= 5)
+	projectile.max_distance = 760.0
+	projectile.knockback = 150.0
+	projectile.tint = Color(0.58, 0.88, 0.78)
+	projectile.secondary_tint = Color(0.94, 1.0, 0.96, 0.40)
+	projectile.homing_target = target
+	projectile.homing_strength = 4.6
+	_register_projectile(projectile)
+
+
+func _get_dirge_count() -> int:
+	return 1 + int(_dirge_level >= 3) + int(_dirge_level >= 6)
+
+
+func _get_dirge_damage() -> int:
+	return max(1, int(round((14.0 + float(_dirge_level) * 4.0) * _get_spell_power_multiplier())))
+
+
+func _get_dirge_cooldown() -> float:
+	return maxf(0.40, (0.96 - float(_dirge_level) * 0.08) * _get_cooldown_multiplier())
+
+
+func _get_wake_damage() -> int:
+	return max(1, int(round((18.0 + float(_wake_level) * 6.0) * _get_spell_power_multiplier())))
+
+
+func _get_wake_cooldown() -> float:
+	return maxf(1.2, (5.0 - float(_wake_level) * 0.42) * _get_cooldown_multiplier())
+
+
+func _get_wake_consume_count() -> int:
+	return 1 + int(_wake_level >= 2) + int(_wake_level >= 4)
+
+
+func _get_toll_damage() -> int:
+	return max(1, int(round((16.0 + float(_toll_level) * 5.0) * _get_spell_power_multiplier())))
+
+
+func _get_toll_radius() -> float:
+	return 84.0 + float(_toll_level) * 18.0
+
+
+func _get_toll_cooldown() -> float:
+	return maxf(1.6, (5.6 - float(_toll_level) * 0.44) * _get_cooldown_multiplier())
+
+
+func _get_toll_pulse_count() -> int:
+	return 1 + _toll_level
+
+
+func _get_choir_damage() -> int:
+	return max(1, int(round((12.0 + float(_choir_level) * 4.0) * _get_spell_power_multiplier())))
+
+
+func _get_choir_cooldown() -> float:
+	return maxf(1.8, (6.0 - float(_choir_level) * 0.46) * _get_cooldown_multiplier())
+
+
+func _get_choir_consume_count() -> int:
+	return 1 + int(_choir_level >= 2) + int(_choir_level >= 4)
+
+
+func _get_choir_projectile_count() -> int:
+	return 2 + int(_choir_level >= 3)
+
+
+func _get_grave_token_limit() -> int:
+	return 4 + _wake_level + int(_choir_level >= 2)
+
+
+func _update_illusionist_attacks(delta: float) -> void:
+	_mirrorbolt_timer -= delta
+	if _mirrorbolt_timer <= 0.0:
+		if _fire_mirrorbolts():
+			_mirrorbolt_timer = _get_mirrorbolt_cooldown()
+		else:
+			_mirrorbolt_timer = 0.10
+
+	if _afterimage_level > 0:
+		_afterimage_timer -= delta
+		if _afterimage_timer <= 0.0:
+			if _cast_afterimage():
+				_afterimage_timer = _get_afterimage_cooldown()
+			else:
+				_afterimage_timer = 0.24
+
+	if _switchstep_level > 0:
+		_switchstep_timer -= delta
+		if _switchstep_timer <= 0.0:
+			if _cast_switchstep():
+				_switchstep_timer = _get_switchstep_cooldown()
+			else:
+				_switchstep_timer = 0.24
+
+	if _prismdance_level > 0:
+		_prismdance_timer -= delta
+		if _prismdance_timer <= 0.0:
+			if _cast_prismdance():
+				_prismdance_timer = _get_prismdance_cooldown()
+			else:
+				_prismdance_timer = 0.22
+
+
+func _fire_mirrorbolts() -> bool:
+	if _player == null or not is_instance_valid(_player):
+		return false
+	var origins: Array[Vector2] = [_player.global_position]
+	for index in range(mini(_illusion_decoys.size(), _get_mirrorbolt_decoy_count())):
+		var decoy: Dictionary = _illusion_decoys[index]
+		var node := decoy.get("node", null) as MapRuleZone
+		if node != null and is_instance_valid(node):
+			origins.append(node.global_position)
+	var targets := _get_nearest_enemies(_player.global_position, maxi(origins.size(), 1), 920.0)
+	if targets.is_empty():
+		return false
+	var signature_direction := (targets[0].global_position - _player.global_position).normalized()
+	_trigger_player_action_signature("mirror_cast", 0.20, 0.90, signature_direction)
+	for index in range(origins.size()):
+		var origin := origins[index]
+		var target := targets[min(index, targets.size() - 1)]
+		if target == null or not is_instance_valid(target):
+			continue
+		var direction := (target.global_position - origin).normalized()
+		if direction == Vector2.ZERO:
+			direction = signature_direction if signature_direction != Vector2.ZERO else Vector2.RIGHT
+		var projectile: SpellProjectile = PROJECTILE_SCRIPT.new()
+		projectile.global_position = origin
+		projectile.direction = direction
+		projectile.damage = _get_mirrorbolt_damage()
+		projectile.speed = 820.0
+		projectile.radius = 6.4
+		projectile.pierce = 1 + int(_mirrorbolt_level >= 4)
+		projectile.max_distance = 860.0
+		projectile.knockback = 150.0
+		projectile.tint = Color(0.86, 0.72, 1.0)
+		projectile.secondary_tint = Color(0.96, 0.92, 1.0, 0.40)
+		projectile.homing_target = target
+		projectile.homing_strength = 5.0
+		_register_projectile(projectile)
+	_audio.play_player_shot("rapid")
+	return true
+
+
+func _cast_afterimage() -> bool:
+	if _player == null or not is_instance_valid(_player):
+		return false
+	var position := _player_previous_position
+	if position.distance_to(_player.global_position) < 24.0:
+		position = _player.global_position - _player.get_facing_direction() * 36.0
+	_spawn_illusion_decoy(position)
+	return true
+
+
+func _cast_switchstep() -> bool:
+	if _player == null or not is_instance_valid(_player) or _illusion_decoys.is_empty():
+		return false
+	var selected_index := -1
+	var best_distance := -1.0
+	for index in range(_illusion_decoys.size()):
+		var decoy: Dictionary = _illusion_decoys[index]
+		var node := decoy.get("node", null) as MapRuleZone
+		if node == null or not is_instance_valid(node):
+			continue
+		var distance := node.global_position.distance_to(_player.global_position)
+		if distance > best_distance:
+			best_distance = distance
+			selected_index = index
+	if selected_index < 0:
+		return false
+	var decoy_node := _illusion_decoys[selected_index].get("node", null) as MapRuleZone
+	if decoy_node == null or not is_instance_valid(decoy_node):
+		return false
+	var old_position := _player.global_position
+	var new_position := decoy_node.global_position
+	_trigger_player_action_signature("swap_step", 0.22, 1.06, (new_position - old_position).normalized())
+	_player.global_position = new_position
+	_player_previous_position = new_position
+	_spawn_effect(old_position, _get_switchstep_radius(), Color(0.88, 0.74, 1.0), Color(0.98, 0.94, 1.0), 0.18)
+	_spawn_effect(new_position, _get_switchstep_radius(), Color(0.88, 0.74, 1.0), Color(0.98, 0.94, 1.0), 0.18)
+	_damage_enemies_in_radius(old_position, _get_switchstep_radius(), _get_switchstep_damage(), 170.0, 5)
+	_damage_enemies_in_radius(new_position, _get_switchstep_radius(), _get_switchstep_damage(), 170.0, 5)
+	decoy_node.queue_free()
+	_illusion_decoys.remove_at(selected_index)
+	_audio.play_player_shot("power")
+	return true
+
+
+func _cast_prismdance() -> bool:
+	if _player == null or not is_instance_valid(_player):
+		return false
+	var origins: Array[Vector2] = [_player.global_position]
+	for index in range(mini(_illusion_decoys.size(), _get_prismdance_origin_count())):
+		var decoy: Dictionary = _illusion_decoys[index]
+		var node := decoy.get("node", null) as MapRuleZone
+		if node != null and is_instance_valid(node):
+			origins.append(node.global_position)
+	if origins.size() <= 1 and _illusion_decoys.is_empty():
+		return false
+	var target_direction := _get_player_target_direction(940.0)
+	if target_direction == Vector2.ZERO:
+		target_direction = _player.get_facing_direction()
+	if target_direction == Vector2.ZERO:
+		target_direction = Vector2.RIGHT
+	_trigger_player_action_signature("mirror_cast", 0.24, 1.02, target_direction)
+	for origin in origins:
+		for bolt_index in range(_get_prismdance_projectile_count()):
+			var angle_offset := (float(bolt_index) - float(_get_prismdance_projectile_count() - 1) * 0.5) * 0.18
+			var direction := target_direction.rotated(angle_offset)
+			var projectile: SpellProjectile = PROJECTILE_SCRIPT.new()
+			projectile.global_position = origin
+			projectile.direction = direction
+			projectile.damage = _get_prismdance_damage()
+			projectile.speed = 720.0
+			projectile.radius = 7.2
+			projectile.pierce = 1 + int(_prismdance_level >= 3)
+			projectile.max_distance = 780.0
+			projectile.knockback = 160.0
+			projectile.tint = Color(0.88, 0.76, 1.0)
+			projectile.secondary_tint = Color(0.98, 0.94, 1.0, 0.42)
+			projectile.homing_strength = 0.0
+			_register_projectile(projectile)
+		_spawn_rule_link_effect(_player.global_position, origin, 3.2, Color(0.82, 0.70, 1.0), Color(0.98, 0.92, 1.0), 0.14)
+	_audio.play_player_shot("power")
+	return true
+
+
+func _spawn_illusion_decoy(position: Vector2) -> void:
+	if _hazard_root == null or not is_instance_valid(_hazard_root):
+		return
+	while _illusion_decoys.size() >= _get_afterimage_limit():
+		var oldest: Dictionary = _illusion_decoys.pop_front()
+		var oldest_node := oldest.get("node", null) as MapRuleZone
+		if oldest_node != null and is_instance_valid(oldest_node):
+			oldest_node.queue_free()
+	var zone := MAP_RULE_ZONE_SCRIPT.new()
+	zone.global_position = position
+	zone.radius = 40.0
+	zone.primary_color = Color(0.84, 0.72, 1.0, 0.88)
+	zone.secondary_color = Color(0.98, 0.94, 1.0, 0.82)
+	zone.label = "残像"
+	zone.sublabel = "镜射"
+	zone.icon_style = "prism"
+	zone.progress = -1.0
+	_hazard_root.add_child(zone)
+	_illusion_decoys.append({
+		"node": zone,
+		"lifetime": _get_afterimage_duration(),
+	})
+	_spawn_effect(position, 34.0, Color(0.84, 0.72, 1.0), Color(0.98, 0.94, 1.0), 0.14)
+
+
+func _get_mirrorbolt_damage() -> int:
+	return max(1, int(round((14.0 + float(_mirrorbolt_level) * 4.0) * _get_spell_power_multiplier())))
+
+
+func _get_mirrorbolt_cooldown() -> float:
+	return maxf(0.38, (0.92 - float(_mirrorbolt_level) * 0.08) * _get_cooldown_multiplier())
+
+
+func _get_mirrorbolt_decoy_count() -> int:
+	return 1 + int(_mirrorbolt_level >= 4) + int(_mirrorbolt_level >= 7)
+
+
+func _get_afterimage_cooldown() -> float:
+	return maxf(1.2, (5.2 - float(_afterimage_level) * 0.44) * _get_cooldown_multiplier())
+
+
+func _get_afterimage_limit() -> int:
+	return 1 + _afterimage_level
+
+
+func _get_afterimage_duration() -> float:
+	return 4.6 + float(_afterimage_level) * 1.0
+
+
+func _get_switchstep_damage() -> int:
+	return max(1, int(round((18.0 + float(_switchstep_level) * 6.0) * _get_spell_power_multiplier())))
+
+
+func _get_switchstep_radius() -> float:
+	return 76.0 + float(_switchstep_level) * 16.0
+
+
+func _get_switchstep_cooldown() -> float:
+	return maxf(1.7, (5.4 - float(_switchstep_level) * 0.42) * _get_cooldown_multiplier())
+
+
+func _get_prismdance_damage() -> int:
+	return max(1, int(round((10.0 + float(_prismdance_level) * 4.0) * _get_spell_power_multiplier())))
+
+
+func _get_prismdance_cooldown() -> float:
+	return maxf(1.8, (6.2 - float(_prismdance_level) * 0.46) * _get_cooldown_multiplier())
+
+
+func _get_prismdance_projectile_count() -> int:
+	return 2 + int(_prismdance_level >= 3) + int(_prismdance_level >= 4)
+
+
+func _get_prismdance_origin_count() -> int:
+	return 1 + int(_prismdance_level >= 2) + int(_prismdance_level >= 4)
 
 
 func _fire_bolts() -> void:
@@ -4316,6 +5820,12 @@ func _get_score_multiplier() -> float:
 		multiplier += 0.10
 	if _clock_overdrive_timer > 0.0:
 		multiplier += 0.06
+	if _train_rush_timer > 0.0:
+		multiplier += 0.14
+	if _fog_light_timer > 0.0:
+		multiplier += 0.12
+	if _airship_tailwind_timer > 0.0:
+		multiplier += 0.12
 	return maxf(1.0, multiplier)
 
 
@@ -4493,6 +6003,36 @@ func _build_character_upgrade_choices() -> Array[Dictionary]:
 		_append_upgrade_candidate(candidates, "mut_flame_split", _slash_level >= 4 and _blade_ring_level >= 2 and not _flame_split_mutation, "变异：焰刃分裂", "钢刃斩挥出的火焰刀气命中后会分裂为三道刀气。")
 		_append_upgrade_candidate(candidates, "mut_rend", _mooncut_level >= 3 and not _rend_mutation, "变异：裂月", "残月斩额外生成两道交叉刀波，并提升穿透。")
 		_append_upgrade_candidate(candidates, "mut_execution", _step_slash_level >= 3 and _slash_level >= 4 and not _execution_mutation, "变异：处决场", "踏空圆斩命中后会追加一次范围处决爆发。")
+	elif _is_alchemist_character():
+		_append_upgrade_candidate(candidates, "flask", _is_upgrade_available("flask", _flask_level), "裂解瓶 +1", "提升裂解瓶的数量、范围和伤害。")
+		_append_upgrade_candidate(candidates, "miasma", _is_upgrade_available("miasma", _miasma_level), "毒雾", "部署持续停留的毒雾区域。")
+		_append_upgrade_candidate(candidates, "shardburst", _is_upgrade_available("shardburst", _shardburst_level), "碎片喷射", "向前喷出扇形玻璃碎片。")
+		_append_upgrade_candidate(candidates, "catalyst", _is_upgrade_available("catalyst", _catalyst_level), "催化反应", "引爆已铺开的毒雾，或在前场触发炼剂爆破。")
+	elif _is_ranger_character():
+		_append_upgrade_candidate(candidates, "needle", _is_upgrade_available("needle", _needle_level), "穿针 +1", "提升连射针矢的数量、伤害和穿透。")
+		_append_upgrade_candidate(candidates, "volley", _is_upgrade_available("volley", _volley_level), "散羽齐射", "一次泼出整排箭雨清理追兵。")
+		_append_upgrade_candidate(candidates, "glaive", _is_upgrade_available("glaive", _glaive_level), "回旋刀", "抛出会追踪敌人的回旋刀刃。")
+		_append_upgrade_candidate(candidates, "trail", _is_upgrade_available("trail", _trail_level), "穿林迹", "沿移动方向扫出一条贯穿线。")
+	elif _is_warden_character():
+		_append_upgrade_candidate(candidates, "pulse", _is_upgrade_available("pulse", _pulse_level), "谐振脉冲 +1", "提高脉冲频率、半径和击退强度。")
+		_append_upgrade_candidate(candidates, "ward", _is_upgrade_available("ward", _ward_level), "守卫环", "召出围绕自身旋转的守卫。")
+		_append_upgrade_candidate(candidates, "beacon", _is_upgrade_available("beacon", _beacon_level), "回声信标", "在前场放下一座持续压制的信标。")
+		_append_upgrade_candidate(candidates, "relay", _is_upgrade_available("relay", _relay_level), "中继线", "把自己、守卫和信标连成持续伤害线。")
+	elif _is_blood_hunter_character():
+		_append_upgrade_candidate(candidates, "oathshot", _is_upgrade_available("oathshot", _oathshot_level), "血誓箭 +1", "提高追猎箭数量、伤害和穿透，残血收益更高。")
+		_append_upgrade_candidate(candidates, "brand", _is_upgrade_available("brand", _brand_level), "猎誓烙印", "给前场目标挂上烙印，收割时回血并炸裂。")
+		_append_upgrade_candidate(candidates, "bloodtrail", _is_upgrade_available("bloodtrail", _bloodtrail_level), "血潮沼", "留下会反复脉冲的血沼磨掉追兵。")
+		_append_upgrade_candidate(candidates, "verdict", _is_upgrade_available("verdict", _verdict_level), "誓刃穿心", "朝前切出一记长线处决，专杀被烙印的目标。")
+	elif _is_grave_caller_character():
+		_append_upgrade_candidate(candidates, "dirge", _is_upgrade_available("dirge", _dirge_level), "挽歌 +1", "提高挽歌弹数量和伤害。")
+		_append_upgrade_candidate(candidates, "wake", _is_upgrade_available("wake", _wake_level), "起灵", "把尸核直接翻成新一轮爆发。")
+		_append_upgrade_candidate(candidates, "toll", _is_upgrade_available("toll", _toll_level), "丧钟", "让场上的尸核同时敲出脉冲。")
+		_append_upgrade_candidate(candidates, "choir", _is_upgrade_available("choir", _choir_level), "尸钟合唱", "调度多颗尸核同时向怪群合唱压进。")
+	elif _is_illusionist_character():
+		_append_upgrade_candidate(candidates, "mirrorbolt", _is_upgrade_available("mirrorbolt", _mirrorbolt_level), "镜折弹 +1", "提高镜折弹伤害、穿透和多点镜射频率。")
+		_append_upgrade_candidate(candidates, "afterimage", _is_upgrade_available("afterimage", _afterimage_level), "残像", "留下更多、持续更久的残像作为火点。")
+		_append_upgrade_candidate(candidates, "switchstep", _is_upgrade_available("switchstep", _switchstep_level), "换幕步", "和远端残像换位，同时在两端引爆。")
+		_append_upgrade_candidate(candidates, "prismdance", _is_upgrade_available("prismdance", _prismdance_level), "棱镜舞台", "让本体和残像一起开火，织出镜廊火网。")
 	else:
 		_append_upgrade_candidate(candidates, "bolt", _is_upgrade_available("bolt", _bolt_level), "奥术箭 +1", "提升奥术箭伤害、数量与穿透。")
 		_append_upgrade_candidate(candidates, "orbit", _is_upgrade_available("orbit", _orbit_level), "环轨核心", "新增或强化环绕法术卫星。")
@@ -4581,6 +6121,21 @@ func _build_combo_upgrade_choices() -> Array[Dictionary]:
 		_append_combo_upgrade_candidate(candidates, "ward", _is_upgrade_available("ward", _ward_level), "守卫环", "召出围绕自身旋转的守卫，用持续碰撞顶住贴脸敌人。", ["守卫", "护体", "持续"], "守点路线的核心组件。", "skill", Color(0.78, 0.98, 0.90))
 		_append_combo_upgrade_candidate(candidates, "beacon", _is_upgrade_available("beacon", _beacon_level), "回声信标", "在前场放下一座脉冲信标，持续压制固定区域。", ["信标", "控区", "持续"], "适合和中继线一起把战场钉在前方。", "skill", Color(0.84, 0.98, 0.92))
 		_append_combo_upgrade_candidate(candidates, "relay", _is_upgrade_available("relay", _relay_level), "中继线", "把自己、守卫和信标连成伤害线，对穿线目标持续施压。", ["直线", "联动", "站场"], "守卫越多，信标越稳，中继线越有压制感。", "skill", Color(0.92, 0.98, 0.94))
+	elif _is_blood_hunter_character():
+		_append_combo_upgrade_candidate(candidates, "oathshot", _is_upgrade_available("oathshot", _oathshot_level), "血誓箭 +1", "继续提高追猎箭的数量、伤害与穿透；生命越低，收益越夸张。", ["血契", "远程", "追猎"], "残血时会明显抬高整轮压线能力。", "skill", Color(0.96, 0.26, 0.34))
+		_append_combo_upgrade_candidate(candidates, "brand", _is_upgrade_available("brand", _brand_level), "猎誓烙印", "给前场目标挂上烙印，被收掉时会直接回命并炸出补伤。", ["烙印", "收割", "续航"], "先贴烙印，再去穿心或拖进血沼。", "skill", Color(1.0, 0.68, 0.72))
+		_append_combo_upgrade_candidate(candidates, "bloodtrail", _is_upgrade_available("bloodtrail", _bloodtrail_level), "血潮沼", "留下会反复脉冲的血沼，专门把追兵磨成回收区。", ["区域", "回收", "残血"], "适合边退边收，把地图刷成血线交换场。", "skill", Color(0.92, 0.40, 0.46))
+		_append_combo_upgrade_candidate(candidates, "verdict", _is_upgrade_available("verdict", _verdict_level), "誓刃穿心", "朝前切出一记长线处决，把被烙印的目标直接穿掉。", ["斩线", "处决", "爆发"], "用来接烙印和残局收头最凶。", "skill", Color(1.0, 0.82, 0.84))
+	elif _is_grave_caller_character():
+		_append_combo_upgrade_candidate(candidates, "dirge", _is_upgrade_available("dirge", _dirge_level), "挽歌 +1", "持续提高挽歌弹的数量、伤害和收线密度。", ["尸核", "远程", "引子"], "先把挽歌补顺，尸核生成的节奏才够快。", "skill", Color(0.58, 0.88, 0.78))
+		_append_combo_upgrade_candidate(candidates, "wake", _is_upgrade_available("wake", _wake_level), "起灵", "把尸核直接翻成下一波爆发，能把残局续成新一轮火力。", ["尸核", "回收", "爆发"], "先有尸核再起灵，越打越厚。", "skill", Color(0.82, 0.98, 0.92))
+		_append_combo_upgrade_candidate(candidates, "toll", _is_upgrade_available("toll", _toll_level), "丧钟", "让场上的尸核同时敲出脉冲，压住怪潮再接挽歌。", ["脉冲", "控场", "尸核"], "适合把散落残局重新钉回一片。", "skill", Color(0.68, 0.96, 0.88))
+		_append_combo_upgrade_candidate(candidates, "choir", _is_upgrade_available("choir", _choir_level), "尸钟合唱", "调度多颗尸核同时开火，从多点往同一片怪群合唱压进。", ["合唱", "多点", "齐射"], "是把尸核路线推成高峰值爆发的关键。", "skill", Color(0.92, 1.0, 0.96))
+	elif _is_illusionist_character():
+		_append_combo_upgrade_candidate(candidates, "mirrorbolt", _is_upgrade_available("mirrorbolt", _mirrorbolt_level), "镜折弹 +1", "提高镜折弹的伤害、穿透和多点镜射频率。", ["镜射", "远程", "假身"], "假身越多，这张卡越像全图齐射。", "skill", Color(0.86, 0.72, 1.0))
+		_append_combo_upgrade_candidate(candidates, "afterimage", _is_upgrade_available("afterimage", _afterimage_level), "残像", "留下更多、持续更久的残像，把火点和换位口都铺开。", ["残像", "布点", "戏法"], "整套玩法的舞台基础。", "skill", Color(0.96, 0.88, 1.0))
+		_append_combo_upgrade_candidate(candidates, "switchstep", _is_upgrade_available("switchstep", _switchstep_level), "换幕步", "和远端残像换位，同时在换出点和落点各炸一轮。", ["换位", "爆发", "脱身"], "最能把追兵带偏的一张牌。", "skill", Color(0.80, 0.72, 0.98))
+		_append_combo_upgrade_candidate(candidates, "prismdance", _is_upgrade_available("prismdance", _prismdance_level), "棱镜舞台", "让本体和多处残像一起开火，把直线火力拆成镜廊火网。", ["多点", "舞台", "齐射"], "把单点风筝抬成整片镜场。", "skill", Color(0.98, 0.92, 1.0))
 	else:
 		_append_combo_upgrade_candidate(candidates, "bolt", _is_upgrade_available("bolt", _bolt_level), "奥术箭 +1", "继续增加数量、穿透和基础输出，让远程清线更稳定。", ["奥术", "远程", "穿透"], "环轨和雷暴会把漏掉的敌人补进奥术箭线路。", "skill", Color(0.44, 0.84, 1.0))
 		_append_combo_upgrade_candidate(candidates, "orbit", _is_upgrade_available("orbit", _orbit_level), "环轨核心", "新增或强化环轨卫星，补出贴身护体层。", ["召唤", "护体", "轨道"], "适合搭配新星做近身爆发联动。", "skill", Color(0.42, 0.98, 0.90))
@@ -4739,6 +6294,30 @@ func _get_upgrade_progress_value(key: String) -> int:
 			return _beacon_level
 		"relay":
 			return _relay_level
+		"oathshot":
+			return _oathshot_level
+		"brand":
+			return _brand_level
+		"bloodtrail":
+			return _bloodtrail_level
+		"verdict":
+			return _verdict_level
+		"dirge":
+			return _dirge_level
+		"wake":
+			return _wake_level
+		"toll":
+			return _toll_level
+		"choir":
+			return _choir_level
+		"mirrorbolt":
+			return _mirrorbolt_level
+		"afterimage":
+			return _afterimage_level
+		"switchstep":
+			return _switchstep_level
+		"prismdance":
+			return _prismdance_level
 		"stride":
 			return _stride_level
 		"vitality":
@@ -4795,6 +6374,54 @@ func _get_upgrade_short_label(key: String) -> String:
 			return "雷球领域"
 		"ascension":
 			return "雷霆进化"
+		"flask":
+			return "裂解瓶"
+		"miasma":
+			return "毒雾"
+		"shardburst":
+			return "碎片喷射"
+		"catalyst":
+			return "催化反应"
+		"needle":
+			return "穿针"
+		"volley":
+			return "散羽齐射"
+		"glaive":
+			return "回旋刀"
+		"trail":
+			return "穿林迹"
+		"pulse":
+			return "谐振脉冲"
+		"ward":
+			return "守卫环"
+		"beacon":
+			return "信标"
+		"relay":
+			return "中继线"
+		"oathshot":
+			return "血誓箭"
+		"brand":
+			return "猎誓烙印"
+		"bloodtrail":
+			return "血潮沼"
+		"verdict":
+			return "誓刃穿心"
+		"dirge":
+			return "挽歌"
+		"wake":
+			return "起灵"
+		"toll":
+			return "丧钟"
+		"choir":
+			return "尸钟合唱"
+		"mirrorbolt":
+			return "镜折弹"
+		"afterimage":
+			return "残像"
+		"switchstep":
+			return "换幕步"
+		"prismdance":
+			return "棱镜舞台"
 		"stride":
 			return "步幅矩阵"
 		"vitality":
@@ -4851,6 +6478,30 @@ func _get_upgrade_short_label_v2(key: String) -> String:
 			return "信标"
 		"relay":
 			return "中继线"
+		"oathshot":
+			return "血誓箭"
+		"brand":
+			return "猎誓烙印"
+		"bloodtrail":
+			return "血潮沼"
+		"verdict":
+			return "誓刃穿心"
+		"dirge":
+			return "挽歌"
+		"wake":
+			return "起灵"
+		"toll":
+			return "丧钟"
+		"choir":
+			return "尸钟合唱"
+		"mirrorbolt":
+			return "镜折弹"
+		"afterimage":
+			return "残像"
+		"switchstep":
+			return "换幕步"
+		"prismdance":
+			return "棱镜舞台"
 		_:
 			return _get_upgrade_short_label(key)
 
@@ -5377,6 +7028,30 @@ func _apply_character_upgrade_choice(index: int) -> void:
 			_beacon_level += 1
 		"relay":
 			_relay_level += 1
+		"oathshot":
+			_oathshot_level += 1
+		"brand":
+			_brand_level += 1
+		"bloodtrail":
+			_bloodtrail_level += 1
+		"verdict":
+			_verdict_level += 1
+		"dirge":
+			_dirge_level += 1
+		"wake":
+			_wake_level += 1
+		"toll":
+			_toll_level += 1
+		"choir":
+			_choir_level += 1
+		"mirrorbolt":
+			_mirrorbolt_level += 1
+		"afterimage":
+			_afterimage_level += 1
+		"switchstep":
+			_switchstep_level += 1
+		"prismdance":
+			_prismdance_level += 1
 		"mut_flame_split":
 			_flame_split_mutation = true
 		"mut_rend":
@@ -5423,14 +7098,6 @@ func _apply_character_upgrade_choice(index: int) -> void:
 	if _experience >= _xp_to_next:
 		_open_level_up()
 	return
-	_show_message("强化完成：%s" % String(choice.get("title", "技能")), Color(0.84, 0.96, 1.0), 1.8)
-	_show_message("强化完成：%s" % String(choice.get("title", "技能")), Color(0.84, 0.96, 1.0), 1.8)
-	_update_character_hud_v2()
-
-	_state = GameState.PLAYING
-	_set_pause_state(false)
-	if _experience >= _xp_to_next:
-		_open_level_up()
 
 
 func _apply_upgrade_choice(index: int) -> void:
@@ -5737,6 +7404,159 @@ func _build_hud_skill_entries() -> Array[Dictionary]:
 				"布线"
 			),
 		]
+	if _is_blood_hunter_character():
+		return [
+			_make_hud_skill_entry(
+				"血誓箭",
+				"oathshot",
+				_oathshot_level,
+				true,
+				false,
+				maxf(_oathshot_timer, 0.0),
+				_get_oathshot_cooldown(),
+				Color(0.96, 0.28, 0.34),
+				"血誓箭 Lv.%d\n箭数 %d，穿透 %d\n伤害 %d，当前残血倍率 x%.2f，冷却 %.2fs" % [_oathshot_level, _get_oathshot_count(), _get_oathshot_pierce(), _get_oathshot_damage(), _get_blood_bonus_multiplier(), _get_oathshot_cooldown()],
+				"x%d" % _get_oathshot_count() if _get_oathshot_count() > 1 else ""
+			),
+			_make_hud_skill_entry(
+				"猎誓烙印",
+				"brand",
+				_brand_level,
+				_brand_level > 0,
+				false,
+				maxf(_brand_timer, 0.0),
+				_get_brand_cooldown(),
+				Color(1.0, 0.70, 0.74),
+				"猎誓烙印 Lv.%d\n目标 %d，直伤 %d\n标记击杀回血 %d，并在周围炸裂一次，冷却 %.1fs" % [_brand_level, _get_brand_target_count(), _get_brand_damage(), _get_brand_heal(), _get_brand_cooldown()],
+				"x%d" % _get_brand_target_count()
+			),
+			_make_hud_skill_entry(
+				"血潮沼",
+				"bloodtrail",
+				_bloodtrail_level,
+				_bloodtrail_level > 0,
+				false,
+				maxf(_bloodtrail_timer, 0.0),
+				_get_bloodtrail_cooldown(),
+				Color(0.92, 0.40, 0.46),
+				"血潮沼 Lv.%d\n半径 %.0f，持续 %.1fs\n每跳伤害 %d，最多存在 %d 片，冷却 %.1fs" % [_bloodtrail_level, _get_bloodtrail_radius(), _get_bloodtrail_duration(), _get_bloodtrail_damage(), _get_bloodtrail_limit(), _get_bloodtrail_cooldown()],
+				"x%d" % _get_bloodtrail_limit()
+			),
+			_make_hud_skill_entry(
+				"誓刃穿心",
+				"verdict",
+				_verdict_level,
+				_verdict_level > 0,
+				false,
+				maxf(_verdict_timer, 0.0),
+				_get_verdict_cooldown(),
+				Color(1.0, 0.84, 0.86),
+				"誓刃穿心 Lv.%d\n距离 %.0f，线宽 %.0f\n伤害 %d，终点会引爆附近烙印目标，冷却 %.1fs" % [_verdict_level, _get_verdict_range(), _get_verdict_width(), _get_verdict_damage(), _get_verdict_cooldown()],
+				"处决"
+			),
+		]
+	if _is_grave_caller_character():
+		return [
+			_make_hud_skill_entry(
+				"挽歌",
+				"dirge",
+				_dirge_level,
+				true,
+				false,
+				maxf(_dirge_timer, 0.0),
+				_get_dirge_cooldown(),
+				Color(0.58, 0.88, 0.78),
+				"挽歌 Lv.%d\n齐射数 %d，伤害 %d\n可用尸核上限 %d，冷却 %.2fs" % [_dirge_level, _get_dirge_count(), _get_dirge_damage(), _get_grave_token_limit(), _get_dirge_cooldown()],
+				"x%d" % _get_dirge_count() if _get_dirge_count() > 1 else ""
+			),
+			_make_hud_skill_entry(
+				"起灵",
+				"wake",
+				_wake_level,
+				_wake_level > 0,
+				false,
+				maxf(_wake_timer, 0.0),
+				_get_wake_cooldown(),
+				Color(0.84, 0.98, 0.92),
+				"起灵 Lv.%d\n消耗尸核 %d，爆裂伤害 %d\n会从尸核位置续出下一发挽歌，冷却 %.1fs" % [_wake_level, _get_wake_consume_count(), _get_wake_damage(), _get_wake_cooldown()],
+				"核%d" % _get_wake_consume_count()
+			),
+			_make_hud_skill_entry(
+				"丧钟",
+				"toll",
+				_toll_level,
+				_toll_level > 0,
+				false,
+				maxf(_toll_timer, 0.0),
+				_get_toll_cooldown(),
+				Color(0.68, 0.96, 0.88),
+				"丧钟 Lv.%d\n敲响尸核 %d 个\n半径 %.0f，伤害 %d，冷却 %.1fs" % [_toll_level, _get_toll_pulse_count(), _get_toll_radius(), _get_toll_damage(), _get_toll_cooldown()],
+				"x%d" % _get_toll_pulse_count()
+			),
+			_make_hud_skill_entry(
+				"尸钟合唱",
+				"choir",
+				_choir_level,
+				_choir_level > 0,
+				false,
+				maxf(_choir_timer, 0.0),
+				_get_choir_cooldown(),
+				Color(0.92, 1.0, 0.96),
+				"尸钟合唱 Lv.%d\n消耗尸核 %d，每核射出 %d 发\n单发伤害 %d，冷却 %.1fs" % [_choir_level, _get_choir_consume_count(), _get_choir_projectile_count(), _get_choir_damage(), _get_choir_cooldown()],
+				"唱%d" % _get_choir_projectile_count()
+			),
+		]
+	if _is_illusionist_character():
+		return [
+			_make_hud_skill_entry(
+				"镜折弹",
+				"mirrorbolt",
+				_mirrorbolt_level,
+				true,
+				false,
+				maxf(_mirrorbolt_timer, 0.0),
+				_get_mirrorbolt_cooldown(),
+				Color(0.86, 0.72, 1.0),
+				"镜折弹 Lv.%d\n单发伤害 %d\n最多借用 %d 个残像镜位同时开火，冷却 %.2fs" % [_mirrorbolt_level, _get_mirrorbolt_damage(), _get_mirrorbolt_decoy_count(), _get_mirrorbolt_cooldown()],
+				"镜%d" % _get_mirrorbolt_decoy_count()
+			),
+			_make_hud_skill_entry(
+				"残像",
+				"afterimage",
+				_afterimage_level,
+				_afterimage_level > 0,
+				false,
+				maxf(_afterimage_timer, 0.0),
+				_get_afterimage_cooldown(),
+				Color(0.96, 0.88, 1.0),
+				"残像 Lv.%d\n最多存在 %d 个，持续 %.1fs\n当前场上残像 %d，冷却 %.1fs" % [_afterimage_level, _get_afterimage_limit(), _get_afterimage_duration(), _illusion_decoys.size(), _get_afterimage_cooldown()],
+				"x%d" % _get_afterimage_limit()
+			),
+			_make_hud_skill_entry(
+				"换幕步",
+				"switchstep",
+				_switchstep_level,
+				_switchstep_level > 0,
+				false,
+				maxf(_switchstep_timer, 0.0),
+				_get_switchstep_cooldown(),
+				Color(0.80, 0.72, 0.98),
+				"换幕步 Lv.%d\n换位爆炸半径 %.0f\n两端各造成 %d 伤害，冷却 %.1fs" % [_switchstep_level, _get_switchstep_radius(), _get_switchstep_damage(), _get_switchstep_cooldown()],
+				"换位"
+			),
+			_make_hud_skill_entry(
+				"棱镜舞台",
+				"prismdance",
+				_prismdance_level,
+				_prismdance_level > 0,
+				false,
+				maxf(_prismdance_timer, 0.0),
+				_get_prismdance_cooldown(),
+				Color(0.98, 0.92, 1.0),
+				"棱镜舞台 Lv.%d\n镜位来源 %d，每源发射 %d 发\n单发伤害 %d，冷却 %.1fs" % [_prismdance_level, _get_prismdance_origin_count(), _get_prismdance_projectile_count(), _get_prismdance_damage(), _get_prismdance_cooldown()],
+				"舞台"
+			),
+		]
 	if _is_thunder_character():
 		return [
 			_make_hud_skill_entry(
@@ -5950,6 +7770,30 @@ func _get_skill_tags(icon_id: String) -> Array[String]:
 			return ["[区域]", "[驻场]"]
 		"relay":
 			return ["[连线]", "[几何]"]
+		"oathshot":
+			return ["[血契]", "[追猎]"]
+		"brand":
+			return ["[烙印]", "[收割]"]
+		"bloodtrail":
+			return ["[区域]", "[换血]"]
+		"verdict":
+			return ["[斩线]", "[处决]"]
+		"dirge":
+			return ["[尸核]", "[远程]"]
+		"wake":
+			return ["[起灵]", "[回收]"]
+		"toll":
+			return ["[丧钟]", "[控场]"]
+		"choir":
+			return ["[合唱]", "[齐射]"]
+		"mirrorbolt":
+			return ["[镜射]", "[远程]"]
+		"afterimage":
+			return ["[残像]", "[布点]"]
+		"switchstep":
+			return ["[换位]", "[戏法]"]
+		"prismdance":
+			return ["[舞台]", "[多点]"]
 		"chain":
 			return ["[闪电]", "[连锁]"]
 		"detonate":
@@ -6071,6 +7915,30 @@ func _get_build_tag_summary() -> String:
 			tags.append("[信标]")
 		if _relay_level > 0:
 			tags.append("[连线]")
+	elif _is_blood_hunter_character():
+		tags = ["[血契]", "[收割]", "[换血]"]
+		if _brand_level > 0:
+			tags.append("[烙印]")
+		if _bloodtrail_level > 0:
+			tags.append("[血潮]")
+		if _verdict_level > 0:
+			tags.append("[处决]")
+	elif _is_grave_caller_character():
+		tags = ["[尸核]", "[回收]", "[调度]"]
+		if _wake_level > 0:
+			tags.append("[起灵]")
+		if _toll_level > 0:
+			tags.append("[丧钟]")
+		if _choir_level > 0:
+			tags.append("[合唱]")
+	elif _is_illusionist_character():
+		tags = ["[残像]", "[换位]", "[镜射]"]
+		if _afterimage_level > 0:
+			tags.append("[舞台]")
+		if _switchstep_level > 0:
+			tags.append("[戏法]")
+		if _prismdance_level > 0:
+			tags.append("[多点]")
 	elif _is_thunder_character():
 		tags = ["[闪电]", "[连锁]"]
 		if _detonate_level > 0:
@@ -6126,6 +7994,24 @@ func _get_map_rule_status_text() -> String:
 			if _void_spore_blessing_timer > 0.0:
 				return "孢爆余势 %.0fs" % _void_spore_blessing_timer
 			return "沼泽池 %d" % _void_pools.size() if _map_rule_active else "沼泽未沸腾"
+		"bridge_train":
+			if not _train_car_zones.is_empty():
+				return "跨车 %d/%d" % [_train_car_active_index, _train_car_zones.size()]
+			if _train_rush_timer > 0.0:
+				return "列车稳速 %.0fs" % _train_rush_timer
+			return "车节待现身"
+		"black_fog_hunt":
+			if _fog_brazier_zone != null and is_instance_valid(_fog_brazier_zone):
+				return "点灯 %.0f%%" % (_fog_brazier_progress * 100.0)
+			if _fog_light_timer > 0.0:
+				return "光域 %.0fs" % _fog_light_timer
+			return "黑雾逼近"
+		"airship_breach":
+			if _airship_breach_zone != null and is_instance_valid(_airship_breach_zone):
+				return "封舱 %.0f%%" % (_airship_breach_progress * 100.0)
+			if _airship_tailwind_timer > 0.0:
+				return "顺风炮列 %.0fs" % _airship_tailwind_timer
+			return "裂口待封堵"
 		_:
 			return "规则平稳"
 
@@ -6337,6 +8223,12 @@ func _get_player_speed() -> float:
 		base_speed = 258.0
 	elif _is_warden_character():
 		base_speed = 236.0
+	elif _is_blood_hunter_character():
+		base_speed = 252.0
+	elif _is_grave_caller_character():
+		base_speed = 232.0
+	elif _is_illusionist_character():
+		base_speed = 262.0
 	if _clock_overdrive_timer > 0.0:
 		base_speed += 26.0
 	return base_speed + float(_stride_level) * 22.0
@@ -6348,10 +8240,18 @@ func _get_player_max_health() -> int:
 		base_health = 10
 	elif _is_thunder_character():
 		base_health = 9
+	elif _is_alchemist_character():
+		base_health = 8
 	elif _is_ranger_character():
 		base_health = 7
 	elif _is_warden_character():
 		base_health = 11
+	elif _is_blood_hunter_character():
+		base_health = 9
+	elif _is_grave_caller_character():
+		base_health = 9
+	elif _is_illusionist_character():
+		base_health = 7
 	return base_health + _vitality_level * 2
 
 
@@ -6367,6 +8267,12 @@ func _get_player_pickup_radius() -> float:
 		base_radius = 144.0
 	elif _is_warden_character():
 		base_radius = 136.0
+	elif _is_blood_hunter_character():
+		base_radius = 138.0
+	elif _is_grave_caller_character():
+		base_radius = 156.0
+	elif _is_illusionist_character():
+		base_radius = 146.0
 	return base_radius + float(_magnet_level) * 50.0
 
 
@@ -6382,6 +8288,8 @@ func _get_spell_power_multiplier() -> float:
 		multiplier += 0.12
 	if _clock_overdrive_timer > 0.0:
 		multiplier += 0.08
+	if _airship_tailwind_timer > 0.0:
+		multiplier += 0.16
 	return multiplier
 
 
@@ -6393,6 +8301,8 @@ func _get_xp_gain_multiplier() -> float:
 		multiplier += 0.14
 	if _prism_overcharge_timer > 0.0:
 		multiplier += 0.08
+	if _fog_light_timer > 0.0:
+		multiplier += 0.14
 	return multiplier
 
 
@@ -6406,6 +8316,10 @@ func _get_cooldown_multiplier() -> float:
 		multiplier *= 0.92
 	if _clock_overdrive_timer > 0.0:
 		multiplier *= 0.90
+	if _train_rush_timer > 0.0:
+		multiplier *= 0.88
+	if _airship_tailwind_timer > 0.0:
+		multiplier *= 0.88
 	return maxf(0.50, multiplier)
 
 
@@ -7196,6 +9110,24 @@ func _update_menu_preview() -> void:
 			"初始技能：谐振脉冲，近身脉冲压退敌群。",
 			"后续技能：守卫环、信标、中继线，适合守点和区域反压。",
 		]
+	elif _is_blood_hunter_character():
+		skill_lines = [
+			"角色：血誓猎手",
+			"初始技能：血誓箭，血线越低，整轮追猎火力越凶。",
+			"后续技能：猎誓烙印、血潮沼、誓刃穿心，主打换血收割和残局处决。",
+		]
+	elif _is_grave_caller_character():
+		skill_lines = [
+			"角色：墓潮号手",
+			"初始技能：挽歌，击杀会把战场慢慢变成可调度的尸核场。",
+			"后续技能：起灵、丧钟、尸钟合唱，擅长把残局翻成下一轮火力。",
+		]
+	elif _is_illusionist_character():
+		skill_lines = [
+			"角色：幻戏师",
+			"初始技能：镜折弹，会借残像和镜位把直线火力拆成多点镜射。",
+			"后续技能：残像、换幕步、棱镜舞台，适合打错位和舞台式多点压制。",
+		]
 	elif _is_thunder_character():
 		skill_lines = [
 			"角色：闪电哥",
@@ -7295,6 +9227,7 @@ func _on_orb_collected(orb: ExperienceOrb, value: int) -> void:
 func _on_enemy_defeated(enemy: EnemySoldier, experience_value: int) -> void:
 	_enemies.erase(enemy)
 	_clear_dot_damage_buffer(enemy)
+	var was_marked := _is_enemy_blood_marked(enemy)
 	_kills += 1
 	_spawn_orb(enemy.global_position, experience_value)
 	_award_score(_get_enemy_score_value(enemy))
@@ -7302,6 +9235,14 @@ func _on_enemy_defeated(enemy: EnemySoldier, experience_value: int) -> void:
 		_spawn_elite_cache(enemy.global_position)
 	if _is_thunder_character() and enemy != _boss_enemy:
 		_try_trigger_detonate(enemy.global_position)
+	if was_marked:
+		if _is_blood_hunter_character() and _player != null and is_instance_valid(_player):
+			_player.heal(_get_brand_heal())
+			_spawn_effect(enemy.global_position, _get_brand_burst_radius() * 0.92, Color(0.98, 0.30, 0.34), Color(1.0, 0.88, 0.84), 0.18)
+			_damage_enemies_in_radius(enemy.global_position, _get_brand_burst_radius(), _get_brand_burst_damage(), 180.0, 5)
+		_consume_blood_mark(enemy)
+	if _is_grave_caller_character() and not enemy.is_boss():
+		_spawn_grave_token(enemy.global_position)
 	if enemy == _boss_enemy:
 		_boss_enemy = null
 		_boss_spawned = false
@@ -7384,6 +9325,12 @@ func _spawn_boss_phase_reinforcements(phase_index: int) -> void:
 			roles = ["ranged", "control", "ranged", "elite"]
 		"clockwork_garden":
 			roles = ["fodder", "ranged", "elite", "fodder"]
+		"bridge_train":
+			roles = ["diver", "fodder", "elite", "ranged"]
+		"black_fog_hunt":
+			roles = ["control", "diver", "ranged", "elite"]
+		"airship_breach":
+			roles = ["ranged", "diver", "ranged", "elite"]
 		_:
 			roles = ["ranged", "diver", "control"]
 
@@ -7428,6 +9375,24 @@ func _trigger_map_boss_phase_burst(phase_index: int, heavy_pressure: bool) -> vo
 			var gear_burst_count := 1 + int(heavy_pressure or phase_index >= 2)
 			for _burst in range(gear_burst_count):
 				_spawn_gear_sweep_hazard()
+		"bridge_train":
+			if _train_car_zones.is_empty():
+				_spawn_train_cars()
+			if heavy_pressure or phase_index >= 2:
+				for burst_index in range(2 + int(heavy_pressure)):
+					_spawn_prelude_blast_marker(_player.global_position + Vector2(float(burst_index - 1) * 110.0, 0.0), 50.0, 0.10, 180.0, 0.66, Color(0.88, 0.94, 1.0), Color(1.0, 0.78, 0.44))
+		"black_fog_hunt":
+			if _fog_brazier_zone == null or not is_instance_valid(_fog_brazier_zone):
+				_spawn_black_fog_brazier()
+			var fog_burst_count := 1 + int(heavy_pressure or phase_index >= 2)
+			for _burst in range(fog_burst_count):
+				_trigger_black_fog_pulse()
+		"airship_breach":
+			if _airship_breach_zone == null or not is_instance_valid(_airship_breach_zone):
+				_spawn_airship_breach()
+			var gust_count := 1 + int(heavy_pressure or phase_index >= 2)
+			for _burst in range(gust_count):
+				_trigger_airship_gust(_player.global_position, 180.0 + float(phase_index) * 18.0)
 
 
 func _trigger_hard_mode_boss_phase_pressure(phase_index: int) -> void:
@@ -7684,6 +9649,18 @@ func _is_ranger_character() -> bool:
 
 func _is_warden_character() -> bool:
 	return _selected_character_id == "warden"
+
+
+func _is_blood_hunter_character() -> bool:
+	return _selected_character_id == "blood_hunter"
+
+
+func _is_grave_caller_character() -> bool:
+	return _selected_character_id == "grave_caller"
+
+
+func _is_illusionist_character() -> bool:
+	return _selected_character_id == "illusionist"
 
 
 func _get_current_map_name() -> String:
