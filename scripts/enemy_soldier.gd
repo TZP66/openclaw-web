@@ -9,6 +9,8 @@ const ELITE_AFFIX_COLORS := {
 	"snare": Color(0.80, 0.68, 1.0),
 	"deathburst": Color(1.0, 0.58, 0.30),
 	"dash": Color(0.64, 0.94, 1.0),
+	"siphon": Color(0.74, 1.0, 0.72),
+	"beacon": Color(1.0, 0.94, 0.58),
 }
 
 signal defeated(enemy, experience_value)
@@ -351,6 +353,27 @@ func _process_elite_affixes(delta: float, to_player: Vector2, direction: Vector2
 	if _has_elite_affix("hunter") and to_player.length() > 200.0 and int(_phase * 10.0) % 9 == 0:
 		_knockback += direction * 10.0 * delta
 
+	if _has_elite_affix("siphon"):
+		var siphon_timer := maxf(0.0, float(_elite_affix_timers.get("siphon", 0.0)) - delta)
+		_elite_affix_timers["siphon"] = siphon_timer
+		if siphon_timer <= 0.0:
+			var siphon_radius := _body_radius + 54.0
+			special_attack.emit(global_position, siphon_radius, Color(0.72, 1.0, 0.74), Color(0.24, 0.44, 0.26))
+			health = min(max_health, health + max(1, int(round(float(max_health) * 0.06))))
+			if _player_in_radius(global_position, siphon_radius):
+				target.take_damage(1 + int(_elite_wave_rank >= 8))
+			_elite_affix_timers["siphon"] = randf_range(4.2, 5.0)
+
+	if _has_elite_affix("beacon"):
+		var beacon_timer := maxf(0.0, float(_elite_affix_timers.get("beacon", 0.0)) - delta)
+		_elite_affix_timers["beacon"] = beacon_timer
+		if beacon_timer <= 0.0:
+			var beacon_radius := _body_radius + 68.0
+			special_attack.emit(global_position, beacon_radius, Color(1.0, 0.94, 0.62), Color(0.90, 0.56, 0.24))
+			if _player_in_radius(global_position, beacon_radius):
+				target.take_damage(1 + int(_elite_wave_rank >= 9))
+			_elite_affix_timers["beacon"] = randf_range(4.6, 5.8)
+
 
 func _use_storm_archon_skill(direction: Vector2) -> void:
 	_trigger_signature_burst("storm", 0.40)
@@ -676,9 +699,23 @@ func _check_boss_phase_transition() -> void:
 	var vitality_ratio := _get_effective_vitality_ratio()
 	while _boss_phase_index < _boss_phase_thresholds.size() and vitality_ratio <= float(_boss_phase_thresholds[_boss_phase_index]):
 		_boss_phase_index += 1
+		_body_radius += 3.0
+		speed *= 1.06
+		touch_damage += 1
+		_update_shape()
+		_refresh_model()
 		_special_timer = minf(_special_timer, 0.45)
 		_dash_time = 0.0
 		_dash_velocity = Vector2.ZERO
+		match archetype:
+			"storm_archon":
+				_trigger_signature_burst("storm", 0.56)
+			"forge_tyrant":
+				_trigger_signature_burst("forge", 0.56)
+			"void_matriarch":
+				_trigger_signature_burst("void", 0.56)
+			_:
+				_trigger_signature_burst("dash", 0.40)
 		queue_redraw()
 		boss_phase_changed.emit(self, _boss_phase_index)
 
@@ -713,6 +750,10 @@ func _configure_elite_affixes(options: Dictionary) -> void:
 				_elite_affix_timers["dash"] = randf_range(1.2, 2.1)
 			"snare":
 				_elite_affix_timers["snare"] = randf_range(1.6, 2.8)
+			"siphon":
+				_elite_affix_timers["siphon"] = randf_range(1.8, 2.8)
+			"beacon":
+				_elite_affix_timers["beacon"] = randf_range(2.2, 3.4)
 
 
 func _has_elite_affix(affix_id: String) -> bool:
@@ -741,6 +782,11 @@ func _trigger_elite_death_affixes() -> void:
 
 	if _has_elite_affix("splitter"):
 		summon_requested.emit(global_position, _get_splitter_spawn_type(), 2, 126.0)
+	if _has_elite_affix("beacon"):
+		var flare_radius := _body_radius + 56.0
+		special_attack.emit(global_position, flare_radius, Color(1.0, 0.92, 0.62), Color(0.98, 0.42, 0.20))
+		if _player_in_radius(global_position, flare_radius):
+			target.take_damage(1 + int(_elite_wave_rank >= 8))
 
 
 func _get_splitter_spawn_type() -> String:
@@ -771,6 +817,10 @@ func _get_elite_affix_label(affix_id: String) -> String:
 			return "死后爆裂"
 		"dash":
 			return "周期冲锋"
+		"siphon":
+			return "吸生脉冲"
+		"beacon":
+			return "追光信标"
 		_:
 			return affix_id
 

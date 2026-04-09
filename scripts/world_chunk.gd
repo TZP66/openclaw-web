@@ -34,17 +34,23 @@ func _draw() -> void:
 	match style_id:
 		"bridge_train":
 			_draw_bridge_train_tracks()
+			_draw_bridge_train_break_zones()
 			_draw_bridge_train_girders()
+			_draw_bridge_train_alert_net()
 			_draw_bridge_train_signals()
 			_draw_bridge_train_debris()
 		"black_fog_hunt":
 			_draw_black_fog_trails()
+			_draw_black_fog_wall_ribbons()
 			_draw_black_fog_bands()
+			_draw_black_fog_false_beacons()
 			_draw_black_fog_lanterns()
 			_draw_black_fog_embers()
 		"airship_breach":
 			_draw_airship_deck_panels()
+			_draw_airship_warning_lanes()
 			_draw_airship_breach_rifts()
+			_draw_airship_torn_armor()
 			_draw_airship_wind_trails()
 			_draw_airship_sky_debris()
 		"ember_forge":
@@ -429,6 +435,38 @@ func _draw_bridge_train_tracks() -> void:
 			draw_line(Vector2(stripe_x, y - 52.0), Vector2(stripe_x + 44.0, y - 44.0), stripe_color, 3.0)
 
 
+func _draw_bridge_train_break_zones() -> void:
+	var rng := _make_rng(467)
+	for lane_index in range(3):
+		var y := 220.0 + float(lane_index) * 300.0 + rng.randf_range(-18.0, 18.0)
+		var break_center_x := 300.0 + float(lane_index) * 360.0 + rng.randf_range(-36.0, 72.0)
+		var gap_width := rng.randf_range(180.0, 260.0)
+		var outer_rect := Rect2(Vector2(break_center_x - gap_width * 0.5, y - 82.0), Vector2(gap_width, 164.0))
+		var inner_rect := outer_rect.grow_individual(-18.0, -22.0, -18.0, -22.0)
+		draw_rect(outer_rect, Color(0.06, 0.06, 0.08, 0.62))
+		draw_rect(inner_rect, Color(0.02, 0.02, 0.03, 0.78))
+		_draw_warning_chevrons(outer_rect.grow(-10.0), Color(1.0, 0.74, 0.26, 0.44), Color(0.16, 0.10, 0.08, 0.40), 30.0)
+		var cut_left := break_center_x - gap_width * 0.5
+		var cut_right := break_center_x + gap_width * 0.5
+		for rail_offset in [-18.0, 18.0]:
+			draw_line(Vector2(cut_left - 86.0, y + rail_offset), Vector2(cut_left - 8.0, y + rail_offset), Color(0.74, 0.76, 0.80, 0.44), 3.4)
+			draw_line(Vector2(cut_right + 8.0, y + rail_offset), Vector2(cut_right + 86.0, y + rail_offset), Color(0.74, 0.76, 0.80, 0.44), 3.4)
+			draw_line(Vector2(cut_left - 12.0, y + rail_offset - 7.0), Vector2(cut_left + 16.0, y + rail_offset + 7.0), Color(1.0, 0.82, 0.48, 0.22), 2.0)
+			draw_line(Vector2(cut_right - 16.0, y + rail_offset - 7.0), Vector2(cut_right + 12.0, y + rail_offset + 7.0), Color(1.0, 0.82, 0.48, 0.22), 2.0)
+		for beacon_side in [-1.0, 1.0]:
+			var beacon := Vector2(break_center_x + beacon_side * (gap_width * 0.5 + 26.0), y - 56.0)
+			draw_circle(beacon, 7.0, Color(1.0, 0.72, 0.28, 0.54))
+			draw_circle(beacon, 18.0, Color(1.0, 0.70, 0.28, 0.16))
+			draw_arc(beacon, 28.0, 0.0, TAU, 18, Color(1.0, 0.86, 0.52, 0.12), 1.4)
+		for spark_index in range(8):
+			var spark_origin := Vector2(
+				break_center_x + rng.randf_range(-gap_width * 0.28, gap_width * 0.28),
+				y + rng.randf_range(-58.0, 58.0)
+			)
+			var spark_end := spark_origin + Vector2(rng.randf_range(-12.0, 12.0), rng.randf_range(-18.0, 18.0))
+			draw_line(spark_origin, spark_end, Color(1.0, 0.84, 0.44, 0.22), 1.4)
+
+
 func _draw_bridge_train_girders() -> void:
 	var rng := _make_rng(479)
 	for col in range(5):
@@ -442,6 +480,25 @@ func _draw_bridge_train_girders() -> void:
 		var origin := Vector2(rng.randf_range(80.0, chunk_size.x - 260.0), rng.randf_range(120.0, chunk_size.y - 120.0))
 		var span := rng.randf_range(120.0, 260.0)
 		draw_line(origin, origin + Vector2(span, rng.randf_range(-20.0, 20.0)), Color(0.30, 0.30, 0.33, 0.30), 6.0)
+
+
+func _draw_bridge_train_alert_net() -> void:
+	var rng := _make_rng(487)
+	for lane_index in range(3):
+		var y := 208.0 + float(lane_index) * 300.0 + rng.randf_range(-12.0, 12.0)
+		var left_x := 110.0 + rng.randf_range(-20.0, 20.0)
+		var right_x := chunk_size.x - 110.0 + rng.randf_range(-20.0, 20.0)
+		draw_line(Vector2(left_x, y - 92.0), Vector2(right_x, y - 92.0), Color(1.0, 0.78, 0.34, 0.14), 2.4)
+		draw_line(Vector2(left_x, y + 92.0), Vector2(right_x, y + 92.0), Color(1.0, 0.78, 0.34, 0.14), 2.4)
+		for post_index in range(6):
+			var x := 120.0 + float(post_index) * 270.0 + rng.randf_range(-14.0, 14.0)
+			draw_line(Vector2(x, y - 102.0), Vector2(x, y - 70.0), Color(0.24, 0.24, 0.26, 0.38), 3.0)
+			draw_line(Vector2(x, y + 70.0), Vector2(x, y + 102.0), Color(0.24, 0.24, 0.26, 0.38), 3.0)
+	for tape_index in range(7):
+		var start := Vector2(80.0 + float(tape_index) * 210.0, 120.0 + rng.randf_range(0.0, chunk_size.y - 240.0))
+		var end := start + Vector2(rng.randf_range(90.0, 180.0), rng.randf_range(-40.0, 40.0))
+		draw_line(start, end, Color(1.0, 0.84, 0.42, 0.18), 4.2)
+		draw_line(start + Vector2(0.0, 6.0), end + Vector2(0.0, 6.0), Color(0.18, 0.14, 0.10, 0.20), 2.2)
 
 
 func _draw_bridge_train_signals() -> void:
@@ -494,6 +551,29 @@ func _draw_black_fog_trails() -> void:
 			previous = current
 
 
+func _draw_black_fog_wall_ribbons() -> void:
+	var rng := _make_rng(533)
+	for ribbon_index in range(5):
+		var center := Vector2(
+			220.0 + float(ribbon_index) * 280.0 + rng.randf_range(-44.0, 44.0),
+			160.0 + rng.randf_range(0.0, chunk_size.y - 320.0)
+		)
+		var span := rng.randf_range(280.0, 520.0)
+		var angle := rng.randf_range(-0.48, 0.48)
+		var direction := Vector2.RIGHT.rotated(angle)
+		var side := direction.orthogonal()
+		var width := rng.randf_range(54.0, 92.0)
+		var fog_band := PackedVector2Array([
+			center - direction * span * 0.5 - side * width,
+			center + direction * span * 0.5 - side * width * 0.42,
+			center + direction * span * 0.5 + side * width,
+			center - direction * span * 0.5 + side * width * 0.42,
+		])
+		draw_colored_polygon(fog_band, Color(0.02, 0.04, 0.05, 0.26))
+		draw_line(center - direction * span * 0.5, center + direction * span * 0.5, Color(0.58, 0.84, 0.74, 0.08), 2.2)
+		draw_line(center - direction * span * 0.5 + side * width * 0.36, center + direction * span * 0.5 + side * width * 0.18, Color(0.76, 0.98, 0.88, 0.06), 1.8)
+
+
 func _draw_black_fog_bands() -> void:
 	var rng := _make_rng(541)
 	for _fog_layer in range(16):
@@ -507,6 +587,29 @@ func _draw_black_fog_bands() -> void:
 	for column in range(7):
 		var x := 80.0 + float(column) * 240.0
 		draw_rect(Rect2(Vector2(x, 0.0), Vector2(80.0, chunk_size.y)), Color(0.03, 0.04, 0.05, 0.10))
+
+
+func _draw_black_fog_false_beacons() -> void:
+	var rng := _make_rng(547)
+	for _beacon in range(9):
+		var center := Vector2(
+			rng.randf_range(100.0, chunk_size.x - 100.0),
+			rng.randf_range(100.0, chunk_size.y - 100.0)
+		)
+		var is_false := rng.randf() < 0.55
+		var mast_height := rng.randf_range(24.0, 54.0)
+		draw_line(center + Vector2(0.0, mast_height), center, Color(0.06, 0.08, 0.09, 0.42), 2.8)
+		if is_false:
+			draw_circle(center, 4.6, Color(1.0, 0.74, 0.42, 0.20))
+			draw_circle(center + Vector2(8.0, -3.0), 3.4, Color(0.72, 0.98, 0.86, 0.18))
+			draw_arc(center, 18.0, 0.2, PI - 0.2, 16, Color(1.0, 0.78, 0.42, 0.10), 1.2)
+			draw_line(center + Vector2(-10.0, -10.0), center + Vector2(10.0, 10.0), Color(0.86, 0.96, 0.88, 0.12), 1.2)
+			draw_line(center + Vector2(-10.0, 10.0), center + Vector2(10.0, -10.0), Color(0.86, 0.96, 0.88, 0.12), 1.2)
+		else:
+			draw_circle(center, 5.2, Color(0.72, 1.0, 0.86, 0.34))
+			draw_circle(center, 18.0, Color(0.74, 0.98, 0.86, 0.10))
+			var beam_dir := Vector2.RIGHT.rotated(rng.randf_range(0.0, TAU))
+			draw_line(center, center + beam_dir * 48.0, Color(0.74, 0.98, 0.86, 0.14), 2.0)
 
 
 func _draw_black_fog_lanterns() -> void:
@@ -546,6 +649,20 @@ func _draw_airship_deck_panels() -> void:
 		draw_circle(center, 2.2, Color(0.84, 0.90, 0.94, 0.24))
 
 
+func _draw_airship_warning_lanes() -> void:
+	var rng := _make_rng(593)
+	for lane_index in range(4):
+		var y := 170.0 + float(lane_index) * 300.0 + rng.randf_range(-20.0, 20.0)
+		var lane_rect := Rect2(Vector2(60.0, y - 34.0), Vector2(chunk_size.x - 120.0, 68.0))
+		_draw_warning_chevrons(lane_rect, Color(1.0, 0.78, 0.30, 0.20), Color(0.10, 0.12, 0.16, 0.16), 24.0)
+		draw_line(Vector2(80.0, y - 40.0), Vector2(chunk_size.x - 80.0, y - 40.0), Color(1.0, 0.86, 0.48, 0.12), 1.8)
+		draw_line(Vector2(80.0, y + 40.0), Vector2(chunk_size.x - 80.0, y + 40.0), Color(1.0, 0.86, 0.48, 0.12), 1.8)
+	for marker_index in range(8):
+		var marker := Vector2(100.0 + float(marker_index) * 180.0, 120.0 + rng.randf_range(0.0, chunk_size.y - 240.0))
+		draw_arc(marker, 20.0, -0.8, 0.8, 12, Color(1.0, 0.84, 0.42, 0.14), 1.4)
+		draw_arc(marker, 20.0, PI - 0.8, PI + 0.8, 12, Color(1.0, 0.84, 0.42, 0.14), 1.4)
+
+
 func _draw_airship_breach_rifts() -> void:
 	var rng := _make_rng(601)
 	for _rift in range(5):
@@ -561,6 +678,37 @@ func _draw_airship_breach_rifts() -> void:
 			var angle := TAU * float(fracture) / 6.0 + rng.randf_range(-0.22, 0.22)
 			var end := center + Vector2.RIGHT.rotated(angle) * (radius + rng.randf_range(28.0, 62.0))
 			draw_line(center, end, Color(0.74, 0.90, 1.0, 0.14), 1.8)
+
+
+func _draw_airship_torn_armor() -> void:
+	var rng := _make_rng(613)
+	for _plate in range(11):
+		var center := Vector2(
+			rng.randf_range(90.0, chunk_size.x - 90.0),
+			rng.randf_range(90.0, chunk_size.y - 90.0)
+		)
+		var size := rng.randf_range(28.0, 72.0)
+		var plate_points := PackedVector2Array([
+			center + Vector2(-size * 0.82, -size * 0.24),
+			center + Vector2(-size * 0.10, -size * 0.74),
+			center + Vector2(size * 0.70, -size * 0.16),
+			center + Vector2(size * 0.46, size * 0.64),
+			center + Vector2(-size * 0.54, size * 0.48),
+		])
+		draw_colored_polygon(plate_points, Color(0.30, 0.36, 0.42, 0.22))
+		draw_line(plate_points[0], plate_points[2], Color(0.84, 0.94, 1.0, 0.12), 1.2)
+		draw_line(plate_points[1], plate_points[4], Color(0.74, 0.88, 1.0, 0.08), 1.0)
+		for rivet in range(3):
+			var rivet_point := center + Vector2(rng.randf_range(-size * 0.30, size * 0.30), rng.randf_range(-size * 0.26, size * 0.26))
+			draw_circle(rivet_point, 1.8, Color(0.86, 0.90, 0.96, 0.22))
+	for vent_index in range(12):
+		var vent_origin := Vector2(
+			rng.randf_range(60.0, chunk_size.x - 140.0),
+			rng.randf_range(80.0, chunk_size.y - 80.0)
+		)
+		var vent_end := vent_origin + Vector2(rng.randf_range(46.0, 120.0), rng.randf_range(-18.0, 18.0))
+		draw_line(vent_origin, vent_end, Color(0.78, 0.92, 1.0, 0.16), 2.4)
+		draw_line(vent_origin + Vector2(0.0, 4.0), vent_end + Vector2(0.0, 4.0), Color(0.26, 0.40, 0.54, 0.12), 1.2)
 
 
 func _draw_airship_wind_trails() -> void:
@@ -590,6 +738,22 @@ func _draw_airship_sky_debris() -> void:
 		])
 		draw_colored_polygon(polygon, Color(0.36, 0.42, 0.50, 0.22))
 		draw_line(polygon[0], polygon[2], Color(0.80, 0.90, 1.0, 0.12), 1.2)
+
+
+func _draw_warning_chevrons(area: Rect2, stripe_color: Color, shadow_color: Color, stripe_width: float) -> void:
+	if area.size.x <= 0.0 or area.size.y <= 0.0 or stripe_width <= 0.0:
+		return
+	draw_rect(area, shadow_color)
+	var stripe_count := int(ceil((area.size.x + area.size.y) / stripe_width)) + 2
+	for stripe_index in range(stripe_count):
+		var x0 := area.position.x + float(stripe_index) * stripe_width - area.size.y
+		var stripe := PackedVector2Array([
+			Vector2(x0, area.position.y),
+			Vector2(x0 + stripe_width * 0.56, area.position.y),
+			Vector2(x0 + area.size.y + stripe_width * 0.56, area.position.y + area.size.y),
+			Vector2(x0 + area.size.y, area.position.y + area.size.y),
+		])
+		draw_colored_polygon(stripe, stripe_color)
 
 
 func _spawn_obstacles() -> void:
@@ -645,24 +809,24 @@ func _get_obstacle_palette() -> Dictionary:
 	match style_id:
 		"bridge_train":
 			return {
-				"body": Color(0.30, 0.31, 0.34),
-				"top": Color(0.88, 0.76, 0.42),
-				"detail": Color(0.14, 0.15, 0.18),
-				"glow": Color(1.0, 0.84, 0.46, 0.20),
+				"body": Color(0.28, 0.29, 0.32),
+				"top": Color(0.96, 0.78, 0.34),
+				"detail": Color(0.10, 0.11, 0.14),
+				"glow": Color(1.0, 0.86, 0.42, 0.26),
 			}
 		"black_fog_hunt":
 			return {
-				"body": Color(0.10, 0.13, 0.16),
-				"top": Color(0.62, 0.78, 0.70),
-				"detail": Color(0.04, 0.06, 0.08),
-				"glow": Color(0.74, 0.94, 0.84, 0.14),
+				"body": Color(0.08, 0.10, 0.12),
+				"top": Color(0.72, 0.90, 0.82),
+				"detail": Color(0.03, 0.04, 0.06),
+				"glow": Color(0.76, 0.98, 0.88, 0.20),
 			}
 		"airship_breach":
 			return {
-				"body": Color(0.26, 0.30, 0.34),
-				"top": Color(0.74, 0.90, 1.0),
-				"detail": Color(0.10, 0.14, 0.18),
-				"glow": Color(0.80, 0.96, 1.0, 0.22),
+				"body": Color(0.24, 0.28, 0.34),
+				"top": Color(0.82, 0.94, 1.0),
+				"detail": Color(0.08, 0.11, 0.15),
+				"glow": Color(0.86, 0.96, 1.0, 0.26),
 			}
 		"ember_forge":
 			return {

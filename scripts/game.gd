@@ -581,6 +581,114 @@ const ENDGAME_EVOLUTION_DEFINITIONS := {
 			"accent": Color(0.88, 0.90, 1.0),
 		},
 	],
+	"hunter_execution": [
+		{
+			"key": "evo_hunter_verdict_gallows",
+			"title": "终局分叉: 绞决长廊",
+			"desc": "誓刃穿心会追加两道交叉副刃，处决被烙印目标后大幅返还冷却。",
+			"tags": ["终局", "处决", "血契"],
+			"combo": "把裂心追猎推成一轮一轮的处决走廊。",
+			"accent": Color(1.0, 0.78, 0.82),
+		},
+		{
+			"key": "evo_hunter_blood_quarry",
+			"title": "终局分叉: 血猎回声",
+			"desc": "烙印击杀会朝周围目标自动再放出一轮血誓箭，并扩散次级烙印。",
+			"tags": ["终局", "追猎", "收割"],
+			"combo": "把单点收头滚成一片片连锁猎杀。",
+			"accent": Color(0.98, 0.56, 0.62),
+		},
+	],
+	"hunter_tide": [
+		{
+			"key": "evo_hunter_crimson_delta",
+			"title": "终局分叉: 赤潮三角洲",
+			"desc": "血潮沼半径更大、脉冲更密，被命中的敌人会被反复刻上烙印。",
+			"tags": ["终局", "血潮", "铺场"],
+			"combo": "把回收区扩成真正的整片血线交换场。",
+			"accent": Color(0.92, 0.40, 0.46),
+		},
+		{
+			"key": "evo_hunter_harvest_run",
+			"title": "终局分叉: 收血奔袭",
+			"desc": "烙印击杀会留下迷你血沼并追加追猎箭，越滚越快。",
+			"tags": ["终局", "回收", "滚雪球"],
+			"combo": "让血潮路线从慢磨变成高速连收。",
+			"accent": Color(1.0, 0.68, 0.72),
+		},
+	],
+	"grave_harvest": [
+		{
+			"key": "evo_grave_wake_engine",
+			"title": "终局分叉: 回生引擎",
+			"desc": "起灵与丧钟消耗的尸核会回生成弱化尸核，尸场循环不会断档。",
+			"tags": ["终局", "尸核", "回生"],
+			"combo": "把葬潮回收推成自我续航的尸核引擎。",
+			"accent": Color(0.78, 0.98, 0.90),
+		},
+		{
+			"key": "evo_grave_tide_bell",
+			"title": "终局分叉: 丧钟潮线",
+			"desc": "丧钟每次敲响都会额外放出追魂挽歌，并抬高尸核上限。",
+			"tags": ["终局", "丧钟", "追魂"],
+			"combo": "让控场钟声自己变成新一轮火力源。",
+			"accent": Color(0.62, 0.94, 0.86),
+		},
+	],
+	"grave_choir": [
+		{
+			"key": "evo_grave_cathedral",
+			"title": "终局分叉: 尸钟圣堂",
+			"desc": "尸钟合唱会借用全部尸核与本体同时齐射，合唱面积极大扩张。",
+			"tags": ["终局", "合唱", "齐射"],
+			"combo": "把尸钟合唱推成真正的多点炮阵。",
+			"accent": Color(0.90, 1.0, 0.96),
+		},
+		{
+			"key": "evo_grave_dirge_conductor",
+			"title": "终局分叉: 挽歌指挥",
+			"desc": "挽歌会借近身尸核继续分唱，尸核停留更久、数量更多。",
+			"tags": ["终局", "挽歌", "调度"],
+			"combo": "让指挥路线从平推变成层层续唱。",
+			"accent": Color(0.74, 0.98, 0.92),
+		},
+	],
+	"illusion_mirror": [
+		{
+			"key": "evo_illusion_kaleido_grid",
+			"title": "终局分叉: 万华镜阵",
+			"desc": "镜折弹和棱镜舞台会借用全部残像镜位，整张图会被拆成镜廊火网。",
+			"tags": ["终局", "镜阵", "多点"],
+			"combo": "把镜廊齐射推成满场镜位压制。",
+			"accent": Color(0.92, 0.86, 1.0),
+		},
+		{
+			"key": "evo_illusion_glass_bloom",
+			"title": "终局分叉: 碎镜繁花",
+			"desc": "镜折弹和棱镜舞台的弹体命中后会继续裂成次级镜片。",
+			"tags": ["终局", "碎镜", "分裂"],
+			"combo": "让镜射从整齐齐射变成密集繁花。",
+			"accent": Color(0.98, 0.92, 1.0),
+		},
+	],
+	"illusion_stage": [
+		{
+			"key": "evo_illusion_stage_heist",
+			"title": "终局分叉: 换幕劫场",
+			"desc": "换幕步在原地与落点都会留新残像，冷却明显缩短。",
+			"tags": ["终局", "换位", "戏法"],
+			"combo": "把换幕戏法推进成高频错位劫场。",
+			"accent": Color(0.86, 0.78, 1.0),
+		},
+		{
+			"key": "evo_illusion_prism_relay",
+			"title": "终局分叉: 棱镜接力",
+			"desc": "残像数量与持续时间暴涨，换位后会立刻追打一轮镜射。",
+			"tags": ["终局", "残像", "接力"],
+			"combo": "让舞台路线变成整场都在接力换幕。",
+			"accent": Color(0.94, 0.88, 1.0),
+		},
+	],
 }
 const THREAT_PHASE_TIMES := [60.0, 180.0, 300.0, 420.0, 540.0]
 const THREAT_PHASE_LABELS := [
@@ -899,6 +1007,82 @@ const MAP_DEFINITIONS := [
 		],
 	},
 ]
+const CONTRACT_SPAWN_TIMES := [135.0, 300.0, 465.0]
+const CONTRACT_DEFINITIONS := [
+	{
+		"id": "contract_crimson_clause",
+		"title": "猩红条款",
+		"desc": "生命上限 -2，但法术威力和得分倍率明显抬升。",
+		"detail": "把容错换成稳定输出，是最直接的压血契约。",
+		"accent": Color(0.96, 0.34, 0.40),
+		"effects": {
+			"max_health_penalty": 2,
+			"spell_power_bonus": 0.18,
+			"score_bonus": 0.18,
+		},
+	},
+	{
+		"id": "contract_clock_debt",
+		"title": "时钟负债",
+		"desc": "全技能冷却更紧，移速更快，但灾害与地图压迫也会更频繁。",
+		"detail": "适合敢抢节奏、敢顶风险的构筑。",
+		"accent": Color(0.74, 0.90, 1.0),
+		"effects": {
+			"cooldown_scale": 0.86,
+			"speed_bonus": 0.10,
+			"hazard_bonus": 0.18,
+		},
+	},
+	{
+		"id": "contract_grave_dividend",
+		"title": "墓息分红",
+		"desc": "经验和拾取范围上扬，但敌人整体生命也会更厚。",
+		"detail": "把刷成长的效率推高，同时让清怪门槛更扎实。",
+		"accent": Color(0.68, 0.96, 0.88),
+		"effects": {
+			"xp_bonus": 0.18,
+			"pickup_bonus": 36.0,
+			"enemy_health_bonus": 0.16,
+		},
+	},
+	{
+		"id": "contract_hunter_ledger",
+		"title": "猎账本",
+		"desc": "精英更常出现且额外带一层词缀，但会给出更高得分。",
+		"detail": "适合想把局内压迫换成高收益的高手局。",
+		"accent": Color(1.0, 0.82, 0.52),
+		"effects": {
+			"elite_spawn_bonus": 0.06,
+			"elite_affix_bonus": 1,
+			"score_bonus": 0.22,
+		},
+	},
+	{
+		"id": "contract_glass_stride",
+		"title": "玻璃步频",
+		"desc": "移速和经验收益更高，但生命上限再降 1 点。",
+		"detail": "让风筝路线更凶，也更容易被一波带走。",
+		"accent": Color(0.92, 0.92, 1.0),
+		"effects": {
+			"max_health_penalty": 1,
+			"speed_bonus": 0.16,
+			"xp_bonus": 0.12,
+		},
+	},
+	{
+		"id": "contract_void_margin",
+		"title": "虚域保证金",
+		"desc": "法术威力和冷却双抬升，但敌人也会更快、更硬。",
+		"detail": "纯粹把整局拉成高压高速交换。",
+		"accent": Color(0.84, 0.76, 1.0),
+		"effects": {
+			"spell_power_bonus": 0.14,
+			"cooldown_scale": 0.92,
+			"enemy_health_bonus": 0.10,
+			"enemy_speed_bonus": 0.08,
+		},
+	},
+]
 
 var _state: GameState = GameState.MENU
 
@@ -1008,6 +1192,29 @@ var _endless_enemy_speed_bonus: float = 0.0
 var _endless_enemy_health_bonus: float = 0.0
 var _endless_hazard_bonus: float = 0.0
 var _endless_boss_interval_scale: float = 1.0
+var _contract_spawn_index: int = 0
+var _contract_zone: MapRuleZone = null
+var _contract_zone_progress: float = 0.0
+var _choice_context: String = "upgrade"
+var _choice_panel_title: String = "选择一项联动组件"
+var _choice_panel_subtitle: String = ""
+var _active_contract_ids: Array[String] = []
+var _contract_spell_power_bonus: float = 0.0
+var _contract_speed_bonus: float = 0.0
+var _contract_xp_bonus: float = 0.0
+var _contract_score_bonus: float = 0.0
+var _contract_cooldown_scale: float = 1.0
+var _contract_pickup_bonus: float = 0.0
+var _contract_max_health_penalty: int = 0
+var _contract_enemy_health_bonus: float = 0.0
+var _contract_enemy_speed_bonus: float = 0.0
+var _contract_elite_spawn_bonus: float = 0.0
+var _contract_elite_affix_bonus: int = 0
+var _contract_hazard_bonus: float = 0.0
+var _train_break_index: int = -1
+var _fog_fake_brazier_zone: MapRuleZone = null
+var _fog_fake_brazier_progress: float = 0.0
+var _airship_breach_drift_direction: Vector2 = Vector2.ZERO
 
 var _run_time: float = 0.0
 var _spawn_budget: float = 0.0
@@ -1252,6 +1459,7 @@ func _process(delta: float) -> void:
 	_hud_refresh_timer += delta
 
 	_update_run_pacing(delta)
+	_update_contract_points(delta)
 	_update_special_character_state(delta)
 	_update_spell_attacks(delta)
 	_update_environment_hazards(delta)
@@ -1452,7 +1660,9 @@ func _reset_runtime_collections() -> void:
 	_clock_node_zone = null
 	_train_car_zones.clear()
 	_fog_brazier_zone = null
+	_fog_fake_brazier_zone = null
 	_airship_breach_zone = null
+	_contract_zone = null
 	if _player != null and is_instance_valid(_player):
 		_player.set_move_speed_multiplier(1.0)
 
@@ -1506,15 +1716,18 @@ func _reset_progression_state() -> void:
 	_train_rush_timer = 0.0
 	_train_car_zones.clear()
 	_train_car_move_direction = Vector2.RIGHT
+	_train_break_index = -1
 	_fog_brazier_progress = 0.0
 	_fog_brazier_respawn_timer = 10.0
 	_fog_light_timer = 0.0
 	_fog_pulse_timer = 1.6
+	_fog_fake_brazier_progress = 0.0
 	_airship_breach_progress = 0.0
 	_airship_breach_respawn_timer = 12.0
 	_airship_tailwind_timer = 0.0
 	_airship_gust_timer = 2.2
 	_airship_gust_direction = Vector2.RIGHT
+	_airship_breach_drift_direction = Vector2.ZERO
 	_player_previous_position = PLAYER_START
 	_world_mutation_index = 0
 	_next_world_mutation_time = 180.0
@@ -1527,6 +1740,24 @@ func _reset_progression_state() -> void:
 	_endless_enemy_health_bonus = 0.0
 	_endless_hazard_bonus = 0.0
 	_endless_boss_interval_scale = 1.0
+	_contract_spawn_index = 0
+	_contract_zone_progress = 0.0
+	_choice_context = "upgrade"
+	_choice_panel_title = "选择一项联动组件"
+	_choice_panel_subtitle = ""
+	_active_contract_ids.clear()
+	_contract_spell_power_bonus = 0.0
+	_contract_speed_bonus = 0.0
+	_contract_xp_bonus = 0.0
+	_contract_score_bonus = 0.0
+	_contract_cooldown_scale = 1.0
+	_contract_pickup_bonus = 0.0
+	_contract_max_health_penalty = 0
+	_contract_enemy_health_bonus = 0.0
+	_contract_enemy_speed_bonus = 0.0
+	_contract_elite_spawn_bonus = 0.0
+	_contract_elite_affix_bonus = 0
+	_contract_hazard_bonus = 0.0
 
 	_bolt_level = 1
 	_orbit_level = 0
@@ -1712,7 +1943,8 @@ func _get_mode_enemy_health_step() -> float:
 
 
 func _get_enemy_health_multiplier() -> float:
-	return _get_enemy_health_multiplier_for_minute(_get_mode_elapsed_minutes())
+	var mode_multiplier := _get_enemy_health_multiplier_for_minute(_get_mode_elapsed_minutes())
+	return mode_multiplier * (1.0 + _contract_enemy_health_bonus)
 
 
 func _get_enemy_health_multiplier_for_minute(minute: int) -> float:
@@ -2070,17 +2302,17 @@ func _roll_elite_affixes(type_name: String, wave_rank: int) -> Array[String]:
 	var weighted_pool: Array[String] = []
 	match type_name:
 		"lancer":
-			weighted_pool = ["hunter", "hunter", "dash", "dash", "deathburst", "splitter"]
+			weighted_pool = ["hunter", "hunter", "dash", "dash", "deathburst", "splitter", "beacon"]
 		"brute":
-			weighted_pool = ["shielded", "shielded", "dash", "deathburst", "splitter", "hunter"]
+			weighted_pool = ["shielded", "shielded", "dash", "deathburst", "splitter", "hunter", "siphon"]
 		"embermage":
-			weighted_pool = ["shielded", "snare", "snare", "deathburst", "hunter", "splitter"]
+			weighted_pool = ["shielded", "snare", "snare", "deathburst", "hunter", "splitter", "beacon"]
 		"seer":
-			weighted_pool = ["snare", "snare", "hunter", "shielded", "splitter", "deathburst"]
+			weighted_pool = ["snare", "snare", "hunter", "shielded", "splitter", "deathburst", "beacon"]
 		"mireling":
-			weighted_pool = ["shielded", "splitter", "splitter", "snare", "hunter", "deathburst"]
+			weighted_pool = ["shielded", "splitter", "splitter", "snare", "hunter", "deathburst", "siphon"]
 		_:
-			weighted_pool = ["shielded", "splitter", "hunter", "snare", "deathburst", "dash"]
+			weighted_pool = ["shielded", "splitter", "hunter", "snare", "deathburst", "dash", "siphon", "beacon"]
 
 	var affix_count := 1
 	if _run_time >= 240.0 or _threat_phase >= 3:
@@ -2089,8 +2321,9 @@ func _roll_elite_affixes(type_name: String, wave_rank: int) -> Array[String]:
 		affix_count = 3
 	if wave_rank >= 14 and affix_count < 3:
 		affix_count += 1
+	affix_count += _contract_elite_affix_bonus
 	if _mobile_layout:
-		affix_count = mini(affix_count, 2)
+		affix_count = mini(affix_count, 3 if _contract_elite_affix_bonus > 0 else 2)
 
 	var result: Array[String] = []
 	while result.size() < affix_count and not weighted_pool.is_empty():
@@ -2102,6 +2335,169 @@ func _roll_elite_affixes(type_name: String, wave_rank: int) -> Array[String]:
 			if weighted_pool[pool_index] == affix_id:
 				weighted_pool.remove_at(pool_index)
 	return result
+
+
+func _update_contract_points(delta: float) -> void:
+	if _contract_zone != null and not is_instance_valid(_contract_zone):
+		_contract_zone = null
+		_contract_zone_progress = 0.0
+	if _contract_spawn_index >= CONTRACT_SPAWN_TIMES.size():
+		return
+	if _boss_spawned or _boss_warning_shown:
+		return
+	if _contract_zone == null:
+		if _run_time >= float(CONTRACT_SPAWN_TIMES[_contract_spawn_index]):
+			_spawn_contract_zone()
+		return
+	if _player == null or not is_instance_valid(_player):
+		return
+	var inside := _is_player_in_rule_zone(_contract_zone, 12.0)
+	_contract_zone.active = inside
+	if inside:
+		_contract_zone_progress = minf(1.0, _contract_zone_progress + delta * 0.52)
+	else:
+		_contract_zone_progress = maxf(0.0, _contract_zone_progress - delta * 0.10)
+	_contract_zone.progress = _contract_zone_progress
+	_contract_zone.sublabel = "读取 %.0f%%" % (_contract_zone_progress * 100.0)
+	if _contract_zone_progress < 1.0:
+		return
+	var center := _contract_zone.global_position
+	_contract_zone.queue_free()
+	_contract_zone = null
+	_contract_zone_progress = 0.0
+	_contract_spawn_index += 1
+	_spawn_effect(center, 96.0, Color(0.82, 0.92, 1.0), Color(0.36, 0.72, 1.0), 0.28)
+	_open_contract_offer()
+
+
+func _spawn_contract_zone() -> void:
+	if _hazard_root == null or not is_instance_valid(_hazard_root) or _player == null or not is_instance_valid(_player):
+		return
+	_contract_zone = MAP_RULE_ZONE_SCRIPT.new()
+	_contract_zone.global_position = _pick_hazard_focus_position(120.0, 210.0)
+	_contract_zone.radius = 74.0
+	_contract_zone.primary_color = Color(0.24, 0.54, 0.78, 0.92)
+	_contract_zone.secondary_color = Color(0.84, 0.96, 1.0, 0.82)
+	_contract_zone.label = "契约点"
+	_contract_zone.sublabel = "站入读取"
+	_contract_zone.icon_style = "prism"
+	_contract_zone.progress = 0.0
+	_hazard_root.add_child(_contract_zone)
+	_show_message("战场契约出现：站进契约点，换一层收益也换一层压力。", Color(0.82, 0.92, 1.0), 2.8)
+
+
+func _open_contract_offer() -> void:
+	if _state != GameState.PLAYING:
+		return
+	_choice_context = "contract"
+	_choice_panel_title = "战场契约"
+	_choice_panel_subtitle = "签下一条规则，后面的整局都会记账。"
+	_upgrade_choices = _build_contract_choices()
+	if _upgrade_choices.is_empty():
+		_choice_context = "upgrade"
+		_choice_panel_title = "选择一项联动组件"
+		_choice_panel_subtitle = ""
+		return
+	_state = GameState.LEVEL_UP
+	_hud.hide_pause_menu()
+	_apply_choice_panel_context()
+	_hud.show_upgrade_choices(_upgrade_choices)
+	_hud.set_message("")
+	_message_timer = 0.0
+	_set_pause_state(true)
+
+
+func _build_contract_choices() -> Array[Dictionary]:
+	var pool: Array[Dictionary] = []
+	for contract_variant in CONTRACT_DEFINITIONS:
+		var contract: Dictionary = contract_variant
+		var contract_id := String(contract.get("id", ""))
+		if contract_id.is_empty() or _active_contract_ids.has(contract_id):
+			continue
+		pool.append({
+			"key": contract_id,
+			"title": String(contract.get("title", "契约")),
+			"desc": String(contract.get("desc", "")),
+			"detail": String(contract.get("detail", "")),
+			"bucket": "contract",
+			"accent": contract.get("accent", Color(0.82, 0.92, 1.0)),
+		})
+	var result: Array[Dictionary] = []
+	while result.size() < 3 and not pool.is_empty():
+		var pick_index := _rng.randi_range(0, pool.size() - 1)
+		var choice: Dictionary = pool[pick_index]
+		result.append(choice)
+		pool.remove_at(pick_index)
+	return result
+
+
+func _find_contract_definition(contract_id: String) -> Dictionary:
+	for contract_variant in CONTRACT_DEFINITIONS:
+		var contract: Dictionary = contract_variant
+		if String(contract.get("id", "")) == contract_id:
+			return contract
+	return {}
+
+
+func _apply_contract_choice(index: int) -> void:
+	if index < 0 or index >= _upgrade_choices.size():
+		return
+	var choice: Dictionary = _upgrade_choices[index]
+	var contract_id := String(choice.get("key", ""))
+	var definition := _find_contract_definition(contract_id)
+	if definition.is_empty():
+		return
+	if _active_contract_ids.has(contract_id):
+		return
+	var effects: Dictionary = definition.get("effects", {})
+	_active_contract_ids.append(contract_id)
+	_contract_spell_power_bonus += float(effects.get("spell_power_bonus", 0.0))
+	_contract_speed_bonus += float(effects.get("speed_bonus", 0.0))
+	_contract_xp_bonus += float(effects.get("xp_bonus", 0.0))
+	_contract_score_bonus += float(effects.get("score_bonus", 0.0))
+	_contract_pickup_bonus += float(effects.get("pickup_bonus", 0.0))
+	_contract_max_health_penalty += int(effects.get("max_health_penalty", 0))
+	_contract_enemy_health_bonus += float(effects.get("enemy_health_bonus", 0.0))
+	_contract_enemy_speed_bonus += float(effects.get("enemy_speed_bonus", 0.0))
+	_contract_elite_spawn_bonus += float(effects.get("elite_spawn_bonus", 0.0))
+	_contract_elite_affix_bonus += int(effects.get("elite_affix_bonus", 0))
+	_contract_hazard_bonus += float(effects.get("hazard_bonus", 0.0))
+	var cooldown_scale := float(effects.get("cooldown_scale", 1.0))
+	if cooldown_scale > 0.0:
+		_contract_cooldown_scale *= cooldown_scale
+	_upgrade_choices.clear()
+	_choice_context = "upgrade"
+	_choice_panel_title = "选择一项联动组件"
+	_choice_panel_subtitle = ""
+	_apply_choice_panel_context()
+	_hud.hide_upgrade_choices()
+	_apply_player_build(false)
+	_sync_satellites()
+	_show_message("契约签订：%s" % String(definition.get("title", "战场契约")), definition.get("accent", Color(0.82, 0.92, 1.0)), 2.2)
+	_update_character_hud_v2()
+	_state = GameState.PLAYING
+	_set_pause_state(false)
+
+
+func _apply_choice_panel_context() -> void:
+	if _hud == null or not is_instance_valid(_hud):
+		return
+	if _hud.has_method("set_upgrade_panel_context"):
+		_hud.call("set_upgrade_panel_context", _choice_panel_title, _choice_panel_subtitle)
+	elif _hud.has_method("set_upgrade_panel_title"):
+		_hud.call("set_upgrade_panel_title", _choice_panel_title)
+
+
+func _get_contract_summary() -> String:
+	if _active_contract_ids.is_empty():
+		return ""
+	var labels: Array[String] = []
+	for contract_id in _active_contract_ids:
+		var definition := _find_contract_definition(contract_id)
+		if definition.is_empty():
+			continue
+		labels.append(String(definition.get("title", contract_id)))
+	return " / ".join(labels)
 
 
 func _get_enemy_roster_for_role(role: String) -> Array[String]:
@@ -2208,6 +2604,12 @@ func _update_blood_trails(delta: float) -> void:
 			var damage := int(trail.get("damage", 1))
 			_damage_enemies_in_radius(node.global_position, radius, damage, 130.0, 5 + _bloodtrail_level)
 			_burst_marked_enemies_in_radius(node.global_position, radius * 1.06, max(1, int(round(float(damage) * 0.55))), 120.0)
+			if _has_endgame_evolution("evo_hunter_crimson_delta"):
+				var marked_targets := _get_nearest_enemies(node.global_position, 4, radius + 26.0)
+				for marked_enemy in marked_targets:
+					if marked_enemy == null or not is_instance_valid(marked_enemy):
+						continue
+					_apply_blood_mark(marked_enemy, 3.6)
 			trail["pulse_timer"] = float(trail.get("pulse_interval", 0.52))
 			_spawn_effect(node.global_position, radius * 0.68, Color(0.94, 0.26, 0.34), Color(1.0, 0.80, 0.78), 0.16)
 		_blood_trails[index] = trail
@@ -3031,6 +3433,10 @@ func _trigger_gear_sweep_damage(center: Vector2, spoke_count: int, radius: float
 	_audio.play_enemy_shot(true)
 
 
+func _is_map_reversal_active() -> bool:
+	return _run_time >= 240.0 or _threat_phase >= 3
+
+
 func _update_bridge_train_rule(delta: float) -> void:
 	if _player != null and is_instance_valid(_player):
 		_player.set_move_speed_multiplier(1.12 if _train_rush_timer > 0.0 else 1.0)
@@ -3040,7 +3446,7 @@ func _update_bridge_train_rule(delta: float) -> void:
 			_spawn_train_cars()
 		return
 
-	var move_speed := 94.0
+	var move_speed := 108.0 if _is_map_reversal_active() else 94.0
 	var first_position := Vector2.ZERO
 	var last_position := Vector2.ZERO
 	for index in range(_train_car_zones.size()):
@@ -3052,8 +3458,18 @@ func _update_bridge_train_rule(delta: float) -> void:
 		zone.global_position += _train_car_move_direction * move_speed * delta
 		zone.active = index == _train_car_active_index
 		zone.progress = _train_car_progress
-		zone.label = "车节 %d" % (index + 1)
-		zone.sublabel = "跳上这节" if index == _train_car_active_index else ("已稳住" if index < _train_car_active_index else "继续前跨")
+		if _train_break_index == index:
+			zone.label = "断节 %d" % (index + 1)
+			zone.sublabel = "诱爆陷阱"
+			zone.primary_color = Color(0.90, 0.40, 0.36, 0.90)
+			zone.secondary_color = Color(1.0, 0.90, 0.72, 0.82)
+			zone.icon_style = "core"
+		else:
+			zone.label = "车节 %d" % (index + 1)
+			zone.sublabel = "跳上这节" if index == _train_car_active_index else ("已稳住" if index < _train_car_active_index else "继续前跨")
+			zone.primary_color = Color(0.88, 0.94, 1.0, 0.92)
+			zone.secondary_color = Color(1.0, 0.80, 0.46, 0.86)
+			zone.icon_style = "gear"
 		if index == 0:
 			first_position = zone.global_position
 		last_position = zone.global_position
@@ -3071,6 +3487,17 @@ func _update_bridge_train_rule(delta: float) -> void:
 
 	var current_zone := _train_car_zones[_train_car_active_index]
 	if current_zone != null and is_instance_valid(current_zone) and _is_player_in_rule_zone(current_zone, 12.0):
+		if _train_break_index == _train_car_active_index:
+			var break_center := current_zone.global_position
+			_spawn_effect(break_center, current_zone.radius * 1.24, Color(1.0, 0.70, 0.34), Color(0.92, 0.22, 0.16), 0.20)
+			_apply_area_current_health_damage(break_center, current_zone.radius * 1.06, 0.12, 220.0)
+			_spawn_prelude_blast_marker(break_center, current_zone.radius * 0.92, 0.10, 200.0, 0.58, Color(1.0, 0.86, 0.50), Color(0.92, 0.24, 0.16))
+			_train_car_move_direction = -_train_car_move_direction
+			_train_break_index = -1
+			_train_car_active_index += 1
+			_train_car_progress = clampf(float(_train_car_active_index) / float(max(_train_car_zones.size(), 1)), 0.0, 1.0)
+			_show_message("断节诱爆：列车节奏反转，立刻追下一节。", Color(1.0, 0.84, 0.62), 1.8)
+			return
 		_spawn_effect(current_zone.global_position, current_zone.radius * 0.88, Color(0.90, 0.96, 1.0), Color(1.0, 0.78, 0.42), 0.14)
 		_train_car_active_index += 1
 		_train_car_progress = clampf(float(_train_car_active_index) / float(max(_train_car_zones.size(), 1)), 0.0, 1.0)
@@ -3094,7 +3521,8 @@ func _spawn_train_cars() -> void:
 	_train_car_move_direction = Vector2.RIGHT.rotated(_rng.randf_range(-0.55, 0.55)).normalized()
 	var side := _train_car_move_direction.orthogonal()
 	var anchor := _pick_hazard_focus_position(180.0, 260.0) - _train_car_move_direction * 180.0
-	for index in range(3):
+	var car_count := 4 if _is_map_reversal_active() else 3
+	for index in range(car_count):
 		var zone := MAP_RULE_ZONE_SCRIPT.new()
 		zone.global_position = anchor + _train_car_move_direction * float(index) * 170.0 + side * (16.0 if index % 2 == 0 else -16.0)
 		zone.radius = 62.0
@@ -3106,9 +3534,15 @@ func _spawn_train_cars() -> void:
 		zone.sublabel = "连续跨车"
 		_hazard_root.add_child(zone)
 		_train_car_zones.append(zone)
+	_train_break_index = -1
+	if _is_map_reversal_active() and _train_car_zones.size() >= 3:
+		_train_break_index = _rng.randi_range(1, _train_car_zones.size() - 2)
 	_train_car_active_index = 0
 	_train_car_progress = 0.0
-	_show_message("列车规则启动：顺着亮起的车节连续跨过去，别让整列车失步。", Color(0.92, 0.96, 1.0), 2.8)
+	if _train_break_index >= 0:
+		_show_message("列车规则反转：车节里混入断节陷阱，踩中会诱爆并反向。", Color(0.98, 0.90, 0.68), 2.8)
+	else:
+		_show_message("列车规则启动：顺着亮起的车节连续跨过去，别让整列车失步。", Color(0.92, 0.96, 1.0), 2.8)
 
 
 func _clear_train_car_zones() -> void:
@@ -3116,6 +3550,7 @@ func _clear_train_car_zones() -> void:
 		if zone != null and is_instance_valid(zone):
 			zone.queue_free()
 	_train_car_zones.clear()
+	_train_break_index = -1
 
 
 func _update_black_fog_rule(delta: float) -> void:
@@ -3126,6 +3561,9 @@ func _update_black_fog_rule(delta: float) -> void:
 			_fog_pulse_timer = 3.2
 	else:
 		_fog_pulse_timer = 1.6
+
+	if _is_map_reversal_active():
+		_update_black_fog_fake_brazier(delta)
 
 	if _fog_brazier_zone == null or not is_instance_valid(_fog_brazier_zone):
 		_fog_brazier_respawn_timer = maxf(0.0, _fog_brazier_respawn_timer - delta)
@@ -3147,6 +3585,10 @@ func _update_black_fog_rule(delta: float) -> void:
 			_award_score(102 + _get_wave_rank() * 16)
 			_fog_brazier_zone.queue_free()
 			_fog_brazier_zone = null
+			if _fog_fake_brazier_zone != null and is_instance_valid(_fog_fake_brazier_zone):
+				_fog_fake_brazier_zone.queue_free()
+				_fog_fake_brazier_zone = null
+				_fog_fake_brazier_progress = 0.0
 			_fog_brazier_progress = 0.0
 			_fog_brazier_respawn_timer = 28.0
 			_fog_light_timer = 24.0
@@ -3157,6 +3599,49 @@ func _update_black_fog_rule(delta: float) -> void:
 			_player.set_move_speed_multiplier(1.08)
 		else:
 			_player.set_move_speed_multiplier(0.84)
+
+
+func _update_black_fog_fake_brazier(delta: float) -> void:
+	if _fog_fake_brazier_zone == null or not is_instance_valid(_fog_fake_brazier_zone):
+		return
+	var inside := _is_player_in_rule_zone(_fog_fake_brazier_zone, 10.0)
+	_fog_fake_brazier_zone.active = inside
+	if inside:
+		_fog_fake_brazier_progress = minf(1.0, _fog_fake_brazier_progress + delta * 0.58)
+	else:
+		_fog_fake_brazier_progress = maxf(0.0, _fog_fake_brazier_progress - delta * 0.14)
+	_fog_fake_brazier_zone.progress = _fog_fake_brazier_progress
+	_fog_fake_brazier_zone.sublabel = "校准 %.0f%%" % (_fog_fake_brazier_progress * 100.0)
+	if _fog_fake_brazier_progress < 1.0:
+		return
+	var center := _fog_fake_brazier_zone.global_position
+	_spawn_effect(center, _fog_fake_brazier_zone.radius * 1.18, Color(0.92, 0.66, 0.44), Color(0.94, 0.24, 0.18), 0.24)
+	_apply_area_current_health_damage(center, _fog_fake_brazier_zone.radius * 1.10, 0.11, 210.0)
+	_spawn_prelude_blast_marker(center, _fog_fake_brazier_zone.radius * 0.84, 0.10, 210.0, 0.56, Color(1.0, 0.84, 0.54), Color(0.94, 0.24, 0.18))
+	_fog_fake_brazier_zone.queue_free()
+	_fog_fake_brazier_zone = null
+	_fog_fake_brazier_progress = 0.0
+	_fog_pulse_timer = minf(_fog_pulse_timer, 0.8)
+	_show_message("误触伪灯：黑雾诱爆，优先找真正猎灯。", Color(0.98, 0.84, 0.62), 2.0)
+
+
+func _spawn_black_fog_fake_brazier(anchor: Vector2) -> void:
+	if _hazard_root == null or not is_instance_valid(_hazard_root):
+		return
+	if _fog_fake_brazier_zone != null and is_instance_valid(_fog_fake_brazier_zone):
+		return
+	var offset_dir := Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU))
+	_fog_fake_brazier_zone = MAP_RULE_ZONE_SCRIPT.new()
+	_fog_fake_brazier_zone.global_position = anchor + offset_dir * _rng.randf_range(120.0, 180.0)
+	_fog_fake_brazier_zone.radius = 74.0
+	_fog_fake_brazier_zone.primary_color = Color(0.92, 0.62, 0.36, 0.88)
+	_fog_fake_brazier_zone.secondary_color = Color(1.0, 0.90, 0.76, 0.76)
+	_fog_fake_brazier_zone.label = "伪猎灯"
+	_fog_fake_brazier_zone.sublabel = "高亮异常"
+	_fog_fake_brazier_zone.icon_style = "core"
+	_fog_fake_brazier_zone.progress = 0.0
+	_hazard_root.add_child(_fog_fake_brazier_zone)
+	_fog_fake_brazier_progress = 0.0
 
 
 func _spawn_black_fog_brazier() -> void:
@@ -3172,6 +3657,8 @@ func _spawn_black_fog_brazier() -> void:
 	_fog_brazier_zone.icon_style = "altar"
 	_fog_brazier_zone.progress = 0.0
 	_hazard_root.add_child(_fog_brazier_zone)
+	if _is_map_reversal_active():
+		_spawn_black_fog_fake_brazier(_fog_brazier_zone.global_position)
 	_show_message("黑雾翻涌：尽快点亮猎灯，不然整张图会继续偏向怪群。", Color(1.0, 0.90, 0.62), 2.6)
 
 
@@ -3191,6 +3678,18 @@ func _update_airship_breach_rule(delta: float) -> void:
 			_spawn_airship_breach()
 		return
 
+	if _is_map_reversal_active():
+		if _airship_breach_drift_direction == Vector2.ZERO:
+			_airship_breach_drift_direction = Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU)).normalized()
+		var drift_speed := 34.0 + float(_threat_phase) * 4.0
+		_airship_breach_zone.global_position += _airship_breach_drift_direction * drift_speed * delta
+		if _player != null and is_instance_valid(_player):
+			var separation := _airship_breach_zone.global_position - _player.global_position
+			if separation.length() > 360.0:
+				_airship_breach_drift_direction = (-separation).normalized()
+	else:
+		_airship_breach_drift_direction = Vector2.ZERO
+
 	_airship_gust_timer = maxf(0.0, _airship_gust_timer - delta)
 	if _airship_gust_timer <= 0.0:
 		_trigger_airship_gust(_airship_breach_zone.global_position, _airship_breach_zone.radius + 168.0)
@@ -3205,7 +3704,7 @@ func _update_airship_breach_rule(delta: float) -> void:
 	else:
 		_airship_breach_progress = maxf(0.0, _airship_breach_progress - delta * 0.10)
 	_airship_breach_zone.progress = _airship_breach_progress
-	_airship_breach_zone.sublabel = "封舱 %.0f%%" % (_airship_breach_progress * 100.0)
+	_airship_breach_zone.sublabel = "逆风封舱 %.0f%%" % (_airship_breach_progress * 100.0) if _is_map_reversal_active() else ("封舱 %.0f%%" % (_airship_breach_progress * 100.0))
 
 	if _airship_breach_progress < 1.0:
 		return
@@ -3220,6 +3719,7 @@ func _update_airship_breach_rule(delta: float) -> void:
 	_airship_breach_progress = 0.0
 	_airship_breach_respawn_timer = 30.0
 	_airship_gust_timer = 2.4
+	_airship_breach_drift_direction = Vector2.ZERO
 	_show_message("封舱成功：甲板暂时稳住，20 秒内法术威力、冷却和得分同步抬升。", Color(0.88, 0.96, 1.0), 2.8)
 
 
@@ -3237,11 +3737,15 @@ func _spawn_airship_breach() -> void:
 	_airship_breach_zone.progress = 0.0
 	_hazard_root.add_child(_airship_breach_zone)
 	_airship_gust_direction = Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU)).normalized()
+	_airship_breach_drift_direction = Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU)).normalized() if _is_map_reversal_active() else Vector2.ZERO
 	_show_message("空艇裂甲出现：顶住风压，把这道破口强行封住。", Color(0.86, 0.94, 1.0), 2.6)
 
 
 func _trigger_airship_gust(center: Vector2, radius: float) -> void:
-	_airship_gust_direction = _airship_gust_direction.rotated(_rng.randf_range(-0.55, 0.55)).normalized()
+	if _is_map_reversal_active() and _airship_breach_drift_direction != Vector2.ZERO:
+		_airship_gust_direction = (-_airship_breach_drift_direction).rotated(_rng.randf_range(-0.22, 0.22)).normalized()
+	else:
+		_airship_gust_direction = _airship_gust_direction.rotated(_rng.randf_range(-0.55, 0.55)).normalized()
 	if _airship_gust_direction == Vector2.ZERO:
 		_airship_gust_direction = Vector2.RIGHT
 	var start_position := center - _airship_gust_direction.orthogonal() * radius
@@ -3476,6 +3980,15 @@ func _cast_verdict() -> bool:
 	_spawn_rule_link_effect(start_position, end_position, _get_verdict_width() * 0.42, Color(0.98, 0.30, 0.34), Color(1.0, 0.92, 0.88), 0.18)
 	_spawn_slash_effect(start_position + direction * (_get_verdict_range() * 0.34), direction, _get_verdict_width() * 1.6, 0.50)
 	_apply_line_damage(start_position, end_position, _get_verdict_width(), _get_verdict_damage(), 260.0, 8)
+	if _has_endgame_evolution("evo_hunter_verdict_gallows"):
+		var side := direction.orthogonal()
+		var side_damage: int = max(1, int(round(float(_get_verdict_damage()) * 0.66)))
+		for sign in [-1, 1]:
+			var offset_sign := float(sign)
+			var side_start: Vector2 = start_position + side * 44.0 * offset_sign
+			var side_end: Vector2 = side_start + direction * (_get_verdict_range() * 0.82)
+			_spawn_rule_link_effect(side_start, side_end, _get_verdict_width() * 0.30, Color(0.98, 0.44, 0.42), Color(1.0, 0.86, 0.76), 0.16)
+			_apply_line_damage(side_start, side_end, _get_verdict_width() * 0.80, side_damage, 210.0, 6)
 	_burst_marked_enemies_in_radius(end_position, 92.0, max(1, int(round(float(_get_verdict_damage()) * 0.48))), 220.0)
 	_audio.play_player_shot("power")
 	return true
@@ -3504,7 +4017,7 @@ func _spawn_bloodtrail_zone(position: Vector2) -> void:
 		"radius": zone.radius,
 		"damage": _get_bloodtrail_damage(),
 		"lifetime": _get_bloodtrail_duration(),
-		"pulse_interval": 0.48,
+		"pulse_interval": 0.42 if _has_endgame_evolution("evo_hunter_crimson_delta") else 0.48,
 		"pulse_timer": 0.24,
 	})
 
@@ -3573,27 +4086,45 @@ func _get_brand_burst_radius() -> float:
 
 
 func _get_oathshot_count() -> int:
-	return 1 + int(_oathshot_level >= 3) + int(_oathshot_level >= 6)
+	var count := 1 + int(_oathshot_level >= 3) + int(_oathshot_level >= 6)
+	if _has_endgame_evolution("evo_hunter_blood_quarry"):
+		count += 1
+	return count
 
 
 func _get_oathshot_damage() -> int:
-	return max(1, int(round((16.0 + float(_oathshot_level) * 4.0) * _get_spell_power_multiplier() * _get_blood_bonus_multiplier())))
+	var damage_multiplier := _get_blood_bonus_multiplier()
+	if _has_endgame_evolution("evo_hunter_blood_quarry"):
+		damage_multiplier *= 1.14
+	return max(1, int(round((16.0 + float(_oathshot_level) * 4.0) * _get_spell_power_multiplier() * damage_multiplier)))
 
 
 func _get_oathshot_cooldown() -> float:
-	return maxf(0.30, (0.84 - float(_oathshot_level) * 0.06) * _get_cooldown_multiplier())
+	var cooldown := (0.84 - float(_oathshot_level) * 0.06) * _get_cooldown_multiplier()
+	if _has_endgame_evolution("evo_hunter_harvest_run"):
+		cooldown *= 0.88
+	return maxf(0.24, cooldown)
 
 
 func _get_oathshot_pierce() -> int:
-	return 1 + int(_oathshot_level >= 4) + int(_oathshot_level >= 7)
+	var pierce := 1 + int(_oathshot_level >= 4) + int(_oathshot_level >= 7)
+	if _has_endgame_evolution("evo_hunter_blood_quarry"):
+		pierce += 1
+	return pierce
 
 
 func _get_brand_target_count() -> int:
-	return 1 + _brand_level
+	var count := 1 + _brand_level
+	if _has_endgame_evolution("evo_hunter_blood_quarry"):
+		count += 2
+	return count
 
 
 func _get_brand_damage() -> int:
-	return max(1, int(round((8.0 + float(_brand_level) * 3.0) * _get_spell_power_multiplier() * (1.0 + _get_missing_health_ratio() * 0.25))))
+	var damage := (8.0 + float(_brand_level) * 3.0) * _get_spell_power_multiplier() * (1.0 + _get_missing_health_ratio() * 0.25)
+	if _has_endgame_evolution("evo_hunter_blood_quarry"):
+		damage *= 1.18
+	return max(1, int(round(damage)))
 
 
 func _get_brand_cooldown() -> float:
@@ -3601,11 +4132,17 @@ func _get_brand_cooldown() -> float:
 
 
 func _get_bloodtrail_radius() -> float:
-	return 74.0 + float(_bloodtrail_level) * 18.0
+	var radius := 74.0 + float(_bloodtrail_level) * 18.0
+	if _has_endgame_evolution("evo_hunter_crimson_delta"):
+		radius *= 1.24
+	return radius
 
 
 func _get_bloodtrail_damage() -> int:
-	return max(1, int(round((10.0 + float(_bloodtrail_level) * 4.0) * _get_spell_power_multiplier() * (1.0 + _get_missing_health_ratio() * 0.20))))
+	var damage := (10.0 + float(_bloodtrail_level) * 4.0) * _get_spell_power_multiplier() * (1.0 + _get_missing_health_ratio() * 0.20)
+	if _has_endgame_evolution("evo_hunter_crimson_delta"):
+		damage *= 1.20
+	return max(1, int(round(damage)))
 
 
 func _get_bloodtrail_cooldown() -> float:
@@ -3613,27 +4150,45 @@ func _get_bloodtrail_cooldown() -> float:
 
 
 func _get_bloodtrail_duration() -> float:
-	return 5.2 + float(_bloodtrail_level) * 0.7
+	var duration := 5.2 + float(_bloodtrail_level) * 0.7
+	if _has_endgame_evolution("evo_hunter_harvest_run"):
+		duration += 2.0
+	return duration
 
 
 func _get_bloodtrail_limit() -> int:
-	return 1 + int(_bloodtrail_level >= 2) + int(_bloodtrail_level >= 4)
+	var limit := 1 + int(_bloodtrail_level >= 2) + int(_bloodtrail_level >= 4)
+	if _has_endgame_evolution("evo_hunter_harvest_run"):
+		limit += 1
+	return limit
 
 
 func _get_verdict_damage() -> int:
-	return max(1, int(round((24.0 + float(_verdict_level) * 8.0) * _get_spell_power_multiplier() * (1.0 + _get_missing_health_ratio() * 0.70))))
+	var damage := (24.0 + float(_verdict_level) * 8.0) * _get_spell_power_multiplier() * (1.0 + _get_missing_health_ratio() * 0.70)
+	if _has_endgame_evolution("evo_hunter_verdict_gallows"):
+		damage *= 1.20
+	return max(1, int(round(damage)))
 
 
 func _get_verdict_cooldown() -> float:
-	return maxf(1.5, (5.2 - float(_verdict_level) * 0.44) * _get_cooldown_multiplier())
+	var cooldown := (5.2 - float(_verdict_level) * 0.44) * _get_cooldown_multiplier()
+	if _has_endgame_evolution("evo_hunter_verdict_gallows"):
+		cooldown *= 0.82
+	return maxf(1.2, cooldown)
 
 
 func _get_verdict_range() -> float:
-	return 240.0 + float(_verdict_level) * 44.0
+	var range_value := 240.0 + float(_verdict_level) * 44.0
+	if _has_endgame_evolution("evo_hunter_verdict_gallows"):
+		range_value += 76.0
+	return range_value
 
 
 func _get_verdict_width() -> float:
-	return 34.0 + float(_verdict_level) * 4.0
+	var width := 34.0 + float(_verdict_level) * 4.0
+	if _has_endgame_evolution("evo_hunter_verdict_gallows"):
+		width *= 1.22
+	return width
 
 
 func _update_grave_caller_attacks(delta: float) -> void:
@@ -3673,7 +4228,8 @@ func _cast_dirge() -> bool:
 	if _player == null or not is_instance_valid(_player):
 		return false
 	var origins: Array[Vector2] = [_player.global_position]
-	var token_origins := _get_grave_token_positions(mini(_get_dirge_count() - 1, 2), 640.0)
+	var max_token_origins := 4 if _has_endgame_evolution("evo_grave_dirge_conductor") else 2
+	var token_origins := _get_grave_token_positions(mini(_get_dirge_count() - 1, max_token_origins), 640.0)
 	origins.append_array(token_origins)
 	var targets := _get_nearest_enemies(_player.global_position, maxi(origins.size(), _get_dirge_count()), 880.0)
 	if targets.is_empty():
@@ -3711,6 +4267,10 @@ func _cast_wake() -> bool:
 			if target != null and is_instance_valid(target):
 				var direction := (target.global_position - position).normalized()
 				_spawn_dirge_projectile(position, direction, target, max(1, int(round(float(_get_wake_damage()) * 0.82))), 0.90)
+	if _has_endgame_evolution("evo_grave_wake_engine"):
+		for token in consumed:
+			var recycled_position: Vector2 = token.get("position", Vector2.ZERO)
+			_spawn_grave_token(recycled_position, 5.8, true)
 	_audio.play_player_shot("spread")
 	return true
 
@@ -3729,6 +4289,13 @@ func _cast_toll() -> bool:
 			continue
 		_spawn_effect(node.global_position, _get_toll_radius() * 0.72, Color(0.60, 0.90, 0.82), Color(0.94, 1.0, 0.96), 0.14)
 		_damage_enemies_in_radius(node.global_position, _get_toll_radius(), _get_toll_damage(), 150.0, 5)
+		if _has_endgame_evolution("evo_grave_tide_bell"):
+			var relay_targets := _get_nearest_enemies(node.global_position, 1, 760.0)
+			if not relay_targets.is_empty():
+				var relay_target := relay_targets[0]
+				if relay_target != null and is_instance_valid(relay_target):
+					var relay_direction := (relay_target.global_position - node.global_position).normalized()
+					_spawn_dirge_projectile(node.global_position, relay_direction, relay_target, max(1, int(round(float(_get_toll_damage()) * 0.72))), 1.05)
 		node.active = true
 	_audio.play_player_shot("power")
 	return true
@@ -3737,9 +4304,17 @@ func _cast_toll() -> bool:
 func _cast_choir() -> bool:
 	if _player == null or not is_instance_valid(_player):
 		return false
-	var consumed := _consume_grave_tokens(_get_choir_consume_count())
+	var consume_count := _get_choir_consume_count()
+	if _has_endgame_evolution("evo_grave_cathedral"):
+		consume_count = max(consume_count, _grave_tokens.size())
+	var consumed := _consume_grave_tokens(consume_count)
 	if consumed.is_empty():
 		return false
+	var recycled_positions: Array[Vector2] = []
+	for token in consumed:
+		recycled_positions.append(token.get("position", _player.global_position))
+	if _has_endgame_evolution("evo_grave_cathedral"):
+		consumed.append({"position": _player.global_position})
 	var signature_direction := _get_player_target_direction(920.0)
 	_trigger_player_action_signature("grave_toll", 0.24, 1.02, signature_direction)
 	var targets := _get_nearest_enemies(_player.global_position, maxi(consumed.size(), 1), 920.0)
@@ -3755,11 +4330,14 @@ func _cast_choir() -> bool:
 			var direction := base_direction.rotated(angle_offset)
 			_spawn_dirge_projectile(origin, direction, target, _get_choir_damage(), 1.08)
 		_spawn_rule_link_effect(origin, _player.global_position, 4.0, Color(0.62, 0.88, 0.80), Color(0.92, 0.98, 0.94), 0.16)
+	if _has_endgame_evolution("evo_grave_wake_engine"):
+		for recycled_position in recycled_positions:
+			_spawn_grave_token(recycled_position, 4.8, true)
 	_audio.play_player_shot("power")
 	return true
 
 
-func _spawn_grave_token(position: Vector2) -> void:
+func _spawn_grave_token(position: Vector2, lifetime_override: float = -1.0, recycled: bool = false) -> void:
 	if _hazard_root == null or not is_instance_valid(_hazard_root):
 		return
 	while _grave_tokens.size() >= _get_grave_token_limit():
@@ -3768,19 +4346,23 @@ func _spawn_grave_token(position: Vector2) -> void:
 		if oldest_node != null and is_instance_valid(oldest_node):
 			oldest_node.queue_free()
 	var zone := MAP_RULE_ZONE_SCRIPT.new()
+	var token_radius := 34.0 if recycled else 42.0
 	zone.global_position = position
-	zone.radius = 42.0
-	zone.primary_color = Color(0.58, 0.88, 0.76, 0.90)
-	zone.secondary_color = Color(0.92, 1.0, 0.96, 0.82)
-	zone.label = "尸核"
-	zone.sublabel = "待起灵"
+	zone.radius = token_radius
+	zone.primary_color = Color(0.56, 0.86, 0.74, 0.90) if recycled else Color(0.58, 0.88, 0.76, 0.90)
+	zone.secondary_color = Color(0.88, 0.98, 0.94, 0.80) if recycled else Color(0.92, 1.0, 0.96, 0.82)
+	zone.label = "余烬尸核" if recycled else "尸核"
+	zone.sublabel = "回生" if recycled else "待起灵"
 	zone.icon_style = "spore"
 	zone.progress = -1.0
 	_hazard_root.add_child(zone)
+	var token_lifetime := lifetime_override if lifetime_override > 0.0 else 12.0 + float(_wake_level) * 2.0
+	if _has_endgame_evolution("evo_grave_dirge_conductor"):
+		token_lifetime += 2.0
 	_grave_tokens.append({
 		"node": zone,
 		"position": position,
-		"lifetime": 12.0 + float(_wake_level) * 2.0,
+		"lifetime": token_lifetime,
 	})
 
 
@@ -3861,11 +4443,17 @@ func _spawn_dirge_projectile(origin: Vector2, direction: Vector2, target: EnemyS
 
 
 func _get_dirge_count() -> int:
-	return 1 + int(_dirge_level >= 3) + int(_dirge_level >= 6)
+	var count := 1 + int(_dirge_level >= 3) + int(_dirge_level >= 6)
+	if _has_endgame_evolution("evo_grave_dirge_conductor"):
+		count += 1
+	return count
 
 
 func _get_dirge_damage() -> int:
-	return max(1, int(round((14.0 + float(_dirge_level) * 4.0) * _get_spell_power_multiplier())))
+	var damage := (14.0 + float(_dirge_level) * 4.0) * _get_spell_power_multiplier()
+	if _has_endgame_evolution("evo_grave_dirge_conductor"):
+		damage *= 1.16
+	return max(1, int(round(damage)))
 
 
 func _get_dirge_cooldown() -> float:
@@ -3881,15 +4469,24 @@ func _get_wake_cooldown() -> float:
 
 
 func _get_wake_consume_count() -> int:
-	return 1 + int(_wake_level >= 2) + int(_wake_level >= 4)
+	var count := 1 + int(_wake_level >= 2) + int(_wake_level >= 4)
+	if _has_endgame_evolution("evo_grave_wake_engine"):
+		count += 1
+	return count
 
 
 func _get_toll_damage() -> int:
-	return max(1, int(round((16.0 + float(_toll_level) * 5.0) * _get_spell_power_multiplier())))
+	var damage := (16.0 + float(_toll_level) * 5.0) * _get_spell_power_multiplier()
+	if _has_endgame_evolution("evo_grave_tide_bell"):
+		damage *= 1.14
+	return max(1, int(round(damage)))
 
 
 func _get_toll_radius() -> float:
-	return 84.0 + float(_toll_level) * 18.0
+	var radius := 84.0 + float(_toll_level) * 18.0
+	if _has_endgame_evolution("evo_grave_tide_bell"):
+		radius += 36.0
+	return radius
 
 
 func _get_toll_cooldown() -> float:
@@ -3897,15 +4494,24 @@ func _get_toll_cooldown() -> float:
 
 
 func _get_toll_pulse_count() -> int:
-	return 1 + _toll_level
+	var count := 1 + _toll_level
+	if _has_endgame_evolution("evo_grave_tide_bell"):
+		count += 2
+	return count
 
 
 func _get_choir_damage() -> int:
-	return max(1, int(round((12.0 + float(_choir_level) * 4.0) * _get_spell_power_multiplier())))
+	var damage := (12.0 + float(_choir_level) * 4.0) * _get_spell_power_multiplier()
+	if _has_endgame_evolution("evo_grave_cathedral"):
+		damage *= 1.18
+	return max(1, int(round(damage)))
 
 
 func _get_choir_cooldown() -> float:
-	return maxf(1.8, (6.0 - float(_choir_level) * 0.46) * _get_cooldown_multiplier())
+	var cooldown := (6.0 - float(_choir_level) * 0.46) * _get_cooldown_multiplier()
+	if _has_endgame_evolution("evo_grave_cathedral"):
+		cooldown *= 0.86
+	return maxf(1.3, cooldown)
 
 
 func _get_choir_consume_count() -> int:
@@ -3913,11 +4519,17 @@ func _get_choir_consume_count() -> int:
 
 
 func _get_choir_projectile_count() -> int:
-	return 2 + int(_choir_level >= 3)
+	var count := 2 + int(_choir_level >= 3)
+	if _has_endgame_evolution("evo_grave_cathedral"):
+		count += 2
+	return count
 
 
 func _get_grave_token_limit() -> int:
-	return 4 + _wake_level + int(_choir_level >= 2)
+	var limit := 4 + _wake_level + int(_choir_level >= 2)
+	if _has_endgame_evolution("evo_grave_tide_bell"):
+		limit += 2
+	return limit
 
 
 func _update_illusionist_attacks(delta: float) -> void:
@@ -3989,6 +4601,21 @@ func _fire_mirrorbolts() -> bool:
 		projectile.homing_target = target
 		projectile.homing_strength = 5.0
 		_register_projectile(projectile)
+		if _has_endgame_evolution("evo_illusion_glass_bloom"):
+			for sign in [-1.0, 1.0]:
+				var shard: SpellProjectile = PROJECTILE_SCRIPT.new()
+				shard.global_position = origin
+				shard.direction = direction.rotated(0.17 * sign)
+				shard.damage = max(1, int(round(float(_get_mirrorbolt_damage()) * 0.56)))
+				shard.speed = 760.0
+				shard.radius = 4.8
+				shard.pierce = 1
+				shard.max_distance = 680.0
+				shard.knockback = 100.0
+				shard.tint = Color(0.92, 0.84, 1.0)
+				shard.secondary_tint = Color(0.98, 0.94, 1.0, 0.36)
+				shard.homing_strength = 0.0
+				_register_projectile(shard)
 	_audio.play_player_shot("rapid")
 	return true
 
@@ -4033,6 +4660,11 @@ func _cast_switchstep() -> bool:
 	_damage_enemies_in_radius(new_position, _get_switchstep_radius(), _get_switchstep_damage(), 170.0, 5)
 	decoy_node.queue_free()
 	_illusion_decoys.remove_at(selected_index)
+	if _has_endgame_evolution("evo_illusion_stage_heist"):
+		_spawn_illusion_decoy(old_position)
+		_spawn_illusion_decoy(new_position)
+	if _has_endgame_evolution("evo_illusion_prism_relay"):
+		_fire_mirrorbolts()
 	_audio.play_player_shot("power")
 	return true
 
@@ -4102,55 +4734,98 @@ func _spawn_illusion_decoy(position: Vector2) -> void:
 
 
 func _get_mirrorbolt_damage() -> int:
-	return max(1, int(round((14.0 + float(_mirrorbolt_level) * 4.0) * _get_spell_power_multiplier())))
+	var damage := (14.0 + float(_mirrorbolt_level) * 4.0) * _get_spell_power_multiplier()
+	if _has_endgame_evolution("evo_illusion_kaleido_grid"):
+		damage *= 1.16
+	if _has_endgame_evolution("evo_illusion_glass_bloom"):
+		damage *= 1.12
+	return max(1, int(round(damage)))
 
 
 func _get_mirrorbolt_cooldown() -> float:
-	return maxf(0.38, (0.92 - float(_mirrorbolt_level) * 0.08) * _get_cooldown_multiplier())
+	var cooldown := (0.92 - float(_mirrorbolt_level) * 0.08) * _get_cooldown_multiplier()
+	if _has_endgame_evolution("evo_illusion_prism_relay"):
+		cooldown *= 0.90
+	return maxf(0.28, cooldown)
 
 
 func _get_mirrorbolt_decoy_count() -> int:
-	return 1 + int(_mirrorbolt_level >= 4) + int(_mirrorbolt_level >= 7)
+	var count := 1 + int(_mirrorbolt_level >= 4) + int(_mirrorbolt_level >= 7)
+	if _has_endgame_evolution("evo_illusion_kaleido_grid"):
+		count += 2
+	return count
 
 
 func _get_afterimage_cooldown() -> float:
-	return maxf(1.2, (5.2 - float(_afterimage_level) * 0.44) * _get_cooldown_multiplier())
+	var cooldown := (5.2 - float(_afterimage_level) * 0.44) * _get_cooldown_multiplier()
+	if _has_endgame_evolution("evo_illusion_stage_heist"):
+		cooldown *= 0.86
+	return maxf(0.84, cooldown)
 
 
 func _get_afterimage_limit() -> int:
-	return 1 + _afterimage_level
+	var limit := 1 + _afterimage_level
+	if _has_endgame_evolution("evo_illusion_prism_relay"):
+		limit += 2
+	return limit
 
 
 func _get_afterimage_duration() -> float:
-	return 4.6 + float(_afterimage_level) * 1.0
+	var duration := 4.6 + float(_afterimage_level) * 1.0
+	if _has_endgame_evolution("evo_illusion_prism_relay"):
+		duration += 2.4
+	return duration
 
 
 func _get_switchstep_damage() -> int:
-	return max(1, int(round((18.0 + float(_switchstep_level) * 6.0) * _get_spell_power_multiplier())))
+	var damage := (18.0 + float(_switchstep_level) * 6.0) * _get_spell_power_multiplier()
+	if _has_endgame_evolution("evo_illusion_stage_heist"):
+		damage *= 1.14
+	return max(1, int(round(damage)))
 
 
 func _get_switchstep_radius() -> float:
-	return 76.0 + float(_switchstep_level) * 16.0
+	var radius := 76.0 + float(_switchstep_level) * 16.0
+	if _has_endgame_evolution("evo_illusion_stage_heist"):
+		radius += 24.0
+	return radius
 
 
 func _get_switchstep_cooldown() -> float:
-	return maxf(1.7, (5.4 - float(_switchstep_level) * 0.42) * _get_cooldown_multiplier())
+	var cooldown := (5.4 - float(_switchstep_level) * 0.42) * _get_cooldown_multiplier()
+	if _has_endgame_evolution("evo_illusion_stage_heist"):
+		cooldown *= 0.78
+	return maxf(1.1, cooldown)
 
 
 func _get_prismdance_damage() -> int:
-	return max(1, int(round((10.0 + float(_prismdance_level) * 4.0) * _get_spell_power_multiplier())))
+	var damage := (10.0 + float(_prismdance_level) * 4.0) * _get_spell_power_multiplier()
+	if _has_endgame_evolution("evo_illusion_kaleido_grid"):
+		damage *= 1.14
+	if _has_endgame_evolution("evo_illusion_glass_bloom"):
+		damage *= 1.12
+	return max(1, int(round(damage)))
 
 
 func _get_prismdance_cooldown() -> float:
-	return maxf(1.8, (6.2 - float(_prismdance_level) * 0.46) * _get_cooldown_multiplier())
+	var cooldown := (6.2 - float(_prismdance_level) * 0.46) * _get_cooldown_multiplier()
+	if _has_endgame_evolution("evo_illusion_prism_relay"):
+		cooldown *= 0.86
+	return maxf(1.3, cooldown)
 
 
 func _get_prismdance_projectile_count() -> int:
-	return 2 + int(_prismdance_level >= 3) + int(_prismdance_level >= 4)
+	var count := 2 + int(_prismdance_level >= 3) + int(_prismdance_level >= 4)
+	if _has_endgame_evolution("evo_illusion_glass_bloom"):
+		count += 2
+	return count
 
 
 func _get_prismdance_origin_count() -> int:
-	return 1 + int(_prismdance_level >= 2) + int(_prismdance_level >= 4)
+	var count := 1 + int(_prismdance_level >= 2) + int(_prismdance_level >= 4)
+	if _has_endgame_evolution("evo_illusion_kaleido_grid"):
+		count += 2
+	return count
 
 
 func _fire_bolts() -> void:
@@ -5348,7 +6023,7 @@ func _spawn_regular_enemies() -> void:
 	while _spawn_budget >= 1.0 and _enemies.size() < _get_active_enemy_cap():
 		_spawn_budget -= 1.0
 		var enemy_type := _pick_weighted_enemy_type()
-		var elite_chance := minf(0.34, 0.04 + float(_get_wave_rank()) * 0.012 + float(max(_threat_phase - 1, 0)) * 0.018 + _endless_elite_bonus)
+		var elite_chance := minf(0.46, 0.04 + float(_get_wave_rank()) * 0.012 + float(max(_threat_phase - 1, 0)) * 0.018 + _endless_elite_bonus + _contract_elite_spawn_bonus)
 		var is_elite := not _boss_spawned and _run_time >= 90.0 and _rng.randf() < elite_chance
 		_spawn_enemy(enemy_type, is_elite)
 
@@ -5376,7 +6051,7 @@ func _spawn_enemy(type_name: String, is_elite: bool, options: Dictionary = {}) -
 		enemy.max_health = max(1, int(round(float(enemy.max_health) * health_scale)))
 		enemy.health = enemy.max_health
 		_last_spawned_enemy_health = enemy.max_health
-	var speed_scale := 1.0 + _endless_enemy_speed_bonus + float(max(_threat_phase - 2, 0)) * 0.03
+	var speed_scale := 1.0 + _endless_enemy_speed_bonus + _contract_enemy_speed_bonus + float(max(_threat_phase - 2, 0)) * 0.03
 	if speed_scale != 1.0:
 		enemy.speed *= speed_scale
 	enemy.defeated.connect(_on_enemy_defeated)
@@ -5652,7 +6327,7 @@ func _roll_hazard_interval() -> float:
 
 	var base_range: Vector2 = _current_map.get("hazard_interval", Vector2(5.8, 8.0))
 	var intensity := clampf(_run_time / 360.0, 0.0, 1.0)
-	var hazard_scale := maxf(0.58, 1.0 - _endless_hazard_bonus)
+	var hazard_scale := maxf(0.46, 1.0 - _endless_hazard_bonus - _contract_hazard_bonus)
 	var min_interval := maxf(1.8, base_range.x * lerpf(1.0, 0.76, intensity) * hazard_scale)
 	var max_interval := maxf(min_interval + 0.2, base_range.y * lerpf(1.0, 0.82, intensity) * hazard_scale)
 	return _rng.randf_range(min_interval, max_interval)
@@ -5808,7 +6483,7 @@ func _award_score(base_points: int) -> void:
 
 
 func _get_score_multiplier() -> float:
-	var multiplier := 1.0 + _score_bonus_multiplier + _pickup_heat_bonus
+	var multiplier := 1.0 + _score_bonus_multiplier + _pickup_heat_bonus + _contract_score_bonus
 	multiplier += _get_low_health_score_bonus()
 	if _ruins_altar_buff_timer > 0.0:
 		multiplier += 0.25
@@ -5944,8 +6619,12 @@ func _open_level_up() -> void:
 		return
 
 	_state = GameState.LEVEL_UP
+	_choice_context = "upgrade"
+	_choice_panel_title = "选择一项联动组件"
+	_choice_panel_subtitle = "补强当前构筑，或顺势转向下一条路线。"
 	_upgrade_choices = _build_upgrade_choices()
 	_hud.hide_pause_menu()
+	_apply_choice_panel_context()
 	_hud.show_upgrade_choices(_upgrade_choices)
 	_hud.set_message("")
 	_message_timer = 0.0
@@ -6979,112 +7658,112 @@ func _apply_character_upgrade_choice(index: int) -> void:
 		return
 
 	var choice: Dictionary = _upgrade_choices[index]
-	match String(choice.get("key", "")):
-		"bolt":
-			_bolt_level += 1
-		"orbit":
-			_orbit_level += 1
-		"nova":
-			_nova_level += 1
-		"storm":
-			_storm_level += 1
-		"slash":
-			_slash_level += 1
-		"blade_ring":
-			_blade_ring_level += 1
-		"mooncut":
-			_mooncut_level += 1
-		"step_slash":
-			_step_slash_level += 1
-		"chain":
-			_chain_level += 1
-		"detonate":
-			_detonate_level += 1
-		"storm_orb":
-			_storm_orb_level += 1
-		"ascension":
-			_ascension_level = max(_ascension_level, 1)
-		"flask":
-			_flask_level += 1
-		"miasma":
-			_miasma_level += 1
-		"shardburst":
-			_shardburst_level += 1
-		"catalyst":
-			_catalyst_level += 1
-		"needle":
-			_needle_level += 1
-		"volley":
-			_volley_level += 1
-		"glaive":
-			_glaive_level += 1
-		"trail":
-			_trail_level += 1
-		"pulse":
-			_pulse_level += 1
-		"ward":
-			_ward_level += 1
-		"beacon":
-			_beacon_level += 1
-		"relay":
-			_relay_level += 1
-		"oathshot":
-			_oathshot_level += 1
-		"brand":
-			_brand_level += 1
-		"bloodtrail":
-			_bloodtrail_level += 1
-		"verdict":
-			_verdict_level += 1
-		"dirge":
-			_dirge_level += 1
-		"wake":
-			_wake_level += 1
-		"toll":
-			_toll_level += 1
-		"choir":
-			_choir_level += 1
-		"mirrorbolt":
-			_mirrorbolt_level += 1
-		"afterimage":
-			_afterimage_level += 1
-		"switchstep":
-			_switchstep_level += 1
-		"prismdance":
-			_prismdance_level += 1
-		"mut_flame_split":
-			_flame_split_mutation = true
-		"mut_rend":
-			_rend_mutation = true
-		"mut_execution":
-			_execution_mutation = true
-		"mut_nova_orbit":
-			_nova_orbit_mutation = true
-		"mut_singularity":
-			_storm_singularity_mutation = true
-		"mut_supercell":
-			_supercell_mutation = true
-		"evo_blade_crimson_tide", "evo_blade_pyre_forks", "evo_blade_execution_storm", "evo_blade_ring_dominion", "evo_thunder_arc_net", "evo_thunder_blast_relay", "evo_thunder_orb_overclock", "evo_thunder_storm_core", "evo_caster_orbit_overload", "evo_caster_supernova_lattice", "evo_caster_tempest_network", "evo_caster_singularity_prison":
-			var route_id := _get_endgame_route_id_for_key(String(choice.get("key", "")))
-			if route_id.is_empty():
+	var choice_key := String(choice.get("key", ""))
+	var endgame_route_id := _get_endgame_route_id_for_key(choice_key)
+	if not endgame_route_id.is_empty():
+		_selected_endgame_branches[endgame_route_id] = choice_key
+	else:
+		match choice_key:
+			"bolt":
+				_bolt_level += 1
+			"orbit":
+				_orbit_level += 1
+			"nova":
+				_nova_level += 1
+			"storm":
+				_storm_level += 1
+			"slash":
+				_slash_level += 1
+			"blade_ring":
+				_blade_ring_level += 1
+			"mooncut":
+				_mooncut_level += 1
+			"step_slash":
+				_step_slash_level += 1
+			"chain":
+				_chain_level += 1
+			"detonate":
+				_detonate_level += 1
+			"storm_orb":
+				_storm_orb_level += 1
+			"ascension":
+				_ascension_level = max(_ascension_level, 1)
+			"flask":
+				_flask_level += 1
+			"miasma":
+				_miasma_level += 1
+			"shardburst":
+				_shardburst_level += 1
+			"catalyst":
+				_catalyst_level += 1
+			"needle":
+				_needle_level += 1
+			"volley":
+				_volley_level += 1
+			"glaive":
+				_glaive_level += 1
+			"trail":
+				_trail_level += 1
+			"pulse":
+				_pulse_level += 1
+			"ward":
+				_ward_level += 1
+			"beacon":
+				_beacon_level += 1
+			"relay":
+				_relay_level += 1
+			"oathshot":
+				_oathshot_level += 1
+			"brand":
+				_brand_level += 1
+			"bloodtrail":
+				_bloodtrail_level += 1
+			"verdict":
+				_verdict_level += 1
+			"dirge":
+				_dirge_level += 1
+			"wake":
+				_wake_level += 1
+			"toll":
+				_toll_level += 1
+			"choir":
+				_choir_level += 1
+			"mirrorbolt":
+				_mirrorbolt_level += 1
+			"afterimage":
+				_afterimage_level += 1
+			"switchstep":
+				_switchstep_level += 1
+			"prismdance":
+				_prismdance_level += 1
+			"mut_flame_split":
+				_flame_split_mutation = true
+			"mut_rend":
+				_rend_mutation = true
+			"mut_execution":
+				_execution_mutation = true
+			"mut_nova_orbit":
+				_nova_orbit_mutation = true
+			"mut_singularity":
+				_storm_singularity_mutation = true
+			"mut_supercell":
+				_supercell_mutation = true
+			"stride":
+				_stride_level += 1
+			"vitality":
+				_vitality_level += 1
+			"focus":
+				_focus_level += 1
+			"magnet":
+				_magnet_level += 1
+			"mastery":
+				_mastery_level += 1
+			"repair":
+				_player.heal(3)
+			"cache":
+				_experience += _xp_to_next * 0.35
+			_:
 				return
-			_selected_endgame_branches[route_id] = String(choice.get("key", ""))
-		"stride":
-			_stride_level += 1
-		"vitality":
-			_vitality_level += 1
-		"focus":
-			_focus_level += 1
-		"magnet":
-			_magnet_level += 1
-		"mastery":
-			_mastery_level += 1
-		"repair":
-			_player.heal(3)
-		"cache":
-			_experience += _xp_to_next * 0.35
-		_:
-			return
 
 	_upgrade_choices.clear()
 	_hud.hide_upgrade_choices()
@@ -7101,48 +7780,10 @@ func _apply_character_upgrade_choice(index: int) -> void:
 
 
 func _apply_upgrade_choice(index: int) -> void:
-	_apply_character_upgrade_choice(index)
-	return
-
-	if index < 0 or index >= _upgrade_choices.size():
+	if _choice_context == "contract":
+		_apply_contract_choice(index)
 		return
-
-	var choice: Dictionary = _upgrade_choices[index]
-	match String(choice.get("key", "")):
-		"bolt":
-			_bolt_level += 1
-		"orbit":
-			_orbit_level += 1
-		"nova":
-			_nova_level += 1
-		"storm":
-			_storm_level += 1
-		"stride":
-			_stride_level += 1
-		"vitality":
-			_vitality_level += 1
-		"focus":
-			_focus_level += 1
-		"magnet":
-			_magnet_level += 1
-		"mastery":
-			_mastery_level += 1
-		"repair":
-			_player.heal(3)
-		"cache":
-			_experience += _xp_to_next * 0.35
-
-	_upgrade_choices.clear()
-	_hud.hide_upgrade_choices()
-	_apply_player_build(false)
-	_sync_satellites()
-	_show_message("强化完成：%s" % String(choice.get("title", "秘术")), Color(0.84, 0.96, 1.0), 1.8)
-	_update_hud()
-
-	_state = GameState.PLAYING
-	_set_pause_state(false)
-	if _experience >= _xp_to_next:
-		_open_level_up()
+	_apply_character_upgrade_choice(index)
 
 
 func _apply_player_build(is_fresh_run: bool) -> void:
@@ -7826,6 +8467,7 @@ func _get_build_info_lines() -> Array[String]:
 	var primary: Dictionary = snapshot.get("primary", {})
 	var secondary: Dictionary = snapshot.get("secondary", {})
 	var primary_score := int(primary.get("score", 0))
+	var contract_summary := _get_contract_summary()
 	if primary.is_empty() or primary_score <= 0:
 		var paths := _get_build_path_definitions()
 		if paths.size() >= 2:
@@ -7833,6 +8475,8 @@ func _get_build_info_lines() -> Array[String]:
 			lines.append("开局建议: 先拿路线专属核心，再补共享组件。")
 		else:
 			lines.append("构筑路线: 未定型")
+		if not contract_summary.is_empty():
+			lines.append("战场契约: %s" % contract_summary)
 		return lines
 
 	if not _is_build_focus_locked(snapshot):
@@ -7854,6 +8498,8 @@ func _get_build_info_lines() -> Array[String]:
 			)
 		else:
 			lines.append("定型建议: %s" % (" / ".join(primary_recommendations) if not primary_recommendations.is_empty() else String(primary.get("focus", "补足核心件"))))
+		if not contract_summary.is_empty():
+			lines.append("战场契约: %s" % contract_summary)
 		return lines
 
 	var focus_line := "主路线: %s" % String(primary.get("name", "当前路线"))
@@ -7871,6 +8517,8 @@ func _get_build_info_lines() -> Array[String]:
 		if not secondary_recommendations.is_empty():
 			next_line += "   转向口: %s" % " / ".join(secondary_recommendations)
 	lines.append(next_line)
+	if not contract_summary.is_empty():
+		lines.append("战场契约: %s" % contract_summary)
 	return lines
 
 
@@ -7996,11 +8644,15 @@ func _get_map_rule_status_text() -> String:
 			return "沼泽池 %d" % _void_pools.size() if _map_rule_active else "沼泽未沸腾"
 		"bridge_train":
 			if not _train_car_zones.is_empty():
+				if _train_break_index >= 0 and _train_break_index < _train_car_zones.size():
+					return "跨车 %d/%d 断节:%d" % [_train_car_active_index, _train_car_zones.size(), _train_break_index + 1]
 				return "跨车 %d/%d" % [_train_car_active_index, _train_car_zones.size()]
 			if _train_rush_timer > 0.0:
 				return "列车稳速 %.0fs" % _train_rush_timer
 			return "车节待现身"
 		"black_fog_hunt":
+			if _fog_fake_brazier_zone != null and is_instance_valid(_fog_fake_brazier_zone):
+				return "伪灯 %.0f%%" % (_fog_fake_brazier_progress * 100.0)
 			if _fog_brazier_zone != null and is_instance_valid(_fog_brazier_zone):
 				return "点灯 %.0f%%" % (_fog_brazier_progress * 100.0)
 			if _fog_light_timer > 0.0:
@@ -8008,6 +8660,8 @@ func _get_map_rule_status_text() -> String:
 			return "黑雾逼近"
 		"airship_breach":
 			if _airship_breach_zone != null and is_instance_valid(_airship_breach_zone):
+				if _airship_breach_drift_direction != Vector2.ZERO:
+					return "逆风封舱 %.0f%%" % (_airship_breach_progress * 100.0)
 				return "封舱 %.0f%%" % (_airship_breach_progress * 100.0)
 			if _airship_tailwind_timer > 0.0:
 				return "顺风炮列 %.0fs" % _airship_tailwind_timer
@@ -8017,21 +8671,34 @@ func _get_map_rule_status_text() -> String:
 
 
 func _get_map_rule_status_text_v2() -> String:
+	var map_status := ""
 	match _selected_map_id:
 		"prism_archive":
 			if _prism_focus_zone != null and is_instance_valid(_prism_focus_zone) and _prism_link_target_zone != null and is_instance_valid(_prism_link_target_zone):
-				return "连线 %.0f%%" % (_prism_focus_progress * 100.0)
-			if _prism_overcharge_timer > 0.0:
-				return "棱镜过载 %.0fs" % _prism_overcharge_timer
-			return "折光链待连通"
+				map_status = "连线 %.0f%%" % (_prism_focus_progress * 100.0)
+			elif _prism_overcharge_timer > 0.0:
+				map_status = "棱镜过载 %.0fs" % _prism_overcharge_timer
+			else:
+				map_status = "折光链待连通"
 		"clockwork_garden":
 			if _clock_node_zone != null and is_instance_valid(_clock_node_zone):
-				return "抢占 %.0f%%" % (_clock_node_progress * 100.0)
-			if _clock_overdrive_timer > 0.0:
-				return "齿轮超频 %.0fs" % _clock_overdrive_timer
-			return "节点待抢占"
+				map_status = "抢占 %.0f%%" % (_clock_node_progress * 100.0)
+			elif _clock_overdrive_timer > 0.0:
+				map_status = "齿轮超频 %.0fs" % _clock_overdrive_timer
+			else:
+				map_status = "节点待抢占"
 		_:
-			return _get_map_rule_status_text()
+			map_status = _get_map_rule_status_text()
+
+	if _contract_zone != null and is_instance_valid(_contract_zone):
+		return "%s   契约 %.0f%%" % [map_status, _contract_zone_progress * 100.0]
+	if _contract_spawn_index < CONTRACT_SPAWN_TIMES.size() and not _boss_spawned and not _boss_warning_shown:
+		var remain := maxf(0.0, float(CONTRACT_SPAWN_TIMES[_contract_spawn_index]) - _run_time)
+		if remain <= 60.0:
+			return "%s   契约点 %.0fs" % [map_status, remain]
+	if not _active_contract_ids.is_empty():
+		return "%s   契约x%d" % [map_status, _active_contract_ids.size()]
+	return map_status
 
 
 func _update_hud() -> void:
@@ -8231,7 +8898,9 @@ func _get_player_speed() -> float:
 		base_speed = 262.0
 	if _clock_overdrive_timer > 0.0:
 		base_speed += 26.0
-	return base_speed + float(_stride_level) * 22.0
+	var final_speed := base_speed + float(_stride_level) * 22.0
+	final_speed *= 1.0 + _contract_speed_bonus
+	return final_speed
 
 
 func _get_player_max_health() -> int:
@@ -8252,7 +8921,7 @@ func _get_player_max_health() -> int:
 		base_health = 9
 	elif _is_illusionist_character():
 		base_health = 7
-	return base_health + _vitality_level * 2
+	return max(1, base_health + _vitality_level * 2 - _contract_max_health_penalty)
 
 
 func _get_player_pickup_radius() -> float:
@@ -8273,7 +8942,7 @@ func _get_player_pickup_radius() -> float:
 		base_radius = 156.0
 	elif _is_illusionist_character():
 		base_radius = 146.0
-	return base_radius + float(_magnet_level) * 50.0
+	return base_radius + float(_magnet_level) * 50.0 + _contract_pickup_bonus
 
 
 func _get_spell_power_multiplier() -> float:
@@ -8290,6 +8959,7 @@ func _get_spell_power_multiplier() -> float:
 		multiplier += 0.08
 	if _airship_tailwind_timer > 0.0:
 		multiplier += 0.16
+	multiplier += _contract_spell_power_bonus
 	return multiplier
 
 
@@ -8303,6 +8973,7 @@ func _get_xp_gain_multiplier() -> float:
 		multiplier += 0.08
 	if _fog_light_timer > 0.0:
 		multiplier += 0.14
+	multiplier += _contract_xp_bonus
 	return multiplier
 
 
@@ -8320,6 +8991,7 @@ func _get_cooldown_multiplier() -> float:
 		multiplier *= 0.88
 	if _airship_tailwind_timer > 0.0:
 		multiplier *= 0.88
+	multiplier *= _contract_cooldown_scale
 	return maxf(0.50, multiplier)
 
 
@@ -9236,10 +9908,29 @@ func _on_enemy_defeated(enemy: EnemySoldier, experience_value: int) -> void:
 	if _is_thunder_character() and enemy != _boss_enemy:
 		_try_trigger_detonate(enemy.global_position)
 	if was_marked:
+		var mark_center := enemy.global_position
 		if _is_blood_hunter_character() and _player != null and is_instance_valid(_player):
 			_player.heal(_get_brand_heal())
-			_spawn_effect(enemy.global_position, _get_brand_burst_radius() * 0.92, Color(0.98, 0.30, 0.34), Color(1.0, 0.88, 0.84), 0.18)
-			_damage_enemies_in_radius(enemy.global_position, _get_brand_burst_radius(), _get_brand_burst_damage(), 180.0, 5)
+			_spawn_effect(mark_center, _get_brand_burst_radius() * 0.92, Color(0.98, 0.30, 0.34), Color(1.0, 0.88, 0.84), 0.18)
+			_damage_enemies_in_radius(mark_center, _get_brand_burst_radius(), _get_brand_burst_damage(), 180.0, 5)
+			if _has_endgame_evolution("evo_hunter_blood_quarry"):
+				var chain_damage: int = max(1, int(round(float(_get_oathshot_damage()) * 0.55)))
+				var chain_targets := _get_nearest_enemies(mark_center, 3, 320.0)
+				for chain_target in chain_targets:
+					if chain_target == null or not is_instance_valid(chain_target) or chain_target == enemy:
+						continue
+					var chain_direction := (chain_target.global_position - mark_center).normalized()
+					if chain_direction == Vector2.ZERO:
+						chain_direction = Vector2.RIGHT.rotated(_rng.randf_range(0.0, TAU))
+					_apply_blood_mark(chain_target, 3.4)
+					chain_target.take_damage(chain_damage, chain_direction * 140.0)
+					_spawn_rule_link_effect(mark_center, chain_target.global_position, 4.0, Color(0.96, 0.30, 0.34), Color(1.0, 0.86, 0.82), 0.14)
+			if _has_endgame_evolution("evo_hunter_harvest_run"):
+				_spawn_bloodtrail_zone(mark_center)
+				_oathshot_timer = minf(_oathshot_timer, 0.18)
+				_verdict_timer = minf(_verdict_timer, 0.90)
+			if _has_endgame_evolution("evo_hunter_verdict_gallows"):
+				_verdict_timer = minf(_verdict_timer, 0.62)
 		_consume_blood_mark(enemy)
 	if _is_grave_caller_character() and not enemy.is_boss():
 		_spawn_grave_token(enemy.global_position)
@@ -9286,6 +9977,10 @@ func _on_boss_phase_changed(enemy: EnemySoldier, phase_index: int) -> void:
 		Color(0.96, 0.42, 0.22),
 		0.44
 	)
+	if _hazard_root != null and is_instance_valid(_hazard_root):
+		var surge_radius := 64.0 + float(phase_index) * 8.0
+		_spawn_prelude_blast_marker(enemy.global_position, surge_radius, 0.08, 200.0 + float(phase_index) * 16.0, 0.48, Color(1.0, 0.88, 0.62), Color(0.94, 0.28, 0.18))
+	_apply_area_current_health_damage(enemy.global_position, 84.0 + float(phase_index) * 12.0, 0.07 + float(phase_index) * 0.01, 200.0)
 	_spawn_boss_phase_reinforcements(phase_index)
 
 	var extra_text := "战场规则开始介入。"
@@ -9298,7 +9993,8 @@ func _on_boss_phase_changed(enemy: EnemySoldier, phase_index: int) -> void:
 	else:
 		_trigger_map_boss_phase_burst(phase_index, false)
 
-	_show_message("%s 进入%s。%s" % [_get_current_boss_name(), _get_boss_phase_title(phase_index), extra_text], Color(1.0, 0.90, 0.64), 3.4)
+	var form_title := _get_boss_form_shift_title(enemy, phase_index)
+	_show_message("%s 进入%s · %s。%s" % [_get_current_boss_name(), _get_boss_phase_title(phase_index), form_title, extra_text], Color(1.0, 0.90, 0.64), 3.4)
 	_update_hud()
 
 
@@ -9310,6 +10006,20 @@ func _get_boss_phase_title(phase_index: int) -> String:
 			return "三阶段暴走"
 		_:
 			return "终局狂潮"
+
+
+func _get_boss_form_shift_title(enemy: EnemySoldier, phase_index: int) -> String:
+	if enemy == null:
+		return "形态重构"
+	match String(enemy.archetype):
+		"storm_archon":
+			return "风翼裂展" if phase_index >= 2 else "雷翼展开"
+		"forge_tyrant":
+			return "炉芯开裂" if phase_index >= 2 else "熔炉增压"
+		"void_matriarch":
+			return "瞳核分裂" if phase_index >= 2 else "触须延展"
+		_:
+			return "形态重构"
 
 
 func _spawn_boss_phase_reinforcements(phase_index: int) -> void:
