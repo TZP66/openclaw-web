@@ -424,6 +424,38 @@ const ENEMY_MODELS := {
 <path d='M74 24L80 10L86 24' fill='none' stroke='#ffd06a' stroke-width='6' stroke-linecap='round'/>
 </svg>""",
 	},
+	"red": {
+		"id": "red",
+		"game_height": 156.0,
+		"game_offset": Vector2(0.0, -8.0),
+		"svg": """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'>
+<circle cx='80' cy='82' r='52' fill='#ff8a78' opacity='0.10'/>
+<circle cx='80' cy='82' r='42' fill='none' stroke='#ffd8a0' stroke-width='4' opacity='0.18'/>
+<path d='M54 150L68 104L92 104L106 150L92 150L84 124L76 124L68 150Z' fill='#2b0f14' stroke='#12070a' stroke-width='5' stroke-linejoin='round'/>
+<path d='M42 148L58 122L70 128L64 150L46 150Z' fill='#4c151d' stroke='#18070b' stroke-width='4' stroke-linejoin='round'/>
+<path d='M118 148L102 122L90 128L96 150L114 150Z' fill='#4c151d' stroke='#18070b' stroke-width='4' stroke-linejoin='round'/>
+<path d='M44 62Q48 40 80 40Q112 40 116 62L110 118Q96 138 80 138Q64 138 50 118Z' fill='#8d1f28' stroke='#2b0b10' stroke-width='6' stroke-linejoin='round'/>
+<path d='M80 48L98 64L96 112Q80 124 64 112L62 64Z' fill='#121418'/>
+<path d='M64 54L80 46L96 54' fill='none' stroke='#f6d27a' stroke-width='4' stroke-linecap='round'/>
+<path d='M70 74L90 74' fill='none' stroke='#d9e0e8' stroke-width='4' stroke-linecap='round'/>
+<path d='M72 92L88 92' fill='none' stroke='#ffd68e' stroke-width='4' stroke-linecap='round'/>
+<path d='M54 76L38 118' stroke='#2b0b10' stroke-width='8' stroke-linecap='round'/>
+<path d='M108 72L126 112' stroke='#2b0b10' stroke-width='8' stroke-linecap='round'/>
+<path d='M50 80L34 68L48 56L66 72' fill='#a42530' stroke='#4c151d' stroke-width='4' stroke-linejoin='round'/>
+<path d='M120 112L144 100L138 124L116 128Z' fill='#e3494a' stroke='#65161a' stroke-width='4' stroke-linejoin='round'/>
+<path d='M132 92Q148 96 144 110Q136 120 124 112' fill='none' stroke='#ffd68e' stroke-width='4' stroke-linecap='round'/>
+<circle cx='132' cy='110' r='6' fill='#ffd68e' stroke='#7a2d21' stroke-width='3'/>
+<rect x='74' y='52' width='12' height='20' rx='4' fill='#f4ead6'/>
+<circle cx='80' cy='36' r='15' fill='#f3c7a7' stroke='#2b0b10' stroke-width='4'/>
+<path d='M62 34Q66 12 80 14Q96 12 100 34L96 44Q88 39 80 39Q72 39 64 44Z' fill='#2b1515' stroke='#18070b' stroke-width='4' stroke-linejoin='round'/>
+<path d='M66 28Q80 20 94 28' fill='none' stroke='#5d2a2a' stroke-width='4' stroke-linecap='round'/>
+<path d='M70 34L64 42' stroke='#2b1515' stroke-width='4' stroke-linecap='round'/>
+<path d='M90 34L98 42' stroke='#2b1515' stroke-width='4' stroke-linecap='round'/>
+<path d='M71 36L76 36' stroke='#201012' stroke-width='3' stroke-linecap='round'/>
+<path d='M84 36L89 36' stroke='#201012' stroke-width='3' stroke-linecap='round'/>
+<path d='M71 46Q80 52 89 46' fill='none' stroke='#b96c61' stroke-width='3' stroke-linecap='round'/>
+</svg>""",
+	},
 	"void_matriarch": {
 		"id": "void_matriarch",
 		"game_height": 150.0,

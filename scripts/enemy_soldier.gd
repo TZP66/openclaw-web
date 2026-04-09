@@ -31,6 +31,8 @@ var shield: int = 0
 var max_shield: int = 0
 var touch_damage: int = 1
 var experience_value: int = 1
+var damage_override: int = 0
+var damage_multiplier: float = 1.0
 
 var _body_radius: float = 14.0
 var _touch_cooldown: float = 0.0
@@ -75,7 +77,7 @@ func configure(type_name: String, wave_rank: int, is_elite: bool, player_target:
 	elite_affixes.clear()
 	_elite_affix_lookup.clear()
 	_elite_affix_timers.clear()
-	boss = bool(options.get("boss", false)) or archetype in ["storm_archon", "forge_tyrant", "void_matriarch"]
+	boss = bool(options.get("boss", false)) or archetype in ["storm_archon", "forge_tyrant", "void_matriarch", "red"]
 	_phase = randf() * TAU
 	_special_timer = randf_range(1.1, 2.2)
 	_dash_time = 0.0
@@ -90,6 +92,8 @@ func configure(type_name: String, wave_rank: int, is_elite: bool, player_target:
 	_signature_burst_duration = 0.0
 	shield = 0
 	max_shield = 0
+	damage_override = max(0, int(options.get("damage_override", 0)))
+	damage_multiplier = maxf(0.0, float(options.get("damage_multiplier", 1.0)))
 
 	match archetype:
 		"lancer":
@@ -140,6 +144,14 @@ func configure(type_name: String, wave_rank: int, is_elite: bool, player_target:
 			touch_damage = 4
 			experience_value = 24
 			_special_timer = 3.8
+		"red":
+			boss = true
+			_body_radius = 44.0
+			speed = 80.0 + float(wave_rank) * 1.5
+			max_health = 600 + wave_rank * 42
+			touch_damage = 4
+			experience_value = 24
+			_special_timer = 3.6
 		"void_matriarch":
 			boss = true
 			_body_radius = 40.0
@@ -208,7 +220,7 @@ func _physics_process(delta: float) -> void:
 
 	var hurt_distance := _body_radius + target.get_body_radius() + (10.0 if boss else 4.0)
 	if global_position.distance_to(target.global_position) <= hurt_distance and _touch_cooldown <= 0.0:
-		target.take_damage(touch_damage)
+		_deal_damage(touch_damage)
 		_touch_cooldown = 0.9 if boss else 0.72
 
 	if boss:
@@ -313,11 +325,11 @@ func _process_special_behavior(to_player: Vector2, direction: Vector2) -> void:
 			var radius := 72.0
 			special_attack.emit(global_position, radius, Color(1.0, 0.76, 0.34), Color(1.0, 0.38, 0.18))
 			if _player_in_radius(global_position, radius):
-				target.take_damage(1)
+				_deal_damage(1)
 			_special_timer = randf_range(1.9, 2.7)
 		"storm_archon":
 			_use_storm_archon_skill(direction)
-		"forge_tyrant":
+		"forge_tyrant", "red":
 			_use_forge_tyrant_skill(direction)
 		"void_matriarch":
 			_use_void_matriarch_skill(direction)
@@ -337,7 +349,7 @@ func _process_elite_affixes(delta: float, to_player: Vector2, direction: Vector2
 			var rush_marker := global_position + direction * (_body_radius + 26.0)
 			special_attack.emit(rush_marker, 44.0, Color(0.72, 0.96, 1.0), Color(0.26, 0.64, 0.98))
 			if _player_in_radius(rush_marker, 44.0):
-				target.take_damage(1)
+				_deal_damage(1)
 			_elite_affix_timers["dash"] = randf_range(4.2, 5.4)
 
 	if _has_elite_affix("snare"):
@@ -347,7 +359,7 @@ func _process_elite_affixes(delta: float, to_player: Vector2, direction: Vector2
 			var snare_radius := _get_snare_radius()
 			special_attack.emit(global_position, snare_radius, Color(0.84, 0.74, 1.0), Color(0.28, 0.18, 0.44))
 			if _player_in_radius(global_position, snare_radius):
-				target.take_damage(1 + int(_elite_wave_rank >= 7))
+				_deal_damage(1 + int(_elite_wave_rank >= 7))
 			_elite_affix_timers["snare"] = randf_range(3.6, 4.8)
 
 	if _has_elite_affix("hunter") and to_player.length() > 200.0 and int(_phase * 10.0) % 9 == 0:
@@ -361,7 +373,7 @@ func _process_elite_affixes(delta: float, to_player: Vector2, direction: Vector2
 			special_attack.emit(global_position, siphon_radius, Color(0.72, 1.0, 0.74), Color(0.24, 0.44, 0.26))
 			health = min(max_health, health + max(1, int(round(float(max_health) * 0.06))))
 			if _player_in_radius(global_position, siphon_radius):
-				target.take_damage(1 + int(_elite_wave_rank >= 8))
+				_deal_damage(1 + int(_elite_wave_rank >= 8))
 			_elite_affix_timers["siphon"] = randf_range(4.2, 5.0)
 
 	if _has_elite_affix("beacon"):
@@ -371,7 +383,7 @@ func _process_elite_affixes(delta: float, to_player: Vector2, direction: Vector2
 			var beacon_radius := _body_radius + 68.0
 			special_attack.emit(global_position, beacon_radius, Color(1.0, 0.94, 0.62), Color(0.90, 0.56, 0.24))
 			if _player_in_radius(global_position, beacon_radius):
-				target.take_damage(1 + int(_elite_wave_rank >= 9))
+				_deal_damage(1 + int(_elite_wave_rank >= 9))
 			_elite_affix_timers["beacon"] = randf_range(4.6, 5.8)
 
 
@@ -395,7 +407,7 @@ func _use_storm_archon_skill(direction: Vector2) -> void:
 			for blast_position in flank_positions:
 				special_attack.emit(blast_position, 52.0 + phase_bonus * 4.0, Color(0.82, 0.92, 1.0), Color(0.20, 0.54, 0.98))
 		if _player_in_radius(global_position, blast_radius) or _player_in_any_radius(flank_positions, 52.0 + phase_bonus * 4.0):
-			target.take_damage(2 + int(_boss_phase_index >= 2))
+			_deal_damage(2 + int(_boss_phase_index >= 2))
 		_special_timer = maxf(2.9, 4.2 - phase_bonus * 0.30)
 	elif cycle == 1:
 		var cross_distance := 96.0 + phase_bonus * 12.0
@@ -417,7 +429,7 @@ func _use_storm_archon_skill(direction: Vector2) -> void:
 		for blast_position in cross_positions:
 			special_attack.emit(blast_position, 64.0 + phase_bonus * 4.0, Color(0.88, 0.96, 1.0), Color(0.34, 0.62, 1.0))
 		if _player_in_any_radius(cross_positions, 64.0 + phase_bonus * 4.0):
-			target.take_damage(2 + int(_boss_phase_index >= 2))
+			_deal_damage(2 + int(_boss_phase_index >= 2))
 		_special_timer = maxf(3.2, 4.9 - phase_bonus * 0.34)
 	else:
 		var ring_positions: Array[Vector2] = []
@@ -431,7 +443,7 @@ func _use_storm_archon_skill(direction: Vector2) -> void:
 		var center_radius := 74.0 + phase_bonus * 8.0
 		special_attack.emit(global_position, center_radius, Color(0.88, 0.96, 1.0), Color(0.28, 0.70, 1.0))
 		if _player_in_any_radius(ring_positions, 58.0 + phase_bonus * 4.0) or _player_in_radius(global_position, center_radius):
-			target.take_damage(1 + int(_boss_phase_index >= 1))
+			_deal_damage(1 + int(_boss_phase_index >= 1))
 		_special_timer = maxf(3.4, 5.3 - phase_bonus * 0.38)
 	_special_cycle += 1
 
@@ -450,7 +462,7 @@ func _use_forge_tyrant_skill(direction: Vector2) -> void:
 			for blast_position in side_bursts:
 				special_attack.emit(blast_position, 52.0 + phase_bonus * 4.0, Color(1.0, 0.84, 0.52), Color(0.84, 0.24, 0.12))
 		if _player_in_radius(global_position, shockwave_radius) or _player_in_any_radius(side_bursts, 52.0 + phase_bonus * 4.0):
-			target.take_damage(2 + int(_boss_phase_index >= 2))
+			_deal_damage(2 + int(_boss_phase_index >= 2))
 		_special_timer = maxf(3.2, 4.6 - phase_bonus * 0.30)
 	elif cycle == 1:
 		var orthogonal := direction.orthogonal()
@@ -469,7 +481,7 @@ func _use_forge_tyrant_skill(direction: Vector2) -> void:
 		for blast_position in artillery_positions:
 			special_attack.emit(blast_position, 56.0 + phase_bonus * 4.0, Color(1.0, 0.82, 0.46), Color(0.92, 0.30, 0.16))
 		if _player_in_any_radius(artillery_positions, 56.0 + phase_bonus * 4.0):
-			target.take_damage(2 + int(_boss_phase_index >= 2))
+			_deal_damage(2 + int(_boss_phase_index >= 2))
 		_special_timer = maxf(3.5, 5.2 - phase_bonus * 0.34)
 	else:
 		_dash_velocity = direction * speed * (3.2 + phase_bonus * 0.30)
@@ -482,7 +494,7 @@ func _use_forge_tyrant_skill(direction: Vector2) -> void:
 		if _boss_phase_index >= 2:
 			special_attack.emit(global_position, 88.0, Color(1.0, 0.82, 0.48), Color(0.86, 0.24, 0.12))
 		if _player_in_any_radius(rush_positions, 52.0 + phase_bonus * 4.0) or (_boss_phase_index >= 2 and _player_in_radius(global_position, 88.0)):
-			target.take_damage(1 + int(_boss_phase_index >= 1))
+			_deal_damage(1 + int(_boss_phase_index >= 1))
 		_special_timer = maxf(3.6, 5.5 - phase_bonus * 0.38)
 	_special_cycle += 1
 
@@ -500,7 +512,7 @@ func _use_void_matriarch_skill(_direction: Vector2) -> void:
 				special_attack.emit(global_position + Vector2.RIGHT.rotated(angle) * 104.0, 42.0 + phase_bonus * 4.0, Color(0.78, 0.70, 1.0), Color(0.30, 0.18, 0.42))
 		summon_requested.emit(global_position, _summon_type, 3 + _boss_phase_index, 196.0 + phase_bonus * 12.0)
 		if _player_in_radius(global_position, brood_radius):
-			target.take_damage(2 + int(_boss_phase_index >= 2))
+			_deal_damage(2 + int(_boss_phase_index >= 2))
 		_special_timer = maxf(3.8, 5.4 - phase_bonus * 0.30)
 	elif cycle == 1:
 		var bloom_positions: Array[Vector2] = []
@@ -514,7 +526,7 @@ func _use_void_matriarch_skill(_direction: Vector2) -> void:
 		if _boss_phase_index >= 1:
 			special_attack.emit(target.global_position, 48.0 + phase_bonus * 4.0, Color(0.84, 0.76, 1.0), Color(0.28, 0.16, 0.40))
 		if _player_in_any_radius(bloom_positions, 66.0 + phase_bonus * 4.0) or (_boss_phase_index >= 1 and _player_in_radius(target.global_position, 48.0 + phase_bonus * 4.0)):
-			target.take_damage(1 + int(_boss_phase_index >= 2))
+			_deal_damage(1 + int(_boss_phase_index >= 2))
 		_special_timer = maxf(4.0, 5.7 - phase_bonus * 0.34)
 	else:
 		var brood_ring: Array[Vector2] = []
@@ -527,7 +539,7 @@ func _use_void_matriarch_skill(_direction: Vector2) -> void:
 			special_attack.emit(blast_position, 60.0 + phase_bonus * 4.0, Color(0.68, 0.60, 1.0), Color(0.18, 0.12, 0.32))
 		summon_requested.emit(global_position, _summon_type, 1 + int(_boss_phase_index >= 1), 170.0 + phase_bonus * 12.0)
 		if _player_in_any_radius(brood_ring, 60.0 + phase_bonus * 4.0):
-			target.take_damage(1 + int(_boss_phase_index >= 1))
+			_deal_damage(1 + int(_boss_phase_index >= 1))
 		_special_timer = maxf(4.2, 6.0 - phase_bonus * 0.38)
 	_special_cycle += 1
 
@@ -543,6 +555,13 @@ func _player_in_any_radius(centers: Array[Vector2], radius: float) -> bool:
 		if _player_in_radius(center, radius):
 			return true
 	return false
+
+
+func _deal_damage(base_amount: int) -> void:
+	if base_amount <= 0 or target == null or not is_instance_valid(target) or not target.is_alive():
+		return
+	var amount: int = damage_override if damage_override > 0 else max(1, int(round(float(base_amount) * damage_multiplier)))
+	target.take_damage(amount)
 
 
 func _build_desired_velocity(to_player: Vector2, direction: Vector2) -> Vector2:
@@ -567,7 +586,7 @@ func _build_desired_velocity(to_player: Vector2, direction: Vector2) -> Vector2:
 			return (direction * pull_speed + direction.orthogonal() * sin(_phase * 0.75) * 18.0) * elite_speed_multiplier
 		"storm_archon":
 			return direction * speed * 0.74 * boss_phase_speed_bonus + direction.orthogonal() * _orbit_direction * (94.0 + float(_boss_phase_index) * 10.0)
-		"forge_tyrant":
+		"forge_tyrant", "red":
 			return direction * speed * (0.86 + float(_boss_phase_index) * 0.04) + direction.orthogonal() * cos(_phase * 0.85) * (18.0 + float(_boss_phase_index) * 4.0)
 		"void_matriarch":
 			var orbit_velocity := direction.orthogonal() * _orbit_direction * (92.0 + float(_boss_phase_index) * 8.0)
@@ -660,6 +679,16 @@ func _draw_boss_phase_adornments(fill_color: Color) -> void:
 				var crack_offset := float(phase) * 7.0
 				draw_line(Vector2(-10.0 + crack_offset, -2.0), Vector2(-2.0 + crack_offset, 18.0), crack_color, 3.2)
 				draw_line(Vector2(10.0 - crack_offset, -2.0), Vector2(2.0 - crack_offset, 18.0), crack_color, 3.2)
+		"red":
+			var flourish_color := Color(fill_color.r, fill_color.g * 0.72, fill_color.b * 0.66, 0.50)
+			for phase in range(_boss_phase_index):
+				var ring_radius := _body_radius * 0.52 + float(phase) * 10.0
+				draw_arc(Vector2(0.0, -8.0), ring_radius, -2.42, -0.74, 16, flourish_color, 2.6)
+				draw_arc(Vector2(0.0, -8.0), ring_radius, PI + 0.74, PI + 2.42, 16, flourish_color, 2.6)
+				var ribbon := 12.0 + float(phase) * 8.0
+				draw_line(Vector2(-18.0 - ribbon, -10.0), Vector2(-30.0 - ribbon, -28.0 - float(phase) * 4.0), flourish_color, 3.0)
+				draw_line(Vector2(18.0 + ribbon, -10.0), Vector2(30.0 + ribbon, -28.0 - float(phase) * 4.0), flourish_color, 3.0)
+			draw_arc(Vector2(0.0, -4.0), _body_radius * 0.40 + float(_boss_phase_index) * 5.0, 0.28, PI - 0.28, 18, Color(1.0, 0.92, 0.76, 0.24), 1.8)
 		"void_matriarch":
 			var iris_radius := _body_radius * 0.44 + float(_boss_phase_index) * 4.0
 			draw_arc(Vector2.ZERO, iris_radius, 0.0, TAU, 48, Color(fill_color.r, fill_color.g, fill_color.b, 0.34), 2.6)
@@ -710,7 +739,7 @@ func _check_boss_phase_transition() -> void:
 		match archetype:
 			"storm_archon":
 				_trigger_signature_burst("storm", 0.56)
-			"forge_tyrant":
+			"forge_tyrant", "red":
 				_trigger_signature_burst("forge", 0.56)
 			"void_matriarch":
 				_trigger_signature_burst("void", 0.56)
@@ -778,7 +807,7 @@ func _trigger_elite_death_affixes() -> void:
 		var burst_radius := _body_radius + 42.0
 		special_attack.emit(global_position, burst_radius, Color(1.0, 0.78, 0.40), Color(0.96, 0.34, 0.18))
 		if _player_in_radius(global_position, burst_radius):
-			target.take_damage(1 + int(_elite_wave_rank >= 8))
+			_deal_damage(1 + int(_elite_wave_rank >= 8))
 
 	if _has_elite_affix("splitter"):
 		summon_requested.emit(global_position, _get_splitter_spawn_type(), 2, 126.0)
@@ -786,7 +815,7 @@ func _trigger_elite_death_affixes() -> void:
 		var flare_radius := _body_radius + 56.0
 		special_attack.emit(global_position, flare_radius, Color(1.0, 0.92, 0.62), Color(0.98, 0.42, 0.20))
 		if _player_in_radius(global_position, flare_radius):
-			target.take_damage(1 + int(_elite_wave_rank >= 8))
+			_deal_damage(1 + int(_elite_wave_rank >= 8))
 
 
 func _get_splitter_spawn_type() -> String:
@@ -965,6 +994,13 @@ func _get_signature_pose() -> Dictionary:
 			offset += Vector2(0.0, 8.0 * forge_charge - 4.0 * burst_peak)
 			rotation += lean_x * 0.05 * burst_peak
 			scale = Vector2(1.08 + 0.04 * forge_peak, 0.90 - 0.05 * forge_charge)
+		"red":
+			var red_charge := clampf(1.0 - _special_timer / 0.60, 0.0, 1.0)
+			var red_peak := maxf(red_charge, burst_peak)
+			offset += forward * (4.0 * burst_peak - 2.0 * red_charge)
+			offset += Vector2(0.0, -6.0 * burst_peak + 4.0 * red_charge)
+			rotation += lean_x * (0.02 * red_charge + 0.08 * burst_peak)
+			scale = Vector2(0.98 + 0.06 * red_peak, 1.04 - 0.04 * red_charge)
 		"void_matriarch":
 			var void_charge := clampf(1.0 - _special_timer / 0.60, 0.0, 1.0)
 			var void_peak := maxf(void_charge, burst_peak)
@@ -991,6 +1027,8 @@ func _get_highlight_color() -> Color:
 			return Color(0.96, 0.60, 0.34)
 		"embermage", "forge_tyrant":
 			return Color(1.0, 0.78, 0.34)
+		"red":
+			return Color(1.0, 0.46, 0.38)
 		"seer", "void_matriarch":
 			return Color(0.82, 0.72, 1.0)
 		"mireling":

@@ -745,6 +745,11 @@ const ENDLESS_WORLD_MUTATIONS := [
 		"score_bonus": 0.30,
 	},
 ]
+const BEECODEX_MAP_ID := "beecodex"
+const BEECODEX_STARTING_LEVEL := 50
+const BEECODEX_STARTING_UPGRADE_CHOICES := 50
+const BEECODEX_BOSS_HEALTH := 1000000
+const BEECODEX_BOSS_DAMAGE := 2147483647
 const MAP_DEFINITIONS := [
 	{
 		"id": "sky_ruins",
@@ -1006,6 +1011,42 @@ const MAP_DEFINITIONS := [
 			{"until": 999.0, "weights": {"embermage": 0.44, "seer": 0.30, "lancer": 0.26}},
 		],
 	},
+	{
+		"id": BEECODEX_MAP_ID,
+		"name": "BeeCode",
+		"tagline": "今天你进入BeeCode开蹬了吗",
+		"description": "BeeCode是最好的中转站",
+		"intro": "BeeCode 协议已接管战场，准备注入 50 次强化选择。",
+		"terrain_hint": "整张图被重绘成开阔的红金礼堂，没有能偷位的掩体，只为让你和 Red 正面碰撞到极限。",
+		"boss_name": "Red",
+		"boss_archetype": "red",
+		"boss_summon_type": "",
+		"enemy_labels": ["无小怪", "只有 Red"],
+		"boss_time": 999999.0,
+		"spawn_rate_bonus": 0.0,
+		"enemy_cap_bonus": -MAX_ENEMIES,
+		"hazard_type": "",
+		"starting_level": BEECODEX_STARTING_LEVEL,
+		"opening_upgrade_choices": BEECODEX_STARTING_UPGRADE_CHOICES,
+		"manual_boss_spawn": true,
+		"solo_boss_arena": true,
+		"force_unbounded_upgrades": true,
+		"deny_clear": true,
+		"disable_regular_spawns": true,
+		"boss_override_health": BEECODEX_BOSS_HEALTH,
+		"boss_override_shield": 0,
+		"boss_override_damage": BEECODEX_BOSS_DAMAGE,
+		"palette": {
+			"style_id": "beecodex",
+			"ground_dark": Color(0.07, 0.02, 0.04),
+			"ground_mid": Color(0.26, 0.06, 0.08),
+			"line_color": Color(0.72, 0.28, 0.20, 0.34),
+			"rune_color": Color(1.0, 0.40, 0.34, 0.20),
+			"ember_color": Color(1.0, 0.88, 0.62, 0.18),
+			"accent_color": Color(0.98, 0.80, 0.56, 0.28),
+		},
+		"waves": [],
+	},
 ]
 const CONTRACT_SPAWN_TIMES := [135.0, 300.0, 465.0]
 const CONTRACT_DEFINITIONS := [
@@ -1106,6 +1147,8 @@ var _projectiles: Array[SpellProjectile] = []
 var _orbs: Array[ExperienceOrb] = []
 var _satellites: Array[SpellSatellite] = []
 var _upgrade_choices: Array[Dictionary] = []
+var _opening_upgrade_choices_remaining: int = 0
+var _manual_boss_spawn_pending: bool = false
 
 var _mobile_layout: bool = false
 var _max_enemy_count: int = MAX_ENEMIES
@@ -1626,6 +1669,31 @@ func _start_run() -> void:
 	_state = GameState.PLAYING
 	_set_pause_state(false)
 	_show_message(String(_current_map.get("intro", "战斗开始。")), Color(0.86, 0.96, 1.0), 3.2)
+	_start_map_opening_sequence()
+	_update_hud()
+
+
+func _start_map_opening_sequence() -> void:
+	var opening_level: int = max(1, int(_current_map.get("starting_level", 1)))
+	if opening_level > _level:
+		_level = opening_level
+		_experience = 0.0
+		_xp_to_next = _get_xp_needed(_level)
+	_update_character_hud_v2()
+
+	_opening_upgrade_choices_remaining = maxi(int(_current_map.get("opening_upgrade_choices", 0)), 0)
+	_manual_boss_spawn_pending = bool(_current_map.get("manual_boss_spawn", false))
+	if _opening_upgrade_choices_remaining > 0:
+		_open_level_up()
+	elif _manual_boss_spawn_pending:
+		_release_manual_boss_spawn()
+
+
+func _release_manual_boss_spawn() -> void:
+	if not _manual_boss_spawn_pending:
+		return
+	_manual_boss_spawn_pending = false
+	_spawn_boss()
 	_update_hud()
 
 
@@ -1851,6 +1919,8 @@ func _reset_progression_state() -> void:
 	_boss_warning_shown = false
 	_boss_prelude_stage = 0
 	_next_boss_spawn_time = _get_initial_boss_spawn_time()
+	_opening_upgrade_choices_remaining = 0
+	_manual_boss_spawn_pending = false
 	if _player != null and is_instance_valid(_player):
 		_player.set_move_speed_multiplier(1.0)
 
@@ -2294,7 +2364,7 @@ func _spawn_role_enemy(role: String, force_elite: bool = false) -> void:
 	if roster.is_empty():
 		return
 	var type_name := roster[_rng.randi_range(0, roster.size() - 1)]
-	var is_elite := force_elite and type_name not in ["storm_archon", "forge_tyrant", "void_matriarch"]
+	var is_elite := force_elite and type_name not in ["storm_archon", "forge_tyrant", "void_matriarch", "red"]
 	_spawn_enemy(type_name, is_elite, {"wave_rank": _get_wave_rank() + int(force_elite)})
 
 
@@ -2338,6 +2408,8 @@ func _roll_elite_affixes(type_name: String, wave_rank: int) -> Array[String]:
 
 
 func _update_contract_points(delta: float) -> void:
+	if _is_solo_boss_arena():
+		return
 	if _contract_zone != null and not is_instance_valid(_contract_zone):
 		_contract_zone = null
 		_contract_zone_progress = 0.0
@@ -6020,6 +6092,8 @@ func _trigger_execution_field(center: Vector2) -> int:
 
 
 func _spawn_regular_enemies() -> void:
+	if bool(_current_map.get("disable_regular_spawns", false)):
+		return
 	while _spawn_budget >= 1.0 and _enemies.size() < _get_active_enemy_cap():
 		_spawn_budget -= 1.0
 		var enemy_type := _pick_weighted_enemy_type()
@@ -6034,6 +6108,11 @@ func _spawn_enemy(type_name: String, is_elite: bool, options: Dictionary = {}) -
 
 	var enemy: EnemySoldier = ENEMY_SCRIPT.new()
 	var enemy_options: Dictionary = options.duplicate(true)
+	var spawn_is_boss: bool = bool(enemy_options.get("boss", false)) or type_name in ["storm_archon", "forge_tyrant", "void_matriarch", "red"]
+	if spawn_is_boss:
+		var boss_damage_override: int = int(_current_map.get("boss_override_damage", 0))
+		if boss_damage_override > 0:
+			enemy_options["damage_override"] = boss_damage_override
 	var spawn_position: Vector2 = options.get("spawn_position", _find_spawn_position(560.0, 980.0, 16.0))
 	var wave_rank := int(options.get("wave_rank", _get_wave_rank()))
 	if is_elite and not bool(enemy_options.get("boss", false)) and not enemy_options.has("elite_affixes"):
@@ -6043,9 +6122,15 @@ func _spawn_enemy(type_name: String, is_elite: bool, options: Dictionary = {}) -
 	var health_scale := 1.0 + _endless_enemy_health_bonus + (0.05 if _threat_phase >= 4 and not enemy.is_boss() else 0.0)
 	if enemy.is_boss():
 		var boss_health: int = max(1, int(round(float(_get_boss_health_reference()) * MODE_BOSS_HEALTH_MULTIPLIER)))
+		var boss_health_override: int = int(_current_map.get("boss_override_health", 0))
+		if boss_health_override > 0:
+			boss_health = boss_health_override
 		enemy.max_health = boss_health
 		enemy.health = boss_health
-		enemy.set_shield(max(1, int(round(float(boss_health) * MODE_BOSS_SHIELD_RATIO))))
+		if _current_map.has("boss_override_shield"):
+			enemy.set_shield(max(0, int(_current_map.get("boss_override_shield", 0))))
+		else:
+			enemy.set_shield(max(1, int(round(float(boss_health) * MODE_BOSS_SHIELD_RATIO))))
 	else:
 		health_scale *= _get_enemy_health_multiplier()
 		enemy.max_health = max(1, int(round(float(enemy.max_health) * health_scale)))
@@ -6620,8 +6705,12 @@ func _open_level_up() -> void:
 
 	_state = GameState.LEVEL_UP
 	_choice_context = "upgrade"
-	_choice_panel_title = "选择一项联动组件"
-	_choice_panel_subtitle = "补强当前构筑，或顺势转向下一条路线。"
+	if _opening_upgrade_choices_remaining > 0:
+		_choice_panel_title = "BeeCodex 协议升级"
+		_choice_panel_subtitle = "剩余 %d 次强化选择。把构筑拉满后，%s 会立刻进场。" % [_opening_upgrade_choices_remaining, _get_current_boss_name()]
+	else:
+		_choice_panel_title = "选择一项联动组件"
+		_choice_panel_subtitle = "补强当前构筑，或顺势转向下一条路线。"
 	_upgrade_choices = _build_upgrade_choices()
 	_hud.hide_pause_menu()
 	_apply_choice_panel_context()
@@ -7774,6 +7863,14 @@ func _apply_character_upgrade_choice(index: int) -> void:
 
 	_state = GameState.PLAYING
 	_set_pause_state(false)
+	if _opening_upgrade_choices_remaining > 0:
+		_opening_upgrade_choices_remaining = maxi(_opening_upgrade_choices_remaining - 1, 0)
+		if _opening_upgrade_choices_remaining > 0:
+			_open_level_up()
+			return
+		if _manual_boss_spawn_pending:
+			_release_manual_boss_spawn()
+			return
 	if _experience >= _xp_to_next:
 		_open_level_up()
 	return
@@ -8738,6 +8835,10 @@ func _get_objective_text() -> String:
 		var phase_index := _boss_enemy.get_boss_phase_index()
 		if phase_index > 0:
 			boss_phase_suffix = " P%d" % (phase_index + 1)
+	if _opening_upgrade_choices_remaining > 0:
+		return "%s   协议升级   剩余选择 %d" % [_get_current_map_name(), _opening_upgrade_choices_remaining]
+	if _is_solo_boss_arena() and _manual_boss_spawn_pending:
+		return "%s   协议完成   %s 待命" % [_get_current_map_name(), _get_current_boss_name()]
 	if _is_endless_mode():
 		if _boss_spawned and _boss_enemy != null and is_instance_valid(_boss_enemy):
 			return "%s   无尽首领：%s%s" % [_get_current_map_name(), _get_current_boss_name(), boss_phase_suffix]
@@ -8847,6 +8948,22 @@ func _on_run_cleared() -> void:
 		"返回选图"
 	)
 	_show_message("%s 已肃清" % _get_current_map_name(), Color(0.86, 0.98, 1.0), 99.0)
+
+
+func _end_run_without_clear() -> void:
+	_release_direction_actions()
+	_state = GameState.GAME_OVER
+	_set_pause_state(true)
+	_hud.hide_upgrade_choices()
+	_hud.hide_pause_menu()
+	var record_result := _record_map_best_kills(_selected_map_id, _kills)
+	_record_run_history(false)
+	_hud.show_result(
+		"BeeCodex 驳回结算",
+		"你击穿了 %s，但 %s 不提供通关判定。它的设计目标就是不让任何人顺利过关。角色：%s，存活 %s，击败 %d 名敌人。%s" % [_get_current_boss_name(), _get_current_map_name(), _get_current_character_name(), _format_time(_run_time), _kills, _build_record_result_suffix(record_result)],
+		"返回选图"
+	)
+	_show_message("%s 拒绝通关" % _get_current_map_name(), Color(1.0, 0.74, 0.58), 99.0)
 
 
 func _cleanup_far_entities() -> void:
@@ -9939,6 +10056,9 @@ func _on_enemy_defeated(enemy: EnemySoldier, experience_value: int) -> void:
 		_boss_spawned = false
 		_spawn_effect(enemy.global_position, 150.0, Color(1.0, 0.86, 0.56), Color(1.0, 0.40, 0.20), 0.60)
 		_audio.play_kill(true)
+		if bool(_current_map.get("deny_clear", false)):
+			_end_run_without_clear()
+			return
 		if _is_endless_mode():
 			_schedule_next_boss_spawn()
 			_show_message("%s 已被击退，下一波首领正在逼近。" % _get_current_boss_name(), Color(1.0, 0.88, 0.60), 2.8)
@@ -9957,6 +10077,8 @@ func _on_enemy_special_attack(position: Vector2, radius: float, primary_color: C
 
 
 func _on_enemy_summon_requested(position: Vector2, summon_type: String, count: int, radius: float) -> void:
+	if _is_solo_boss_arena():
+		return
 	var spawn_total := mini(count, max(0, _get_active_enemy_cap() - _enemies.size()))
 	for index in range(spawn_total):
 		var angle := TAU * float(index) / float(max(spawn_total, 1)) + _rng.randf_range(-0.25, 0.25)
@@ -9981,6 +10103,11 @@ func _on_boss_phase_changed(enemy: EnemySoldier, phase_index: int) -> void:
 		var surge_radius := 64.0 + float(phase_index) * 8.0
 		_spawn_prelude_blast_marker(enemy.global_position, surge_radius, 0.08, 200.0 + float(phase_index) * 16.0, 0.48, Color(1.0, 0.88, 0.62), Color(0.94, 0.28, 0.18))
 	_apply_area_current_health_damage(enemy.global_position, 84.0 + float(phase_index) * 12.0, 0.07 + float(phase_index) * 0.01, 200.0)
+	if _is_solo_boss_arena():
+		var solo_form_title := _get_boss_form_shift_title(enemy, phase_index)
+		_show_message("%s 进入%s · %s。BeeCodex 仍然不给你任何喘息。" % [_get_current_boss_name(), _get_boss_phase_title(phase_index), solo_form_title], Color(1.0, 0.90, 0.64), 3.4)
+		_update_hud()
+		return
 	_spawn_boss_phase_reinforcements(phase_index)
 
 	var extra_text := "战场规则开始介入。"
@@ -10016,6 +10143,8 @@ func _get_boss_form_shift_title(enemy: EnemySoldier, phase_index: int) -> String
 			return "风翼裂展" if phase_index >= 2 else "雷翼展开"
 		"forge_tyrant":
 			return "炉芯开裂" if phase_index >= 2 else "熔炉增压"
+		"red":
+			return "赤纹失控" if phase_index >= 2 else "礼装解放"
 		"void_matriarch":
 			return "瞳核分裂" if phase_index >= 2 else "触须延展"
 		_:
@@ -10023,6 +10152,8 @@ func _get_boss_form_shift_title(enemy: EnemySoldier, phase_index: int) -> String
 
 
 func _spawn_boss_phase_reinforcements(phase_index: int) -> void:
+	if _is_solo_boss_arena():
+		return
 	var roles: Array[String] = []
 	match _selected_map_id:
 		"sky_ruins":
@@ -10329,8 +10460,12 @@ func _is_hard_mode() -> bool:
 	return _current_run_mode_id == RUN_MODE_HARD
 
 
+func _is_solo_boss_arena() -> bool:
+	return bool(_current_map.get("solo_boss_arena", false))
+
+
 func _is_unbounded_upgrade_mode() -> bool:
-	return _is_endless_mode() or _is_hard_mode()
+	return _is_endless_mode() or _is_hard_mode() or bool(_current_map.get("force_unbounded_upgrades", false))
 
 
 func _get_current_character_definition() -> Dictionary:

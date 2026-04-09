@@ -32,6 +32,13 @@ func configure(new_chunk_coord: Vector2i, new_chunk_size: Vector2, palette: Dict
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, chunk_size + Vector2.ONE), ground_dark)
 	match style_id:
+		"beecodex":
+			_draw_beecodex_stage()
+			_draw_beecodex_lanes()
+			_draw_beecodex_hexes()
+			_draw_beecodex_roses()
+			_draw_beecodex_nodes()
+			_draw_beecodex_shards()
 		"bridge_train":
 			_draw_bridge_train_tracks()
 			_draw_bridge_train_break_zones()
@@ -172,6 +179,132 @@ func _draw_sky_relics() -> void:
 		draw_arc(center, wing_span * 0.22, 0.0, TAU, 22, Color(rune_color.r, rune_color.g, rune_color.b, 0.40), 2.2)
 		draw_arc(center + Vector2(0.0, 4.0), wing_span * 0.12, 0.0, TAU, 18, Color(accent_color.r, accent_color.g, accent_color.b, 0.32), 1.8)
 		draw_circle(center, 7.0, Color(0.94, 0.96, 0.88, 0.26))
+
+
+func _draw_beecodex_stage() -> void:
+	var center := chunk_size * 0.5
+	var outer_rect := Rect2(center - Vector2(500.0, 340.0), Vector2(1000.0, 680.0))
+	draw_rect(outer_rect, Color(ground_mid.r, ground_mid.g, ground_mid.b, 0.16))
+	draw_rect(outer_rect.grow(-26.0), Color(ground_dark.r, ground_dark.g, ground_dark.b, 0.24))
+	var promenade := Rect2(Vector2(90.0, center.y - 84.0), Vector2(chunk_size.x - 180.0, 168.0))
+	_draw_warning_chevrons(
+		promenade,
+		Color(accent_color.r, accent_color.g, accent_color.b, 0.08),
+		Color(ground_dark.r, ground_dark.g, ground_dark.b, 0.08),
+		54.0
+	)
+	draw_circle(center, 286.0, Color(rune_color.r, rune_color.g, rune_color.b, 0.08))
+	draw_arc(center, 286.0, 0.0, TAU, 48, Color(accent_color.r, accent_color.g, accent_color.b, 0.30), 3.0)
+	draw_arc(center, 182.0, 0.0, TAU, 32, Color(1.0, 0.92, 0.72, 0.18), 2.0)
+	for corner in [
+		Vector2(132.0, 132.0),
+		Vector2(chunk_size.x - 132.0, 132.0),
+		Vector2(132.0, chunk_size.y - 132.0),
+		Vector2(chunk_size.x - 132.0, chunk_size.y - 132.0),
+	]:
+		draw_circle(corner, 18.0, Color(ember_color.r, ember_color.g, ember_color.b, 0.16))
+		draw_arc(corner, 34.0, 0.0, TAU, 18, Color(accent_color.r, accent_color.g, accent_color.b, 0.24), 1.6)
+
+
+func _draw_beecodex_lanes() -> void:
+	var major_line := Color(line_color.r, line_color.g, line_color.b, 0.22)
+	var minor_line := Color(accent_color.r, accent_color.g, accent_color.b, 0.12)
+	var center := chunk_size * 0.5
+	for band in range(3):
+		var y := 300.0 + float(band) * 320.0
+		draw_rect(Rect2(Vector2(0.0, y - 42.0), Vector2(chunk_size.x, 84.0)), Color(line_color.r, line_color.g, line_color.b, 0.12))
+		draw_rect(Rect2(Vector2(0.0, y - 18.0), Vector2(chunk_size.x, 36.0)), Color(ground_mid.r, ground_mid.g, ground_mid.b, 0.18))
+	for index in range(9):
+		var x := 120.0 + float(index) * 170.0
+		draw_line(Vector2(x, 0.0), Vector2(x, chunk_size.y), major_line, 1.4)
+	for index in range(9):
+		var y := 120.0 + float(index) * 170.0
+		draw_line(Vector2(0.0, y), Vector2(chunk_size.x, y), major_line, 1.4)
+	for index in range(7):
+		var offset := -520.0 + float(index) * 170.0
+		draw_line(center + Vector2(offset, -620.0), center + Vector2(offset + 320.0, 620.0), minor_line, 1.0)
+		draw_line(center + Vector2(offset, 620.0), center + Vector2(offset + 320.0, -620.0), minor_line, 1.0)
+	draw_arc(center, 220.0, 0.0, TAU, 42, Color(accent_color.r, accent_color.g, accent_color.b, 0.42), 2.8)
+	draw_arc(center, 390.0, 0.0, TAU, 54, Color(rune_color.r, rune_color.g, rune_color.b, 0.34), 1.8)
+
+
+func _draw_beecodex_hexes() -> void:
+	for row in range(4):
+		for column in range(5):
+			var center := Vector2(250.0 + float(column) * 280.0, 250.0 + float(row) * 280.0 + float(column % 2) * 70.0)
+			var hex := _build_beecodex_hex_loop(center, 62.0)
+			draw_polyline(hex, Color(rune_color.r, rune_color.g, rune_color.b, 0.46), 2.0, true)
+			draw_circle(center, 10.0, Color(accent_color.r, accent_color.g, accent_color.b, 0.18))
+			draw_arc(center, 28.0, 0.0, TAU, 18, Color(1.0, 0.92, 0.78, 0.14), 1.4)
+
+
+func _draw_beecodex_roses() -> void:
+	var rng := _make_rng(191)
+	for _rose_index in range(8):
+		var center := Vector2(
+			rng.randf_range(160.0, chunk_size.x - 160.0),
+			rng.randf_range(160.0, chunk_size.y - 160.0)
+		)
+		_draw_beecodex_rose(center, rng.randf_range(30.0, 46.0))
+
+
+func _draw_beecodex_nodes() -> void:
+	var rng := _make_rng(187)
+	var center := chunk_size * 0.5
+	for _node_index in range(16):
+		var point := Vector2(
+			rng.randf_range(140.0, chunk_size.x - 140.0),
+			rng.randf_range(140.0, chunk_size.y - 140.0)
+		)
+		var radius := rng.randf_range(12.0, 24.0)
+		draw_circle(point, radius, Color(ember_color.r, ember_color.g, ember_color.b, 0.12))
+		draw_arc(point, radius + 6.0, 0.0, TAU, 20, Color(accent_color.r, accent_color.g, accent_color.b, 0.46), 1.6)
+		if point.distance_to(center) > 120.0:
+			draw_line(point, center.lerp(point, 0.32), Color(line_color.r, line_color.g, line_color.b, 0.18), 1.2)
+
+
+func _draw_beecodex_shards() -> void:
+	var rng := _make_rng(223)
+	for _shard_index in range(18):
+		var center := Vector2(
+			rng.randf_range(80.0, chunk_size.x - 80.0),
+			rng.randf_range(80.0, chunk_size.y - 80.0)
+		)
+		var width := rng.randf_range(14.0, 28.0)
+		var height := rng.randf_range(24.0, 46.0)
+		var shard := PackedVector2Array([
+			center + Vector2(0.0, -height * 0.5),
+			center + Vector2(width * 0.42, -height * 0.10),
+			center + Vector2(0.0, height * 0.5),
+			center + Vector2(-width * 0.42, -height * 0.10),
+		])
+		draw_colored_polygon(shard, Color(accent_color.r, accent_color.g, accent_color.b, 0.14))
+		draw_line(shard[0], shard[2], Color(1.0, 0.92, 0.74, 0.14), 1.2)
+
+
+func _build_beecodex_hex_loop(center: Vector2, radius: float) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for index in range(6):
+		var angle := TAU * float(index) / 6.0 + PI / 6.0
+		points.append(center + Vector2.RIGHT.rotated(angle) * radius)
+	points.append(points[0])
+	return points
+
+
+func _draw_beecodex_rose(center: Vector2, radius: float) -> void:
+	draw_circle(center, radius * 0.36, Color(ember_color.r, ember_color.g, ember_color.b, 0.14))
+	for index in range(6):
+		var angle := TAU * float(index) / 6.0 - PI * 0.5
+		var direction := Vector2.RIGHT.rotated(angle)
+		var side := direction.orthogonal() * radius * 0.18
+		var petal := PackedVector2Array([
+			center + direction * radius * 0.28 - side,
+			center + direction * radius,
+			center + direction * radius * 0.28 + side,
+			center + direction * radius * 0.10,
+		])
+		draw_colored_polygon(petal, Color(rune_color.r, rune_color.g, rune_color.b, 0.16))
+	draw_arc(center, radius * 0.72, 0.0, TAU, 20, Color(accent_color.r, accent_color.g, accent_color.b, 0.30), 1.6)
 
 
 func _draw_foundry_channels() -> void:
@@ -786,6 +919,8 @@ func _build_obstacle_specs(rng: RandomNumberGenerator) -> Array[Dictionary]:
 	var colors := _get_obstacle_palette()
 	var specs: Array[Dictionary] = []
 	match style_id:
+		"beecodex":
+			specs = []
 		"bridge_train":
 			specs = _build_bridge_train_specs(rng, colors)
 		"black_fog_hunt":
@@ -807,6 +942,13 @@ func _build_obstacle_specs(rng: RandomNumberGenerator) -> Array[Dictionary]:
 
 func _get_obstacle_palette() -> Dictionary:
 	match style_id:
+		"beecodex":
+			return {
+				"body": Color(0.34, 0.10, 0.12),
+				"top": Color(1.0, 0.68, 0.42),
+				"detail": Color(0.18, 0.06, 0.08),
+				"glow": Color(1.0, 0.74, 0.52, 0.18),
+			}
 		"bridge_train":
 			return {
 				"body": Color(0.28, 0.29, 0.32),
