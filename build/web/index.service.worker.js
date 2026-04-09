@@ -1,10 +1,10 @@
-// This service worker is required to expose an exported Godot project as a
+﻿// This service worker is required to expose an exported Godot project as a
 // Progressive Web App. It provides an offline fallback page telling the user
 // that they need an Internet connection to run the project if desired.
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1775753186|6032735';
+const CACHE_VERSION = '20260410013631';
 /** @type {string} */
 const CACHE_PREFIX = '钢翼秘术旅团-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
@@ -14,10 +14,10 @@ const OFFLINE_URL = 'index.offline.html';
 const ENSURE_CROSSORIGIN_ISOLATION_HEADERS = true;
 // Files that will be cached on load.
 /** @type {string[]} */
-const CACHED_FILES = ["index.html","index.js","index.offline.html","index.icon.png","index.apple-touch-icon.png","index.audio.worklet.js","index.audio.position.worklet.js"];
+const CACHED_FILES = ["index.html","index.js?v=20260410013631","index.offline.html","index.icon.png","index.apple-touch-icon.png","index.audio.worklet.js?v=20260410013631","index.audio.position.worklet.js?v=20260410013631"];
 // Files that we might not want the user to preload, and will only be cached on first load.
 /** @type {string[]} */
-const CACHEABLE_FILES = ["index.wasm","index.pck"];
+const CACHEABLE_FILES = ["index.wasm?v=20260410013631","index.pck?v=20260410013631"];
 const FULL_CACHE = CACHED_FILES.concat(CACHEABLE_FILES);
 
 self.addEventListener('install', (event) => {
@@ -163,4 +163,5 @@ self.addEventListener('message', (event) => {
 		}
 	});
 });
+
 
